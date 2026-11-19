@@ -2536,9 +2536,12 @@ async def admin_callback_handler(update: Update, context: ContextTypes.DEFAULT_T
     data = query.data
 
     if data == "adm_back_to_admin":
-        await query.edit_message_text(
-            "🔑 **Returning to Admin Panel...**",
-            reply_markup=get_admin_keyboard(user_id)
+        await safe_delete_message(context, query.message.chat_id, query.message.message_id)
+        await context.bot.send_message(
+            chat_id=query.message.chat_id,
+            text="🔑 <b>Admin Panel</b>",
+            reply_markup=get_admin_keyboard(user_id),
+            parse_mode=ParseMode.HTML
         )
         return
 
@@ -2547,7 +2550,7 @@ async def admin_callback_handler(update: Update, context: ContextTypes.DEFAULT_T
         current = get_setting_val(key, "OFF")
         new_val = "ON" if current == "OFF" else "OFF"
         set_setting_val(key, new_val)
-        await query.edit_message_text(f"✅ ````{key}```` toggled to ````{new_val}````.")
+        await query.edit_message_text(f"✅ <code>{html.escape(key)}</code> → <b>{html.escape(new_val)}</b>", parse_mode=ParseMode.HTML)
         return
 
     if data == "adm_edit_force_channels_list":
@@ -2627,7 +2630,7 @@ async def admin_callback_handler(update: Update, context: ContextTypes.DEFAULT_T
     if data.startswith("adm_edit_"):
         setting_key = data.replace("adm_edit_", "")
         context.user_data["edit_setting_key"] = setting_key
-        await query.edit_message_text(f"✏️ Send new value for **{setting_key}**:")
+        await query.edit_message_text(f"✏️ Send new value for <code>{html.escape(setting_key)}</code>:", parse_mode=ParseMode.HTML)
         return STATE_ADMIN_SETTING_VAL
 
     # Sub Admin Controls
@@ -3658,7 +3661,7 @@ def main():
             MessageHandler(filters.Regex(btn_adm_bulk_rej_re), admin_bulk_reject_prompt),
             CallbackQueryHandler(
                 admin_callback_handler,
-                pattern="^(adm_usr_ban|adm_usr_unban|adm_usr_add_bal|adm_usr_sub_bal|adm_usr_search|adm_add_subadmin|adm_rem_subadmin|adm_edit_|adm_edit_force_channels_list|adm_fj_add|adm_rej_custom_)"
+                pattern="^(adm_usr_ban|adm_usr_unban|adm_usr_add_bal|adm_usr_sub_bal|adm_usr_search|adm_add_subadmin|adm_rem_subadmin|adm_edit_(?!force_channels_list)|adm_fj_add|adm_rej_custom_)"
             ),
         ],
         states={
@@ -3765,7 +3768,7 @@ def main():
     app.add_handler(CallbackQueryHandler(admin_excel_clear_cb, pattern="^adm_cls_"))
     app.add_handler(CallbackQueryHandler(
         admin_callback_handler,
-        pattern="^(adm_app_sub_|adm_hold_sub_|adm_rej_prompt_|adm_rej_act_|adm_rej_custom_|adm_app_wd_|adm_rej_wd_|adm_back_to_admin|adm_toggle_|adm_edit_|adm_fj_|adm_add_subadmin|adm_rem_subadmin|adm_usr_)"
+        pattern="^(adm_app_sub_|adm_hold_sub_|adm_rej_prompt_|adm_rej_act_|adm_app_wd_|adm_rej_wd_|adm_back_to_admin|adm_toggle_|adm_edit_force_channels_list|adm_fj_del_|adm_fj_clear|adm_usr_banned_list|adm_usr_reset_balances)"
     ))
 
     logger.info("Trust Vault Mails Style Bot successfully started!")
