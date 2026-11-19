@@ -261,6 +261,8 @@ def init_db():
             "wd_nagad_active": "ON",
             "wd_usdt_active": "ON",
             "min_withdraw_bkash": "50.0",
+            "bkash_charge_bdt": "0.0",
+            "nagad_charge_bdt": "0.0",
             "max_withdraw_bkash": "5000.0",
             "min_withdraw_nagad": "50.0",
             "max_withdraw_nagad": "5000.0",
@@ -355,7 +357,7 @@ MESSAGES = {
         "wd_all_disabled": "❌ বর্তমানে সকল পেমেন্ট মেথড বন্ধ রয়েছে। অনুগ্রহ করে পরে চেষ্টা করুন।",
         "task_cat_prompt": "💎 **প্রিমিয়ার টাস্ক মেনু**\n━━━━━━━━━━━━━━━━━━━━━━\n👉 কাজ শুরু করতে নিচের **📧 জিমেইল (Gmail)** বাটনে চাপ দিন:",
         "task_off_gmail": "❌ জিমেইলের কাজ বর্তমানে বন্ধ রয়েছে।",
-        "gmail_guidelines": "**New Gmail Work:**\n━━━━━━━━━━━━━━━━━━━━━━\n💵 **টাস্ক বোনাস:** ৳{price}\n🔑 **নির্ধারিত পাসওয়ার্ড (ট্যাপ করে কপি করুন):**\n<code>{fixed_pass}</code>\n━━━━━━━━━━━━━━━━━━━━━━\n👉 ১. একটি নতুন জিমেইল অ্যাকাউন্ট তৈরি করে পাসওয়ার্ড হিসেবে ওপরের পাসওয়ার্ডটি দিন।\n👉 ২. কাজ শেষ হলে আপনার তৈরি করা **জিমেইল অ্যাড্রেসটি** নিচে লিখে পাঠান:",
+        "gmail_guidelines": "✨ <b>New Gmail Work</b>\n━━━━━━━━━━━━━━━━━━━━━━\n💵 <b>রেট (প্রতি জিমেইল):</b> ৳{price}\n🔑 <b>পাসওয়ার্ড (ট্যাপ করে কপি করুন):</b> <code>{fixed_pass}</code>\n━━━━━━━━━━━━━━━━━━━━━━\n<b>কাজের নিয়মাবলি:</b>\n১. উপরের পাসওয়ার্ড দিয়ে একটি নতুন Gmail তৈরি করুন।\n২. তৈরি করা Gmail অ্যাড্রেসটি নিচে লিখে পাঠান।\n৩. এরপর নিচের <b>Submit Gmail</b> বাটনে চাপ দিন।",
         "btn_done": "Submit Gmail",
         "file_received_msg": "📄 **ফাইল/ডেটা সফলভাবে গ্রহণ করা হয়েছে!**\n\nকাজটি রিভিউয়ের জন্য জমা দিতে নিচে **'✅ জমা দিন (Done)'** বাটনে চাপ দিন।",
         "no_file_or_data_err": "⚠️ **কোনো ফাইল বা ডেটা পাওয়া যায়নি!**\n\nপ্রথমে এক্সেল ফাইল (.xlsx) বা টেক্সট পাঠান, তারপর **'✅ জমা দিন (Done)'** বাটনে চাপ দিন।",
@@ -365,7 +367,7 @@ MESSAGES = {
         "otp_need_verify_first": "⚠️ **প্রথমে 2FA সিক্রেট কি ভেরিফাই করুন!**\n\n'🔑 2FA Code Generate করুন' বাটনে চাপ দিন।",
         "enter_username_prompt": "👤 **আপনার অ্যাকাউন্টের ইউজারনেম/ইমেইল/UID টাইপ করে পাঠান:**",
         "task_submitted_success": "🎉 <b>টাস্ক সফলভাবে জমা দেওয়া হয়েছে!</b> ✨\n━━━━━━━━━━━━━━━━━━━━━━\n🆔 <b>টাস্ক আইডি:</b> #{sub_id}\n📱 <b>টাইপ:</b> {task_display}\n👤 <b>ইউজারনেম:</b> <code>{username}</code>\n━━━━━━━━━━━━━━━━━━━━━━\n🔍 <b>আপনার তথ্য সফলভাবে পাওয়া গেছে!</b>\n\nআগামী ২৪ থেকে ৪৮ ঘণ্টার মধ্যে আপনার একাউন্ট চেক করে ব্যালেন্স যোগ করে দেওয়া হবে।\n\nএডমিন রিভিউ করে দ্রুত আপনার ওয়ালেটে ব্যালেন্স যুক্ত করে দেবে।\n\nধন্যবাদ!",
-        "gmail_submitted_success": "🎉 **জিমেইল টাস্ক জমা দেওয়া হয়েছে!**\n\n🆔 **টাস্ক আইডি:** #{sub_id}\n🔍 **আপনার তথ্য সফলভাবে পাওয়া গেছে!**\n\nআগামী ২৪ থেকে ৪৮ ঘণ্টার মধ্যে আপনার একাউন্ট চেক করে ব্যালেন্স যোগ করে দেওয়া হবে।\n\nএডমিন রিভিউ করে দ্রুত আপনার ওয়ালেটে ব্যালেন্স যুক্ত করে দেবে।\n\nধন্যবাদ!",
+        "gmail_submitted_success": "✅ <b>Gmail সফলভাবে জমা হয়েছে!</b>\n━━━━━━━━━━━━━━━━━━━━━━\n🆔 <b>টাস্ক আইডি:</b> #{sub_id}\n⏳ <b>স্ট্যাটাস:</b> রিভিউ পেন্ডিং (২৪–৪৮ ঘণ্টা)\n━━━━━━━━━━━━━━━━━━━━━━\nচেক সম্পন্ন হলেই আপনার ওয়ালেটে ব্যালেন্স যোগ করে দেওয়া হবে।",
         "operation_cancelled": "❌ কাজটি বাতিল করা হয়েছে।",
         "returning_main_menu": "🔙 মূল মেনুতে ফিরে যাচ্ছেন...",
 
@@ -412,7 +414,7 @@ MESSAGES = {
         "admin_price_mgr_title": "🏷️ **টাস্ক প্রাইস ম্যানেজার (Task Price Management)**\n━━━━━━━━━━━━━━━━━━━━━━\n✉️ Gmail: <code>৳{gmail}</code>\n👥 Ref Bonus: <code>{ref_bonus}%</code>\n━━━━━━━━━━━━━━━━━━━━━━\nনতুন দাম নির্ধারণ করতে নিচের বাটনে চাপ দিন:",
         "admin_no_pending_wds": "✅ কোনো পেন্ডিং উইথড্র রিকোয়েস্ট নেই।",
         "admin_pending_wds_title": "💸 **পেন্ডিং উইথড্র রিকোয়েস্ট:**\n\n",
-        "admin_sys_settings_title": "⚙️ **সিস্টেম সেটিংস (ON/OFF Toggles & Controls)**\n━━━━━━━━━━━━━━━━━━━━━━\n🔒 Force Join Status: {force_join}\n🛠️ Maintenance Mode: {maint}\n✉️ Gmail: {gmail}\n🟢 Bkash WD: {bkash_wd} (Min: {min_bkash} | Max: {max_bkash})\n🟠 Nagad WD: {nagad_wd} (Min: {min_nagad} | Max: {max_nagad})\n🔵 USDT WD: {usdt_wd} (Min: {min_usdt} | Max: {max_usdt})\n💱 USDT Rate: ৳{usdt_rate}/USDT\n💳 USDT Charge: {charge_status} ({charge_usdt} USDT)\n━━━━━━━━━━━━━━━━━━━━━━\nটগল বা পরিবর্তন করতে নিচের বাটন ব্যবহার করুন।",
+        "admin_sys_settings_title": "⚙️ **সিস্টেম সেটিংস (ON/OFF Toggles & Controls)**\n━━━━━━━━━━━━━━━━━━━━━━\n🔒 Force Join Status: {force_join}\n🛠️ Maintenance Mode: {maint}\n✉️ Gmail: {gmail}\n🟢 Bkash WD: {bkash_wd} (Min: {min_bkash} | Max: {max_bkash} | Charge: ৳{bkash_charge})\n🟠 Nagad WD: {nagad_wd} (Min: {min_nagad} | Max: {max_nagad} | Charge: ৳{nagad_charge})\n🔵 USDT WD: {usdt_wd} (Min: {min_usdt} | Max: {max_usdt})\n💱 USDT Rate: ৳{usdt_rate}/USDT\n💳 USDT Charge: {charge_status} ({charge_usdt} USDT)\n━━━━━━━━━━━━━━━━━━━━━━\nটগল বা পরিবর্তন করতে নিচের বাটন ব্যবহার করুন।",
         "admin_live_stats_title": "📊 **লাইভ স্ট্যাটাস** ⚡\n━━━━━━━━━━━━━━━━━━━━━━\n👥 মোট ইউজার: {total_users}\n⏳ পেন্ডিং টাস্ক: {pending_tasks}\n⌛ হোল্ড টাস্ক: {held_tasks}\n✅ এপ্রুভড টাস্ক: {approved_tasks}\n❌ রিজেক্টেড টাস্ক: {rejected_tasks}\n💸 পেন্ডিং উইথড্র: {pending_wd}\n💰 মোট ইউজার ব্যালেন্স: ৳{total_balance:.2f}",
         "admin_broadcast_prompt_msg": "𝚁𝙱𝙺 𝙰𝙿𝙿 𝚂𝚃𝙾𝚁𝙴: 📢 Broadcast Message পাঠান (All Media Supported)\n━━━━━━━━━━━━━━━━━━━━━━\nএখানে পছন্দমতো যেকোনো **Text, Photo 🖼️, Video 🎥, Document 📄, Voice 🎤, Audio 🎵** সেন্ড করুন। ক্যাপশন থাকলে ক্যাপশনসহ ইউজারদের কাছে অরিজিনাল মেসেজ হিসেবে যাবে।",
         "admin_search_no_results": "❌ কোনো টাস্ক পাওয়া যায়নি।",
@@ -471,7 +473,7 @@ MESSAGES = {
         "wd_all_disabled": "❌ All withdrawal gateways are currently disabled. Please try again later.",
         "task_cat_prompt": "💎 **Premier Task Menu**\n━━━━━━━━━━━━━━━━━━━━━━\n👉 Press **📧 Gmail** below to start working:",
         "task_off_gmail": "❌ Gmail tasks are currently disabled.",
-        "gmail_guidelines": "**New Gmail Work Guidelines:**\n\n💵 **Task Bonus:** ৳{price}\n🔑 **Password (Tap to copy):**\n<code>{fixed_pass}</code>\n\n👉 Create a new Gmail account using the password above.\nOnce completed, reply with your created **Gmail address** below:",
+        "gmail_guidelines": "✨ <b>New Gmail Work</b>\n━━━━━━━━━━━━━━━━━━━━━━\n💵 <b>Rate (Per Gmail):</b> ৳{price}\n🔑 <b>Password (Tap to copy):</b> <code>{fixed_pass}</code>\n━━━━━━━━━━━━━━━━━━━━━━\n<b>Instructions:</b>\n1. Create a new Gmail account using the password above.\n2. Send your created Gmail address below.\n3. Tap <b>Submit Gmail</b> to complete.",
         "btn_done": "Submit Gmail",
         "file_received_msg": "📄 **File/Data received successfully!**\n\nPress **'✅ Submit (Done)'** below to send it to the admin.",
         "no_file_or_data_err": "⚠️ **No file or data found!**\n\nPlease send an Excel file (.xlsx) or text first, then press **'✅ Submit (Done)'**.",
@@ -481,7 +483,7 @@ MESSAGES = {
         "otp_need_verify_first": "⚠️ **Please verify your 2FA Secret Key first!**\n\nPress the '🔑 Generate 2FA Code' button.",
         "enter_username_prompt": "👤 **Type and send your account Username/Email/UID:**",
         "task_submitted_success": "🎉 <b>Task submitted successfully!</b> ✨\n━━━━━━━━━━━━━━━━━━━━━━\n🆔 <b>Task ID:</b> #{sub_id}\n📱 <b>Type:</b> {task_display}\n👤 <b>Username:</b> <code>{username}</code>\n━━━━━━━━━━━━━━━━━━━━━━\n🔍 <b>Your information has been received successfully!</b>\n\nYour account will be checked and the balance will be added within 24–48 hours.\n\nThe admin will review your submission and credit your wallet as soon as possible.\n\nThank you!",
-        "gmail_submitted_success": "🎉 **Gmail task submitted!**\n\n🆔 **Task ID:** #{sub_id}\n🔍 **Your information has been received successfully!**\n\nYour account will be checked and the balance will be added within 24–48 hours.\n\nThe admin will review your submission and credit your wallet as soon as possible.\n\nThank you!",
+        "gmail_submitted_success": "✅ <b>Gmail Submitted Successfully!</b>\n━━━━━━━━━━━━━━━━━━━━━━\n🆔 <b>Task ID:</b> #{sub_id}\n⏳ <b>Status:</b> Pending Review (24–48 hrs)\n━━━━━━━━━━━━━━━━━━━━━━\nYour wallet will be credited as soon as the review is complete.",
         "operation_cancelled": "❌ Operation cancelled.",
         "returning_main_menu": "🔙 Returning to Main Menu...",
 
@@ -528,7 +530,7 @@ MESSAGES = {
         "admin_price_mgr_title": "🏷️ **Task Price Manager**\n\n✉️ Gmail: <code>৳{gmail}</code>\n👥 Ref Bonus: <code>{ref_bonus}%</code>\n\nUse buttons below to set new prices:",
         "admin_no_pending_wds": "✅ No pending withdrawal requests.",
         "admin_pending_wds_title": "💸 **Pending Withdrawal Requests:**\n\n",
-        "admin_sys_settings_title": "⚙️ **System Settings (ON/OFF Toggles)**\n\n🔒 Force Join: {force_join}\n🛠️ Maintenance: {maint}\n✉️ Gmail: {gmail}\n🟢 Bkash WD: {bkash_wd} (Min: {min_bkash} | Max: {max_bkash})\n🟠 Nagad WD: {nagad_wd} (Min: {min_nagad} | Max: {max_nagad})\n🔵 USDT WD: {usdt_wd} (Min: {min_usdt} | Max: {max_usdt})\n💱 USDT Rate: ৳{usdt_rate}/USDT\n💳 USDT Charge: {charge_status} ({charge_usdt} USDT)\n\nUse buttons below to toggle or edit settings.",
+        "admin_sys_settings_title": "⚙️ **System Settings (ON/OFF Toggles)**\n\n🔒 Force Join: {force_join}\n🛠️ Maintenance: {maint}\n✉️ Gmail: {gmail}\n🟢 Bkash WD: {bkash_wd} (Min: {min_bkash} | Max: {max_bkash} | Charge: ৳{bkash_charge})\n🟠 Nagad WD: {nagad_wd} (Min: {min_nagad} | Max: {max_nagad} | Charge: ৳{nagad_charge})\n🔵 USDT WD: {usdt_wd} (Min: {min_usdt} | Max: {max_usdt})\n💱 USDT Rate: ৳{usdt_rate}/USDT\n💳 USDT Charge: {charge_status} ({charge_usdt} USDT)\n\nUse buttons below to toggle or edit settings.",
         "admin_live_stats_title": "📊 **Live Stats**\n\n👥 Total Users: {total_users}\n⏳ Pending Tasks: {pending_tasks}\n⌛ Hold Tasks: {held_tasks}\n✅ Approved Tasks: {approved_tasks}\n❌ Rejected Tasks: {rejected_tasks}\n💸 Pending Withdrawals: {pending_wd}\n💰 Total User Balance: ৳{total_balance:.2f}",
         "admin_broadcast_prompt_msg": "𝚁𝙱𝙺 𝙰𝙿𝙿 𝚂𝚃𝙾𝚁𝙴: 📢 Broadcast Message পাঠান (All Media Supported)\n━━━━━━━━━━━━━━━━━━━━━━\nSend any **Text, Photo 🖼️, Video 🎥, Document 📄, Voice 🎤, Audio 🎵**. Caption will be preserved.",
         "admin_search_no_results": "❌ No tasks found.",
@@ -866,8 +868,10 @@ def is_valid_gmail_address(email: str) -> bool:
 def get_gmail_done_keyboard(user_id: int = None):
     """Inline buttons dedicated to the Gmail task flow."""
     return InlineKeyboardMarkup([
-        [ikb_btn(tr(user_id, "btn_done"), style="success", callback_data="gmail_done")],
-        [ikb_btn(tr(user_id, "btn_cancel"), style="danger", callback_data="gmail_cancel")]
+        [
+            ikb_btn(tr(user_id, "btn_done"), style="success", callback_data="gmail_done"),
+            ikb_btn(tr(user_id, "btn_cancel"), style="danger", callback_data="gmail_cancel")
+        ]
     ])
 
 
@@ -970,14 +974,19 @@ def get_withdraw_keyboard(user_id: int = None, lang: str = None) -> ReplyKeyboar
     nagad_active = get_setting_val("wd_nagad_active", "ON") == "ON"
     usdt_active = get_setting_val("wd_usdt_active", "ON") == "ON"
 
+    min_b = float(get_setting_val("min_withdraw_bkash", "50.0"))
+    chg_b = float(get_setting_val("bkash_charge_bdt", "0.0"))
+    min_n = float(get_setting_val("min_withdraw_nagad", "50.0"))
+    chg_n = float(get_setting_val("nagad_charge_bdt", "0.0"))
+
+    b_label = f"{tr(l, 'btn_bkash')} -> Min: {min_b:g}৳" + (f" (-{chg_b:g}৳)" if chg_b > 0 else "")
+    n_label = f"{tr(l, 'btn_nagad')} -> Min: {min_n:g}৳" + (f" (-{chg_n:g}৳)" if chg_n > 0 else "")
+
     keyboard = []
-    mfs_row = []
     if bkash_active:
-        mfs_row.append(kb_btn(tr(l, "btn_bkash"), style="danger"))
+        keyboard.append([kb_btn(b_label, style="danger")])
     if nagad_active:
-        mfs_row.append(kb_btn(tr(l, "btn_nagad"), style="primary"))
-    if mfs_row:
-        keyboard.append(mfs_row)
+        keyboard.append([kb_btn(n_label, style="primary")])
 
     if usdt_active:
         keyboard.append([
@@ -1243,7 +1252,7 @@ async def gmail_done_callback(update: Update, context: ContextTypes.DEFAULT_TYPE
 
     await query.edit_message_text(
         tr(user_id, "gmail_submitted_success", sub_id=submission_id),
-        parse_mode=ParseMode.MARKDOWN
+        parse_mode=ParseMode.HTML
     )
     await context.bot.send_message(
         chat_id=user_id,
@@ -1438,10 +1447,10 @@ async def handle_withdraw_method(update: Update, context: ContextTypes.DEFAULT_T
         return ConversationHandler.END
 
     method = None
-    if text in ["বিকাশ (Bkash)", "Bkash"]:
+    if text.startswith("Bkash") or text.startswith("বিকাশ"):
         if get_setting_val("wd_bkash_active", "ON") == "ON":
             method = "bkash"
-    elif text in ["নগদ (Nagad)", "Nagad"]:
+    elif text.startswith("Nagad") or text.startswith("নগদ"):
         if get_setting_val("wd_nagad_active", "ON") == "ON":
             method = "nagad"
     elif text in ["USDT (BEP-20)"]:
@@ -1518,7 +1527,10 @@ async def handle_withdraw_number(update: Update, context: ContextTypes.DEFAULT_T
             "💳 Charge: **OFF**"
         )
     else:
+        chg_bdt = float(get_setting_val(f"{method}_charge_bdt", "0.0"))
         msg = tr(user_id, "wd_enter_amount", balance=user_data['balance'], min_limit=min_limit, max_limit=max_limit)
+        if chg_bdt > 0:
+            msg += f"\n💳 **Charge ({method.upper()}):** ৳{chg_bdt:g}"
 
     await update.message.reply_text(msg, reply_markup=get_cancel_keyboard(user_id), parse_mode=ParseMode.MARKDOWN)
     return STATE_WD_AMOUNT
@@ -1597,7 +1609,15 @@ async def handle_withdraw_amount(update: Update, context: ContextTypes.DEFAULT_T
         shown_amount = usdt_amount
         shown_currency = "$"
     else:
-        fee_text = ""
+        chg_bdt = float(get_setting_val(f"{method}_charge_bdt", "0.0"))
+        if chg_bdt > 0:
+            if amount <= chg_bdt:
+                await update.message.reply_text(tr(user_id, "wd_usdt_fee_err"), reply_markup=get_cancel_keyboard(user_id))
+                return STATE_WD_AMOUNT
+            net_bdt = amount - chg_bdt
+            fee_text = f" (Charge: ৳{chg_bdt:g} | Net: ৳{net_bdt:g})"
+        else:
+            fee_text = ""
         shown_amount = amount
         shown_currency = "৳"
 
@@ -1614,7 +1634,7 @@ async def handle_withdraw_amount(update: Update, context: ContextTypes.DEFAULT_T
         f"💸 **নতুন উইথড্র রিকোয়েস্ট! / New Withdraw Request!**\n\n"
         f"🆔 **উইথড্র আইডি:** #{wd_id}\n"
         f"👤 **ইউজার আইডি:** <code>{user_id}</code>\n"
-        f"💵 **পরিমাণ:** " + (f"${usdt_amount:.4f} USDT (Debit: ৳{debit_amount_bdt:.2f})" if method in ("usdt", "binance_uid") else f"৳{amount:.2f}") + "\n"
+        f"💵 **পরিমাণ:** " + (f"${usdt_amount:.4f} USDT (Debit: ৳{debit_amount_bdt:.2f})" if method in ("usdt", "binance_uid") else f"৳{amount:.2f}{fee_text}") + "\n"
         f"📱 **গেটওয়ে:** {("USDT (BEP20)" if method == "usdt" else "Binance UID" if method == "binance_uid" else method.upper())} - <code>{number}</code>"
     )
     buttons = [
@@ -2424,6 +2444,8 @@ async def admin_system_settings(update: Update, context: ContextTypes.DEFAULT_TY
     usdt_rate = get_setting_val("usdt_rate_bdt", "120.0")
     charge_status = get_setting_val("usdt_charge_enabled", "ON")
     charge_usdt = get_setting_val("usdt_charge_usdt", "0.05")
+    bkash_charge = get_setting_val("bkash_charge_bdt", "0.0")
+    nagad_charge = get_setting_val("nagad_charge_bdt", "0.0")
 
     msg = tr(
         user_id, "admin_sys_settings_title",
@@ -2432,16 +2454,18 @@ async def admin_system_settings(update: Update, context: ContextTypes.DEFAULT_TY
         min_bkash=min_bkash, max_bkash=max_bkash,
         min_nagad=min_nagad, max_nagad=max_nagad,
         min_usdt=min_usdt, max_usdt=max_usdt, usdt_rate=usdt_rate,
-        charge_status=charge_status, charge_usdt=charge_usdt
+        charge_status=charge_status, charge_usdt=charge_usdt, bkash_charge=bkash_charge, nagad_charge=nagad_charge
     )
     keyboard = [
         [ikb_btn(f"Force Join: {force_join}", callback_data="adm_toggle_force_join_enabled"),
          ikb_btn("📢 Edit Force Channels", callback_data="adm_edit_force_channels_list")],
         [ikb_btn(f"Maintenance: {maint}", callback_data="adm_toggle_maintenance_mode")],
-        [ikb_btn(f"Bkash: {bkash_wd}", callback_data="adm_toggle_wd_bkash_active"),
-         ikb_btn("✏️ Bkash Min/Max", callback_data="adm_edit_bkash_limits")],
-        [ikb_btn(f"Nagad: {nagad_wd}", callback_data="adm_toggle_wd_nagad_active"),
-         ikb_btn("✏️ Nagad Min/Max", callback_data="adm_edit_nagad_limits")],
+        [ikb_btn(f"Bkash: {bkash_wd}", style="danger", callback_data="adm_toggle_wd_bkash_active"),
+         ikb_btn("Bkash Min/Max", style="primary", callback_data="adm_edit_bkash_limits"),
+         ikb_btn(f"Charge: ৳{bkash_charge}", style="success", callback_data="adm_edit_bkash_charge_bdt")],
+        [ikb_btn(f"Nagad: {nagad_wd}", style="primary", callback_data="adm_toggle_wd_nagad_active"),
+         ikb_btn("Nagad Min/Max", style="success", callback_data="adm_edit_nagad_limits"),
+         ikb_btn(f"Charge: ৳{nagad_charge}", style="danger", callback_data="adm_edit_nagad_charge_bdt")],
         [ikb_btn(f"USDT: {usdt_wd}", callback_data="adm_toggle_wd_usdt_active"),
          ikb_btn("✏️ USDT Min/Max", callback_data="adm_edit_usdt_limits")],
         [ikb_btn("💱 Edit USDT Rate", callback_data="adm_edit_usdt_rate_bdt"),
@@ -2527,21 +2551,65 @@ async def admin_callback_handler(update: Update, context: ContextTypes.DEFAULT_T
         return
 
     if data == "adm_edit_force_channels_list":
-        current_list = get_setting_val(
+        raw_list = get_setting_val(
             "force_channels_list",
             "@TrustVaultMailsOfficial|https://t.me/TrustVaultMailsOfficial"
         )
+        channels = parse_force_join_channels(raw_list)
+        fj_status = get_setting_val("force_join_enabled", "OFF")
+        buttons = []
+        for idx, (ch_id, _link) in enumerate(channels):
+            buttons.append([ikb_btn(f"❌ Remove {ch_id}", style="danger", callback_data=f"adm_fj_del_{idx}")])
+        buttons.append([
+            ikb_btn("➕ Add Channel", style="success", callback_data="adm_fj_add"),
+            ikb_btn(f"Force Join: {fj_status}", style="primary", callback_data="adm_toggle_force_join_enabled")
+        ])
+        if channels:
+            buttons.append([ikb_btn("🗑️ Clear All Channels", style="danger", callback_data="adm_fj_clear")])
+        buttons.append([ikb_btn("Admin Menu", style="primary", callback_data="adm_back_to_admin")])
+
+        ch_lines = "\n".join(f"{i+1}. <code>{html.escape(c[0])}</code>" for i, c in enumerate(channels)) if channels else "কোনো চ্যানেল যোগ করা নেই।"
         await query.edit_message_text(
-            "📢 <b>ফোর্স জয়েন চ্যানেল লিস্ট সেট করুন</b>\n━━━━━━━━━━━━━━━━━━━━━━\n"
-            "প্রতি লাইনে একটি করে চ্যানেল দিন।\n\n"
-            "<b>Public channel:</b> <code>@channelusername|https://t.me/channelusername</code>\n"
-            "<b>Private channel:</b> <code>--1004397984847|https://t.me/+invite_hash</code>\n\n"
-            "⚠️ Private channel-এর ক্ষেত্রে বাম পাশে অবশ্যই আসল <b>Chat ID</b> দিতে হবে এবং bot-কে ওই channel-এর administrator করতে হবে।\n\n"
-            f"<b>বর্তমান লিস্ট:</b>\n<code>{html.escape(current_list)}</code>\n\n"
-            "👉 নতুন লিস্ট নিচে পাঠান:",
+            f"📢 <b>Force Join Channels Manager ({len(channels)} টি)</b>\n━━━━━━━━━━━━━━━━━━━━━━\n"
+            f"{ch_lines}\n\n"
+            f"👉 নতুন চ্যানেল যোগ করতে <b>➕ Add Channel</b> চাপুন (একাধিক চ্যানেল একসাথে বা একে একে যোগ করা যাবে)।",
+            reply_markup=InlineKeyboardMarkup(buttons),
+            parse_mode=ParseMode.HTML
+        )
+        return
+
+    if data == "adm_fj_add":
+        await query.edit_message_text(
+            "➕ <b>নতুন Force Join চ্যানেল যোগ করুন</b>\n━━━━━━━━━━━━━━━━━━━━━━\n"
+            "একটি বা একাধিক চ্যানেল প্রতি লাইনে দিন (আগের চ্যানেলগুলো মুছবে না):\n\n"
+            "<b>Public:</b> <code>@channelusername</code>\n"
+            "<b>Private:</b> <code>-1001234567890|https://t.me/+invite_link</code>\n\n"
+            "⚠️ বটকে ওই চ্যানেলের Admin রাখতে হবে।",
             parse_mode=ParseMode.HTML
         )
         return STATE_ADMIN_FORCE_CHANNELS_EDIT
+
+    if data.startswith("adm_fj_del_"):
+        idx = int(data.replace("adm_fj_del_", ""))
+        raw_list = get_setting_val("force_channels_list", "")
+        channels = parse_force_join_channels(raw_list)
+        if 0 <= idx < len(channels):
+            removed = channels.pop(idx)
+            set_setting_val("force_channels_list", "\n".join(f"{c[0]}|{c[1]}" for c in channels))
+            await query.edit_message_text(
+                f"✅ চ্যানেল <code>{html.escape(removed[0])}</code> রিমুভ করা হয়েছে! (বাকি: {len(channels)} টি)",
+                reply_markup=InlineKeyboardMarkup([[ikb_btn("📢 Back to Force Channels", style="primary", callback_data="adm_edit_force_channels_list")]]),
+                parse_mode=ParseMode.HTML
+            )
+        return
+
+    if data == "adm_fj_clear":
+        set_setting_val("force_channels_list", "")
+        await query.edit_message_text(
+            "🗑️ সব Force Join চ্যানেল ক্লিয়ার করা হয়েছে!",
+            reply_markup=InlineKeyboardMarkup([[ikb_btn("📢 Back to Force Channels", style="primary", callback_data="adm_edit_force_channels_list")]])
+        )
+        return
 
     if data in ["adm_edit_bkash_limits", "adm_edit_nagad_limits", "adm_edit_usdt_limits"]:
         m_name = data.replace("adm_edit_", "").replace("_limits", "")
@@ -3165,14 +3233,19 @@ async def process_admin_force_channels_edit(update: Update, context: ContextType
         )
         return STATE_ADMIN_FORCE_CHANNELS_EDIT
 
-    # Store a clean one-entry-per-line representation.
-    normalized = []
+    existing = parse_force_join_channels(get_setting_val("force_channels_list", ""))
+    merged = list(existing)
+    seen = {c[0].lower() for c in merged}
+    added_count = 0
     for channel_id, join_link in channels:
-        normalized.append(f"{channel_id}|{join_link}")
-    set_setting_val("force_channels_list", "\n".join(normalized))
+        if channel_id.lower() not in seen:
+            seen.add(channel_id.lower())
+            merged.append((channel_id, join_link))
+            added_count += 1
+    set_setting_val("force_channels_list", "\n".join(f"{c[0]}|{c[1]}" for c in merged))
     await update.message.reply_text(
-        "✅ <b>ফোর্স জয়েন চ্যানেল লিস্ট সফলভাবে আপডেট হয়েছে!</b>\n\n"
-        f"📢 Configured channels: <b>{len(normalized)}</b>",
+        f"✅ <b>নতুন {added_count}টি চ্যানেল যোগ হয়েছে!</b>\n\n"
+        f"📢 মোট Force Join চ্যানেল: <b>{len(merged)} টি</b>",
         parse_mode=ParseMode.HTML,
         reply_markup=get_admin_keyboard(user_id)
     )
@@ -3439,8 +3512,8 @@ def main():
 
     btn_gmail_re = r"^New Gmail Work$"
 
-    btn_bkash_re = r"^Bkash$"
-    btn_nagad_re = r"^Nagad$"
+    btn_bkash_re = r"^Bkash(?: -> .*)?$"
+    btn_nagad_re = r"^Nagad(?: -> .*)?$"
     btn_usdt_re = r"^USDT \(BEP-20\)$"
     btn_binance_uid_re = r"^Binance UID$"
 
@@ -3585,7 +3658,7 @@ def main():
             MessageHandler(filters.Regex(btn_adm_bulk_rej_re), admin_bulk_reject_prompt),
             CallbackQueryHandler(
                 admin_callback_handler,
-                pattern="^(adm_usr_ban|adm_usr_unban|adm_usr_add_bal|adm_usr_sub_bal|adm_usr_search|adm_add_subadmin|adm_rem_subadmin|adm_edit_|adm_edit_force_channels_list|adm_rej_custom_)"
+                pattern="^(adm_usr_ban|adm_usr_unban|adm_usr_add_bal|adm_usr_sub_bal|adm_usr_search|adm_add_subadmin|adm_rem_subadmin|adm_edit_|adm_edit_force_channels_list|adm_fj_add|adm_rej_custom_)"
             ),
         ],
         states={
@@ -3692,7 +3765,7 @@ def main():
     app.add_handler(CallbackQueryHandler(admin_excel_clear_cb, pattern="^adm_cls_"))
     app.add_handler(CallbackQueryHandler(
         admin_callback_handler,
-        pattern="^(adm_app_sub_|adm_hold_sub_|adm_rej_prompt_|adm_rej_act_|adm_rej_custom_|adm_app_wd_|adm_rej_wd_|adm_back_to_admin|adm_toggle_|adm_edit_|adm_add_subadmin|adm_rem_subadmin|adm_usr_)"
+        pattern="^(adm_app_sub_|adm_hold_sub_|adm_rej_prompt_|adm_rej_act_|adm_rej_custom_|adm_app_wd_|adm_rej_wd_|adm_back_to_admin|adm_toggle_|adm_edit_|adm_fj_|adm_add_subadmin|adm_rem_subadmin|adm_usr_)"
     ))
 
     logger.info("Trust Vault Mails Style Bot successfully started!")
