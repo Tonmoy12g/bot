@@ -828,7 +828,7 @@ async def send_force_join_prompt(update: Update, context: ContextTypes.DEFAULT_T
         ])
 
     buttons.append([
-        ikb_btn(tr(user_id, "btn_verify"), callback_data="check_force_join_cb")
+        ikb_btn(tr(user_id, "btn_verify"), style="success", callback_data="check_force_join_cb")
     ])
 
     text = tr(user_id, "force_join_msg")
@@ -930,13 +930,13 @@ LAST_NAMES = ["Ahmed", "Sarker", "Hasan", "Rahman", "Uddin", "Chowdhury", "Akter
 def get_main_keyboard(user_id: int = None, lang: str = None) -> ReplyKeyboardMarkup:
     l = lang or get_user_lang(user_id)
     keyboard = [
-        [kb_btn(tr(l, "btn_task"), style="primary")],
-        [kb_btn(tr(l, "btn_wallet")), kb_btn(tr(l, "btn_withdraw"))],
-        [kb_btn(tr(l, "btn_ref")), kb_btn(tr(l, "btn_leaderboard"))],
-        [kb_btn(tr(l, "btn_support")), kb_btn(tr(l, "btn_lang"))],
+        [kb_btn(tr(l, "btn_task"), style="success")],
+        [kb_btn(tr(l, "btn_wallet"), style="primary"), kb_btn(tr(l, "btn_withdraw"), style="danger")],
+        [kb_btn(tr(l, "btn_ref"), style="danger"), kb_btn(tr(l, "btn_leaderboard"), style="success")],
+        [kb_btn(tr(l, "btn_support"), style="success"), kb_btn(tr(l, "btn_lang"), style="primary")],
     ]
     if user_id and is_admin(user_id):
-        keyboard.append([kb_btn(tr(l, "btn_admin_panel"))])
+        keyboard.append([kb_btn(tr(l, "btn_admin_panel"), style="danger")])
     return ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
 
 def get_task_category_keyboard(user_id: int = None, lang: str = None) -> ReplyKeyboardMarkup:
@@ -960,7 +960,7 @@ get_seed_done_keyboard = get_task_done_keyboard
 def get_wallet_keyboard(user_id: int = None, lang: str = None) -> ReplyKeyboardMarkup:
     l = lang or get_user_lang(user_id)
     keyboard = [
-        [kb_btn(tr(l, "btn_withdraw")), kb_btn(tr(l, "btn_main_menu"))]
+        [kb_btn(tr(l, "btn_withdraw"), style="success"), kb_btn(tr(l, "btn_main_menu"), style="primary")]
     ]
     return ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
 
@@ -973,19 +973,19 @@ def get_withdraw_keyboard(user_id: int = None, lang: str = None) -> ReplyKeyboar
     keyboard = []
     mfs_row = []
     if bkash_active:
-        mfs_row.append(kb_btn(tr(l, "btn_bkash")))
+        mfs_row.append(kb_btn(tr(l, "btn_bkash"), style="danger"))
     if nagad_active:
-        mfs_row.append(kb_btn(tr(l, "btn_nagad")))
+        mfs_row.append(kb_btn(tr(l, "btn_nagad"), style="primary"))
     if mfs_row:
         keyboard.append(mfs_row)
 
     if usdt_active:
         keyboard.append([
-            kb_btn(tr(l, "btn_usdt")),
-            kb_btn(tr(l, "btn_binance_uid"))
+            kb_btn(tr(l, "btn_usdt"), style="success"),
+            kb_btn(tr(l, "btn_binance_uid"), style="primary")
         ])
 
-    keyboard.append([kb_btn(tr(l, "btn_main_menu"))])
+    keyboard.append([kb_btn(tr(l, "btn_main_menu"), style="danger")])
     return ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
 
 def get_cancel_keyboard(user_id: int = None, lang: str = None) -> ReplyKeyboardMarkup:
@@ -998,14 +998,14 @@ def get_cancel_keyboard(user_id: int = None, lang: str = None) -> ReplyKeyboardM
 def get_admin_keyboard(user_id: int = None, lang: str = None) -> ReplyKeyboardMarkup:
     l = lang or get_user_lang(user_id)
     keyboard = [
-        [kb_btn(tr(l, "btn_pending_tasks")), kb_btn(tr(l, "btn_held_tasks"))],
-        [kb_btn(tr(l, "btn_bulk_approve")), kb_btn(tr(l, "btn_bulk_reject"), style="danger")],
-        [kb_btn(tr(l, "btn_pwd_mgr")), kb_btn(tr(l, "btn_price_mgr"))],
-        [kb_btn(tr(l, "btn_task_search")), kb_btn(tr(l, "btn_user_export"))],
-        [kb_btn(tr(l, "btn_excel_export")), kb_btn(tr(l, "btn_wd_reqs"))],
-        [kb_btn(tr(l, "btn_user_mgmt")), kb_btn(tr(l, "btn_admin_mgmt"))],
-        [kb_btn(tr(l, "btn_sys_settings")), kb_btn(tr(l, "btn_live_stats"))],
-        [kb_btn(tr(l, "btn_broadcast")), kb_btn(tr(l, "btn_main_menu"))]
+        [kb_btn(tr(l, "btn_pending_tasks"), style="danger"), kb_btn(tr(l, "btn_held_tasks"), style="primary")],
+        [kb_btn(tr(l, "btn_bulk_approve"), style="success"), kb_btn(tr(l, "btn_bulk_reject"), style="danger")],
+        [kb_btn(tr(l, "btn_pwd_mgr"), style="primary"), kb_btn(tr(l, "btn_price_mgr"), style="success")],
+        [kb_btn(tr(l, "btn_task_search"), style="danger"), kb_btn(tr(l, "btn_user_export"), style="primary")],
+        [kb_btn(tr(l, "btn_excel_export"), style="success"), kb_btn(tr(l, "btn_wd_reqs"), style="danger")],
+        [kb_btn(tr(l, "btn_user_mgmt"), style="primary"), kb_btn(tr(l, "btn_admin_mgmt"), style="success")],
+        [kb_btn(tr(l, "btn_sys_settings"), style="danger"), kb_btn(tr(l, "btn_live_stats"), style="primary")],
+        [kb_btn(tr(l, "btn_broadcast"), style="success"), kb_btn(tr(l, "btn_main_menu"), style="danger")],
     ]
     return ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
 
@@ -1705,7 +1705,7 @@ async def handle_support(update: Update, context: ContextTypes.DEFAULT_TYPE):
     support_text = tr(user_id, "support_text")
 
     buttons = [
-        [ikb_btn(tr(user_id, "btn_admin_support"), url=support_handle)],
+        [ikb_btn(tr(user_id, "btn_admin_support"), style="success", url=support_handle)],
         [ikb_btn(tr(user_id, "btn_official_channel"), url=official_channel)]
     ]
 
@@ -1724,8 +1724,8 @@ async def handle_language(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return ConversationHandler.END
 
     buttons = [
-        [ikb_btn("🇧🇩 বাংলা", callback_data="lang_bn"),
-         ikb_btn("🇺🇸 English", callback_data="lang_en")]
+        [ikb_btn("🇧🇩 বাংলা", style="success", callback_data="lang_bn"),
+         ikb_btn("🇺🇸 English", style="primary", callback_data="lang_en")]
     ]
     await update.message.reply_text(
         tr(user_id, "lang_select_prompt"),
@@ -2049,10 +2049,10 @@ async def admin_excel_export_menu(update: Update, context: ContextTypes.DEFAULT_
         return
 
     buttons = [
-        [ikb_btn("✉️ Gmail (📥 Download)", callback_data="adm_xlsx_gmail"),
-         ikb_btn("🗑️ Clear Gmail", callback_data="adm_cls_gmail")],
-        [ikb_btn("📊 All Tasks (📥 Download)", callback_data="adm_xlsx_all"),
-         ikb_btn("🗑️ Clear ALL Data", callback_data="adm_cls_all")],
+        [ikb_btn("Gmail (Download)", style="success", callback_data="adm_xlsx_gmail"),
+         ikb_btn("Clear Gmail", style="danger", callback_data="adm_cls_gmail")],
+        [ikb_btn("All Tasks (Download)", style="primary", callback_data="adm_xlsx_all"),
+         ikb_btn("Clear ALL Data", style="danger", callback_data="adm_cls_all")],
         [ikb_btn(tr(user_id, "btn_admin_menu"), callback_data="adm_back_to_admin")]
     ]
 
