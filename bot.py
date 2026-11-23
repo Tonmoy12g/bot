@@ -1894,7 +1894,7 @@ async def handle_withdraw_amount(update: Update, context: ContextTypes.DEFAULT_T
         f"🆔 **উইথড্র আইডি:** #{wd_id}\n"
         f"👤 **ইউজার আইডি:** <code>{user_id}</code>\n"
         f"💵 **পরিমাণ:** " + (f"${usdt_amount:.4f} USDT (Debit: ৳{debit_amount_bdt:.2f})" if method in ("usdt", "binance_uid") else f"৳{amount:.2f}{fee_text}") + "\n"
-        f"📱 **গেটওয়ে:** {("USDT (BEP20)" if method == "usdt" else "Binance UID" if method == "binance_uid" else method.upper())} - <code>{number}</code>"
+        f"📱 **গেটওয়ে:** {('USDT (BEP20)' if method == 'usdt' else 'Binance UID' if method == 'binance_uid' else method.upper())} - <code>{number}</code>"
     )
     buttons = [
         [
@@ -3771,7 +3771,7 @@ async def process_admin_user_search(update: Update, context: ContextTypes.DEFAUL
             f"👥 **Referral Count:** {u['ref_count']} জন\n"
             f"💵 **Referral Earnings:** ৳{u['ref_earnings']:.2f}\n"
             + (f"🎁 **Custom Ref Bonus:** ৳{float(u['custom_ref_fixed']):g} / approved task\n" if u["custom_ref_fixed"] is not None else "🎁 **Ref Bonus:** Default (%)\n")
-            f"━━━━━━━━━━━━━━━━━━━━━━"
+            + f"━━━━━━━━━━━━━━━━━━━━━━"
         )
         await update.message.reply_text(
             msg,
