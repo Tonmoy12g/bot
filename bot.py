@@ -316,6 +316,9 @@ def init_db():
             "gmail_task_active": "ON",
             "bulk_gmail_task_active": "ON",
             "old_gmail_task_active": "ON",
+            "new_2fa_price": "25.00",
+            "old_2fa_price": "40.00",
+            "new_gmail_2fa_active": "ON",
             "old_gmail_2fa_active": "ON",
             "old_gmail_default_password": "oldpass123",
             "old_gmail_recovery_email": "",
@@ -374,6 +377,8 @@ MESSAGES = {
         "btn_bulk_gmail": "Bulk Gmail Work",
         "btn_new_single": "Single New Gmail",
         "btn_new_bulk": "Bulk New Gmail",
+        "btn_new_2fa": "New Gmail 2FA",
+        "btn_old_2fa": "Old Gmail 2FA",
         "btn_old_gmail": "Old Gmail Work",
         "btn_old_single": "Single Old Gmail",
         "btn_old_bulk": "Bulk Old Gmail",
@@ -473,10 +478,10 @@ MESSAGES = {
         "admin_search_prompt_msg": "🔍 **টাস্ক সার্চ:**\nইউজারনেম, জিমেইল, অথবা টাস্ক আইডি লিখুন:",
         "admin_export_prompt_msg": "📂 **ইউজার এক্সপোর্ট:**\nযে ইউজারের ডেটা চান তার টেলিগ্রাম ইউজার আইডি লিখুন:",
         "admin_pwd_mgr_title": "🔑 **পাসওয়ার্ড ম্যানেজ**\n━━━━━━━━━━━━━━━━━━━━━━\n✉️ New/Bulk Gmail Pass: <code>{gmail_pass}</code>\n♻️ Old Gmail Pass: <code>{old_pass}</code>\n💌 Old Recovery: <code>{old_rec}</code>\n━━━━━━━━━━━━━━━━━━━━━━\nনতুন পাসওয়ার্ড সেট করতে নিচের বাটন ব্যবহার করুন।",
-        "admin_price_mgr_title": "🏷️ **টাস্ক প্রাইস ম্যানেজার (Task Price Management)**\n━━━━━━━━━━━━━━━━━━━━━━\n✉️ Gmail: <code>৳{gmail}</code>\n👥 Ref Bonus: <code>{ref_bonus}%</code>\n━━━━━━━━━━━━━━━━━━━━━━\nনতুন দাম নির্ধারণ করতে নিচের বাটনে চাপ দিন:",
+        "admin_price_mgr_title": "🏷️ **টাস্ক প্রাইস ম্যানেজার (Task Price Management)**\n━━━━━━━━━━━━━━━━━━━━━━\n✉️ New/Bulk Gmail: <code>৳{gmail}</code>\n🔐 New Gmail 2FA: <code>৳{new_2fa}</code>\n♻️ Old Gmail 2FA: <code>৳{old_2fa}</code>\n👥 Ref Bonus: <code>{ref_bonus}%</code>\n━━━━━━━━━━━━━━━━━━━━━━\nনতুন দাম নির্ধারণ করতে নিচের বাটনে চাপ দিন:",
         "admin_no_pending_wds": "✅ কোনো পেন্ডিং উইথড্র রিকোয়েস্ট নেই।",
         "admin_pending_wds_title": "💸 **পেন্ডিং উইথড্র রিকোয়েস্ট:**\n\n",
-        "admin_sys_settings_title": "⚙️ **সিস্টেম সেটিংস (ON/OFF Toggles & Controls)**\n━━━━━━━━━━━━━━━━━━━━━━\n🏷️ Bot Name: {bot_name}\n🎧 Support: {support_link}\n📢 Channel: {channel_link}\n🔒 Force Join Status: {force_join}\n🛠️ Maintenance Mode: {maint}\n✉️ New Gmail: {gmail} | Bulk Gmail: {bulk_gmail}\n♻️ Old Gmail: {old_gmail} | Old 2FA: {old_2fa}\n🟢 Bkash WD: {bkash_wd} (Min: {min_bkash} | Max: {max_bkash} | Charge: ৳{bkash_charge})\n🟠 Nagad WD: {nagad_wd} (Min: {min_nagad} | Max: {max_nagad} | Charge: ৳{nagad_charge})\n🔵 USDT WD: {usdt_wd} (Min: {min_usdt} | Max: {max_usdt})\n💱 USDT Rate: ৳{usdt_rate}/USDT\n💳 USDT Charge: {charge_status} ({charge_usdt} USDT)\n━━━━━━━━━━━━━━━━━━━━━━\nটগল বা পরিবর্তন করতে নিচের বাটন ব্যবহার করুন।",
+        "admin_sys_settings_title": "⚙️ **সিস্টেম সেটিংস (ON/OFF Toggles & Controls)**\n━━━━━━━━━━━━━━━━━━━━━━\n🏷️ Bot Name: {bot_name}\n🎧 Support: {support_link}\n📢 Channel: {channel_link}\n🔒 Force Join Status: {force_join}\n🛠️ Maintenance Mode: {maint}\n✉️ New Gmail: {gmail} | Bulk Gmail: {bulk_gmail}\n♻️ Old Gmail: {old_gmail} | New 2FA: {new_2fa} | Old 2FA: {old_2fa}\n🟢 Bkash WD: {bkash_wd} (Min: {min_bkash} | Max: {max_bkash} | Charge: ৳{bkash_charge})\n🟠 Nagad WD: {nagad_wd} (Min: {min_nagad} | Max: {max_nagad} | Charge: ৳{nagad_charge})\n🔵 USDT WD: {usdt_wd} (Min: {min_usdt} | Max: {max_usdt})\n💱 USDT Rate: ৳{usdt_rate}/USDT\n💳 USDT Charge: {charge_status} ({charge_usdt} USDT)\n━━━━━━━━━━━━━━━━━━━━━━\nটগল বা পরিবর্তন করতে নিচের বাটন ব্যবহার করুন।",
         "admin_live_stats_title": "📊 **লাইভ স্ট্যাটাস** ⚡\n━━━━━━━━━━━━━━━━━━━━━━\n👥 মোট ইউজার: {total_users}\n⏳ পেন্ডিং টাস্ক: {pending_tasks}\n⌛ হোল্ড টাস্ক: {held_tasks}\n✅ এপ্রুভড টাস্ক: {approved_tasks}\n❌ রিজেক্টেড টাস্ক: {rejected_tasks}\n💸 পেন্ডিং উইথড্র: {pending_wd}\n💰 মোট ইউজার ব্যালেন্স: ৳{total_balance:.2f}",
         "admin_broadcast_prompt_msg": "𝚁𝙱𝙺 𝙰𝙿𝙿 𝚂𝚃𝙾𝚁𝙴: 📢 Broadcast Message পাঠান (All Media Supported)\n━━━━━━━━━━━━━━━━━━━━━━\nএখানে পছন্দমতো যেকোনো **Text, Photo 🖼️, Video 🎥, Document 📄, Voice 🎤, Audio 🎵** সেন্ড করুন। ক্যাপশন থাকলে ক্যাপশনসহ ইউজারদের কাছে অরিজিনাল মেসেজ হিসেবে যাবে।",
         "admin_search_no_results": "❌ কোনো টাস্ক পাওয়া যায়নি।",
@@ -504,6 +509,8 @@ MESSAGES = {
         "btn_bulk_gmail": "Bulk Gmail Work",
         "btn_new_single": "Single New Gmail",
         "btn_new_bulk": "Bulk New Gmail",
+        "btn_new_2fa": "New Gmail 2FA",
+        "btn_old_2fa": "Old Gmail 2FA",
         "btn_old_gmail": "Old Gmail Work",
         "btn_old_single": "Single Old Gmail",
         "btn_old_bulk": "Bulk Old Gmail",
@@ -601,10 +608,10 @@ MESSAGES = {
         "admin_search_prompt_msg": "🔍 **Task Search:**\nType Username, Gmail, or Task ID:",
         "admin_export_prompt_msg": "📂 **User Export:**\nType Telegram User ID of the user you want data for:",
         "admin_pwd_mgr_title": "🔑 **Password Manager**\n\n✉️ New/Bulk Gmail Pass: <code>{gmail_pass}</code>\n♻️ Old Gmail Pass: <code>{old_pass}</code>\n💌 Old Recovery: <code>{old_rec}</code>\n\nUse buttons below to set new passwords.",
-        "admin_price_mgr_title": "🏷️ **Task Price Manager**\n\n✉️ Gmail: <code>৳{gmail}</code>\n👥 Ref Bonus: <code>{ref_bonus}%</code>\n\nUse buttons below to set new prices:",
+        "admin_price_mgr_title": "🏷️ **Task Price Manager**\n\n✉️ New/Bulk Gmail: <code>৳{gmail}</code>\n🔐 New Gmail 2FA: <code>৳{new_2fa}</code>\n♻️ Old Gmail 2FA: <code>৳{old_2fa}</code>\n👥 Ref Bonus: <code>{ref_bonus}%</code>\n\nUse buttons below to set new prices:",
         "admin_no_pending_wds": "✅ No pending withdrawal requests.",
         "admin_pending_wds_title": "💸 **Pending Withdrawal Requests:**\n\n",
-        "admin_sys_settings_title": "⚙️ **System Settings (ON/OFF Toggles)**\n\n🏷️ Bot Name: {bot_name}\n🎧 Support: {support_link}\n📢 Channel: {channel_link}\n🔒 Force Join: {force_join}\n🛠️ Maintenance: {maint}\n✉️ New Gmail: {gmail} | Bulk Gmail: {bulk_gmail}\n♻️ Old Gmail: {old_gmail} | Old 2FA: {old_2fa}\n🟢 Bkash WD: {bkash_wd} (Min: {min_bkash} | Max: {max_bkash} | Charge: ৳{bkash_charge})\n🟠 Nagad WD: {nagad_wd} (Min: {min_nagad} | Max: {max_nagad} | Charge: ৳{nagad_charge})\n🔵 USDT WD: {usdt_wd} (Min: {min_usdt} | Max: {max_usdt})\n💱 USDT Rate: ৳{usdt_rate}/USDT\n💳 USDT Charge: {charge_status} ({charge_usdt} USDT)\n\nUse buttons below to toggle or edit settings.",
+        "admin_sys_settings_title": "⚙️ **System Settings (ON/OFF Toggles)**\n\n🏷️ Bot Name: {bot_name}\n🎧 Support: {support_link}\n📢 Channel: {channel_link}\n🔒 Force Join: {force_join}\n🛠️ Maintenance: {maint}\n✉️ New Gmail: {gmail} | Bulk Gmail: {bulk_gmail}\n♻️ Old Gmail: {old_gmail} | New 2FA: {new_2fa} | Old 2FA: {old_2fa}\n🟢 Bkash WD: {bkash_wd} (Min: {min_bkash} | Max: {max_bkash} | Charge: ৳{bkash_charge})\n🟠 Nagad WD: {nagad_wd} (Min: {min_nagad} | Max: {max_nagad} | Charge: ৳{nagad_charge})\n🔵 USDT WD: {usdt_wd} (Min: {min_usdt} | Max: {max_usdt})\n💱 USDT Rate: ৳{usdt_rate}/USDT\n💳 USDT Charge: {charge_status} ({charge_usdt} USDT)\n\nUse buttons below to toggle or edit settings.",
         "admin_live_stats_title": "📊 **Live Stats**\n\n👥 Total Users: {total_users}\n⏳ Pending Tasks: {pending_tasks}\n⌛ Hold Tasks: {held_tasks}\n✅ Approved Tasks: {approved_tasks}\n❌ Rejected Tasks: {rejected_tasks}\n💸 Pending Withdrawals: {pending_wd}\n💰 Total User Balance: ৳{total_balance:.2f}",
         "admin_broadcast_prompt_msg": "𝚁𝙱𝙺 𝙰𝙿𝙿 𝚂𝚃𝙾𝚁𝙴: 📢 Broadcast Message পাঠান (All Media Supported)\n━━━━━━━━━━━━━━━━━━━━━━\nSend any **Text, Photo 🖼️, Video 🎥, Document 📄, Voice 🎤, Audio 🎵**. Caption will be preserved.",
         "admin_search_no_results": "❌ No tasks found.",
@@ -997,7 +1004,7 @@ def is_menu_or_admin_button(text: str) -> bool:
     if not text:
         return False
     known_buttons = [
-        "Gmail Work", "New Gmail Work", "Bulk Gmail Work", "Single New Gmail", "Bulk New Gmail", "Old Gmail Work", "Single Old Gmail", "Bulk Old Gmail", "Back to Gmail Work", "Old Gmail Categories", "Wallet", "My Referrals", "Leaderboard",
+        "Gmail Work", "New Gmail Work", "Bulk Gmail Work", "Single New Gmail", "Bulk New Gmail", "New Gmail 2FA", "Old Gmail 2FA", "Old Gmail Work", "Single Old Gmail", "Bulk Old Gmail", "Back to Gmail Work", "Old Gmail Categories", "Wallet", "My Referrals", "Leaderboard",
         "Withdraw", "Support", "Language", "Admin Panel", "Main Menu", "Cancel",
         "Submit Gmail", "Pending Tasks", "Held Tasks", "Approve All", "Reject All",
         "Password Manager", "Price Manager", "Task Search", "User Export",
@@ -1054,6 +1061,7 @@ STATE_TASK_OLD_SINGLE_INPUT = 36
 STATE_TASK_OLD_BULK_INPUT = 37
 STATE_ADMIN_OLD_CAT_ADD = 38
 STATE_TASK_NEW_MENU = 39
+STATE_TASK_2FA_GMAIL_INPUT = 40
 
 # -----------------------------------------------------------------------------
 # DYNAMIC MULTILINGUAL REPLY KEYBOARDS
@@ -1083,7 +1091,8 @@ def get_new_gmail_menu_keyboard(user_id: int = None, lang: str = None) -> ReplyK
     l = lang or get_user_lang(user_id)
     keyboard = [
         [kb_btn(tr(l, "btn_new_single"), style="success"), kb_btn(tr(l, "btn_new_bulk"), style="primary")],
-        [kb_btn(tr(l, "btn_back_gmail_work"), style="danger"), kb_btn(tr(l, "btn_main_menu"), style="primary")]
+        [kb_btn(tr(l, "btn_new_2fa"), style="danger"), kb_btn(tr(l, "btn_back_gmail_work"), style="primary")],
+        [kb_btn(tr(l, "btn_main_menu"), style="danger")]
     ]
     return ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
 
@@ -1091,7 +1100,8 @@ def get_old_gmail_menu_keyboard(user_id: int = None, lang: str = None) -> ReplyK
     l = lang or get_user_lang(user_id)
     keyboard = [
         [kb_btn(tr(l, "btn_old_single"), style="success"), kb_btn(tr(l, "btn_old_bulk"), style="primary")],
-        [kb_btn(tr(l, "btn_back_gmail_work"), style="danger"), kb_btn(tr(l, "btn_main_menu"), style="primary")]
+        [kb_btn(tr(l, "btn_old_2fa"), style="danger"), kb_btn(tr(l, "btn_back_gmail_work"), style="primary")],
+        [kb_btn(tr(l, "btn_main_menu"), style="danger")]
     ]
     return ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
 
@@ -1702,7 +1712,7 @@ async def handle_old_gmail_menu(update: Update, context: ContextTypes.DEFAULT_TY
         return STATE_TASK_CATEGORY
 
     cats = get_old_categories()
-    if not cats:
+    if not cats and get_setting_val("old_gmail_2fa_active", "ON") == "OFF":
         await update.message.reply_text(
             "⚠️ অ্যাডমিন এখনো কোনো Old Gmail ক্যাটাগরি যোগ করেননি।",
             reply_markup=get_task_category_keyboard(user_id)
@@ -1985,6 +1995,181 @@ async def old_bulk_done_callback(update: Update, context: ContextTypes.DEFAULT_T
 
 
 async def old_gmail_cancel_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    await query.answer()
+    clear_user_state(context)
+    await query.edit_message_text(tr(query.from_user.id, "operation_cancelled"))
+    await context.bot.send_message(chat_id=query.message.chat_id, text=tr(query.from_user.id, "returning_main_menu"), reply_markup=get_main_keyboard(query.from_user.id))
+    return ConversationHandler.END
+
+
+# --- 2FA GMAIL WORKFLOWS (NEW & OLD) ---
+def _twofa_done_kb(user_id: int):
+    return InlineKeyboardMarkup([[
+        ikb_btn("Submit 2FA Gmail", style="success", callback_data="twofa_gmail_done"),
+        ikb_btn(tr(user_id, "btn_cancel"), style="danger", callback_data="twofa_gmail_cancel")
+    ]])
+
+
+async def handle_2fa_gmail_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    clear_user_state(context)
+    user_id = update.effective_user.id
+    if is_banned(user_id):
+        await update.message.reply_text(tr(user_id, "banned_msg"))
+        return ConversationHandler.END
+
+    is_joined, _ = await check_force_join(user_id, context)
+    if not is_joined:
+        await start_command(update, context)
+        return ConversationHandler.END
+
+    is_old = "Old" in (update.message.text or "")
+    if is_old:
+        if get_setting_val("old_gmail_2fa_active", "ON") == "OFF":
+            await update.message.reply_text("❌ Old Gmail 2FA বর্তমানে বন্ধ রয়েছে।", reply_markup=get_old_gmail_menu_keyboard(user_id))
+            return STATE_TASK_OLD_MENU
+        price = get_setting_val("old_2fa_price", "40.00")
+        pwd = get_setting_val("old_gmail_default_password", "oldpass123")
+        rec = get_setting_val("old_gmail_recovery_email", "").strip()
+        task_type = "old_gmail_2fa"
+        title = "🔐 <b>Old Gmail 2FA</b>"
+    else:
+        if get_setting_val("new_gmail_2fa_active", "ON") == "OFF":
+            await update.message.reply_text("❌ New Gmail 2FA বর্তমানে বন্ধ রয়েছে।", reply_markup=get_new_gmail_menu_keyboard(user_id))
+            return STATE_TASK_NEW_MENU
+        price = get_setting_val("new_2fa_price", "25.00")
+        pwd = get_setting_val("gmail_default_password", "aass1122")
+        rec = ""
+        task_type = "new_gmail_2fa"
+        title = "🔐 <b>New Gmail 2FA</b>"
+
+    context.user_data["task_type"] = task_type
+    context.user_data["reward_amount"] = float(price)
+    context.user_data["assigned_pass"] = pwd
+    context.user_data.pop("twofa_secret", None)
+    context.user_data.pop("twofa_gmail", None)
+
+    rec_line = f"💌 <b>Recovery Email:</b> <code>{html.escape(rec)}</code>\n" if rec else ""
+    msg = (
+        f"{title}\n━━━━━━━━━━━━━━━━━━━━━━\n"
+        f"💵 <b>রেট:</b> ৳{price}\n"
+        f"🔑 <b>পাসওয়ার্ড (ট্যাপ করে কপি):</b> <code>{html.escape(pwd)}</code>\n"
+        f"{rec_line}━━━━━━━━━━━━━━━━━━━━━━\n"
+        f"<b>ধাপ ১:</b> অ্যাকাউন্টে 2FA চালু করে প্রাপ্ত <b>Secret Key</b>-টি নিচে লিখে পাঠান:"
+    )
+    sent_m = await update.message.reply_text(msg, reply_markup=get_cancel_keyboard(user_id), parse_mode=ParseMode.HTML)
+    context.user_data["cred_msg_id"] = sent_m.message_id
+    return STATE_TASK_2FA_SECRET
+
+
+async def process_2fa_secret_input(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_id = update.effective_user.id
+    raw = (update.message.text or "").strip()
+    if is_menu_or_admin_button(raw):
+        clear_user_state(context)
+        return ConversationHandler.END
+
+    secret = raw.replace(" ", "").upper()
+    try:
+        otp = pyotp.TOTP(secret).now()
+    except Exception:
+        await update.message.reply_text(
+            "❌ সঠিক Base32 2FA Secret Key দিন (যেমন: <code>JBSWY3DPEHPK3PXP</code>):",
+            parse_mode=ParseMode.HTML,
+            reply_markup=get_cancel_keyboard(user_id)
+        )
+        return STATE_TASK_2FA_SECRET
+
+    context.user_data["twofa_secret"] = secret
+    sent_m = await update.message.reply_text(
+        f"✅ <b>2FA Secret Key ভেরিফাই হয়েছে!</b>\n"
+        f"━━━━━━━━━━━━━━━━━━━━━━\n"
+        f"🔐 <b>Secret Key:</b> <code>{html.escape(secret)}</code>\n"
+        f"🔢 <b>Live OTP:</b> <code>{otp}</code> (ট্যাপ করে কপি)\n"
+        f"━━━━━━━━━━━━━━━━━━━━━━\n"
+        f"<b>ধাপ ২:</b> এই OTP দিয়ে ভেরিফাই সম্পন্ন করে আপনার <b>Gmail অ্যাড্রেসটি</b> নিচে লিখে পাঠান:",
+        reply_markup=_twofa_done_kb(user_id),
+        parse_mode=ParseMode.HTML
+    )
+    context.user_data["otp_msg_id"] = sent_m.message_id
+    return STATE_TASK_2FA_GMAIL_INPUT
+
+
+async def process_2fa_gmail_input(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_id = update.effective_user.id
+    email = (update.message.text or "").strip()
+    if is_menu_or_admin_button(email):
+        clear_user_state(context)
+        return ConversationHandler.END
+
+    if not is_valid_gmail_address(email):
+        await update.message.reply_text("❌ সঠিক Gmail এড্রেস দিন (যেমন: example@gmail.com)!", reply_markup=_twofa_done_kb(user_id))
+        return STATE_TASK_2FA_GMAIL_INPUT
+
+    email = email.lower()
+    context.user_data["twofa_gmail"] = email
+    await update.message.reply_text(
+        f"✅ Gmail গ্রহণ করা হয়েছে: <code>{html.escape(email)}</code>\n\nকাজটি জমা দিতে নিচের <b>Submit 2FA Gmail</b> বাটনে চাপ দিন।",
+        reply_markup=_twofa_done_kb(user_id),
+        parse_mode=ParseMode.HTML
+    )
+    return STATE_TASK_2FA_GMAIL_INPUT
+
+
+async def twofa_done_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    user_id = query.from_user.id
+    email = (context.user_data.get("twofa_gmail") or "").strip().lower()
+    secret = (context.user_data.get("twofa_secret") or "").strip()
+
+    if not secret:
+        await query.answer("❌ আগে 2FA Secret Key পাঠান!", show_alert=True)
+        return STATE_TASK_2FA_SECRET
+    if not email or not is_valid_gmail_address(email):
+        await query.answer("❌ আগে সঠিক Gmail এড্রেসটি লিখুন!", show_alert=True)
+        return STATE_TASK_2FA_GMAIL_INPUT
+
+    with get_db() as conn:
+        cursor = conn.cursor()
+        dup = cursor.execute(
+            "SELECT 1 FROM task_submissions WHERE LOWER(TRIM(submitted_username)) = ? AND status IN ('Pending','Hold','Approved') LIMIT 1",
+            (email,)
+        ).fetchone()
+        if dup:
+            await query.answer("❌ এই Gmail আগে জমা দেওয়া হয়েছে!", show_alert=True)
+            return STATE_TASK_2FA_GMAIL_INPUT
+
+        await query.answer()
+        for mid_key in ("cred_msg_id", "otp_msg_id"):
+            if mid_key in context.user_data:
+                await safe_delete_message(context, query.message.chat_id, context.user_data[mid_key])
+
+        task_type = context.user_data.get("task_type", "new_gmail_2fa")
+        pwd = context.user_data.get("assigned_pass", "aass1122")
+        reward = context.user_data.get("reward_amount", 25.0)
+        cat_label = "Old 2FA" if task_type == "old_gmail_2fa" else "New 2FA"
+        now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+        cursor.execute(
+            """
+            INSERT INTO task_submissions
+            (user_id, task_type, submitted_username, submitted_password,
+             secret_key_2fa, status, reward_amount, is_archived, category_label, created_at, updated_at)
+            VALUES (?, ?, ?, ?, ?, 'Pending', ?, 0, ?, ?, ?)
+            """,
+            (user_id, task_type, email, pwd, secret, reward, cat_label, now, now)
+        )
+        sub_id = cursor.lastrowid
+        conn.commit()
+
+    await query.edit_message_text(tr(user_id, "gmail_submitted_success", sub_id=sub_id), parse_mode=ParseMode.HTML)
+    await context.bot.send_message(chat_id=user_id, text="📋 আপনার 2FA Gmail টাস্কটি রিভিউয়ের জন্য পাঠানো হয়েছে।", reply_markup=get_main_keyboard(user_id))
+    await notify_admins_new_submission(context, sub_id, user_id, task_type, email, pwd, secret, "", reward)
+    clear_user_state(context)
+    return ConversationHandler.END
+
+
+async def twofa_cancel_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
     clear_user_state(context)
@@ -3184,16 +3369,20 @@ async def admin_price_manager(update: Update, context: ContextTypes.DEFAULT_TYPE
     if not is_admin(user_id):
         return
     gmail = get_setting_val("gmail_task_price", "22.00")
+    new_2fa = get_setting_val("new_2fa_price", "25.00")
+    old_2fa = get_setting_val("old_2fa_price", "40.00")
     ref_bonus = get_setting_val("ref_bonus_percent", "10.0")
 
     msg = tr(
         user_id, "admin_price_mgr_title",
-        gmail=gmail, ref_bonus=ref_bonus
+        gmail=gmail, new_2fa=new_2fa, old_2fa=old_2fa, ref_bonus=ref_bonus
     )
     keyboard = [
-        [ikb_btn(f"✉️ Gmail (৳{gmail})", callback_data="adm_edit_gmail_task_price"),
-         ikb_btn(f"👥 Ref Commission ({ref_bonus}%)", callback_data="adm_edit_ref_bonus_percent")],
-        [ikb_btn(tr(user_id, "btn_admin_menu"), callback_data="adm_back_to_admin")]
+        [ikb_btn(f"New/Bulk Gmail (৳{gmail})", style="primary", callback_data="adm_edit_gmail_task_price"),
+         ikb_btn(f"New 2FA (৳{new_2fa})", style="success", callback_data="adm_edit_new_2fa_price")],
+        [ikb_btn(f"Old 2FA (৳{old_2fa})", style="danger", callback_data="adm_edit_old_2fa_price"),
+         ikb_btn(f"Ref Bonus ({ref_bonus}%)", style="primary", callback_data="adm_edit_ref_bonus_percent")],
+        [ikb_btn(tr(user_id, "btn_admin_menu"), style="danger", callback_data="adm_back_to_admin")]
     ]
     await update.message.reply_text(msg, reply_markup=InlineKeyboardMarkup(keyboard), parse_mode=ParseMode.HTML)
 
@@ -3228,6 +3417,7 @@ async def admin_system_settings(update: Update, context: ContextTypes.DEFAULT_TY
     gmail = get_setting_val("gmail_task_active", "ON")
     bulk_gmail = get_setting_val("bulk_gmail_task_active", "ON")
     old_gmail = get_setting_val("old_gmail_task_active", "ON")
+    new_2fa = get_setting_val("new_gmail_2fa_active", "ON")
     old_2fa = get_setting_val("old_gmail_2fa_active", "ON")
     
     bkash_wd = get_setting_val("wd_bkash_active", "ON")
@@ -3251,7 +3441,7 @@ async def admin_system_settings(update: Update, context: ContextTypes.DEFAULT_TY
         bot_name=get_setting_val("bot_display_name", "Gmail Work BD"),
         support_link=get_setting_val("support_handle", ""),
         channel_link=get_setting_val("official_channel_link", ""),
-        force_join=force_join, maint=maint, gmail=gmail, bulk_gmail=bulk_gmail, old_gmail=old_gmail, old_2fa=old_2fa,
+        force_join=force_join, maint=maint, gmail=gmail, bulk_gmail=bulk_gmail, old_gmail=old_gmail, new_2fa=new_2fa, old_2fa=old_2fa,
         bkash_wd=bkash_wd, nagad_wd=nagad_wd, usdt_wd=usdt_wd,
         min_bkash=min_bkash, max_bkash=max_bkash,
         min_nagad=min_nagad, max_nagad=max_nagad,
@@ -3276,7 +3466,8 @@ async def admin_system_settings(update: Update, context: ContextTypes.DEFAULT_TY
         [ikb_btn(f"New Gmail: {gmail}", style="success", callback_data="adm_toggle_gmail_task_active"),
          ikb_btn(f"Bulk Gmail: {bulk_gmail}", style="primary", callback_data="adm_toggle_bulk_gmail_task_active")],
         [ikb_btn(f"Old Gmail: {old_gmail}", style="danger", callback_data="adm_toggle_old_gmail_task_active"),
-         ikb_btn(f"Old 2FA: {old_2fa}", style="success", callback_data="adm_toggle_old_gmail_2fa_active")],
+         ikb_btn(f"New 2FA: {new_2fa}", style="primary", callback_data="adm_toggle_new_gmail_2fa_active")],
+        [ikb_btn(f"Old 2FA: {old_2fa}", style="success", callback_data="adm_toggle_old_gmail_2fa_active")],
         [ikb_btn("🏷️ Bot Name", style="primary", callback_data="adm_edit_bot_display_name"),
          ikb_btn("🎧 Support ID/Link", style="success", callback_data="adm_edit_support_handle")],
         [ikb_btn("📢 Official Channel", style="danger", callback_data="adm_edit_official_channel_link"),
@@ -4658,6 +4849,8 @@ def main():
     btn_bulk_gmail_re = r"^Bulk Gmail Work$"
     btn_new_single_re = r"^Single New Gmail$"
     btn_new_bulk_re = r"^Bulk New Gmail$"
+    btn_new_2fa_re = r"^New Gmail 2FA$"
+    btn_old_2fa_re = r"^Old Gmail 2FA$"
     btn_old_gmail_re = r"^Old Gmail Work$"
     btn_old_single_re = r"^Single Old Gmail$"
     btn_old_bulk_re = r"^Bulk Old Gmail$"
@@ -4689,7 +4882,7 @@ def main():
     btn_adm_admin_mgmt_re = r"^Admin Control$"
 
     all_menu_buttons_re = (
-        r"^(Gmail Work|New Gmail Work|Bulk Gmail Work|Single New Gmail|Bulk New Gmail|Old Gmail Work|"
+        r"^(Gmail Work|New Gmail Work|Bulk Gmail Work|Single New Gmail|Bulk New Gmail|New Gmail 2FA|Old Gmail 2FA|Old Gmail Work|"
         r"Single Old Gmail|Bulk Old Gmail|Back to Gmail Work|"
         r"Wallet|Withdraw|My Referrals|Leaderboard|Support|Language|Admin Panel|Main Menu|Cancel|"
         r"Pending Tasks|Held Tasks|Approve All|Reject All|Password Manager|Price Manager|"
@@ -4706,6 +4899,8 @@ def main():
         MessageHandler(filters.Regex(btn_gmail_re), handle_new_gmail_submenu),
         MessageHandler(filters.Regex(btn_new_single_re), handle_gmail_menu),
         MessageHandler(filters.Regex(btn_new_bulk_re), handle_bulk_gmail_menu),
+        MessageHandler(filters.Regex(btn_new_2fa_re), handle_2fa_gmail_start),
+        MessageHandler(filters.Regex(btn_old_2fa_re), handle_2fa_gmail_start),
         MessageHandler(filters.Regex(btn_bulk_gmail_re), handle_bulk_gmail_menu),
         MessageHandler(filters.Regex(btn_old_gmail_re), handle_old_gmail_menu),
         MessageHandler(filters.Regex(btn_old_single_re), handle_old_single_or_bulk_start),
@@ -4727,23 +4922,32 @@ def main():
             MessageHandler(filters.Regex(btn_gmail_re), handle_new_gmail_submenu),
             MessageHandler(filters.Regex(btn_new_single_re), handle_gmail_menu),
             MessageHandler(filters.Regex(btn_new_bulk_re), handle_bulk_gmail_menu),
+        MessageHandler(filters.Regex(btn_new_2fa_re), handle_2fa_gmail_start),
+        MessageHandler(filters.Regex(btn_old_2fa_re), handle_2fa_gmail_start),
             MessageHandler(filters.Regex(btn_bulk_gmail_re), handle_bulk_gmail_menu),
             MessageHandler(filters.Regex(btn_old_gmail_re), handle_old_gmail_menu),
             MessageHandler(filters.Regex(btn_old_single_re), handle_old_single_or_bulk_start),
             MessageHandler(filters.Regex(btn_old_bulk_re), handle_old_single_or_bulk_start),
             MessageHandler(filters.Regex(btn_back_gmail_work_re), handle_task_menu),
+            MessageHandler(filters.Regex(btn_new_2fa_re), handle_2fa_gmail_start),
+            MessageHandler(filters.Regex(btn_old_2fa_re), handle_2fa_gmail_start),
         ],
         states={
             STATE_TASK_CATEGORY: [
                 MessageHandler(filters.Regex(btn_gmail_re), handle_new_gmail_submenu),
                 MessageHandler(filters.Regex(btn_new_single_re), handle_gmail_menu),
                 MessageHandler(filters.Regex(btn_new_bulk_re), handle_bulk_gmail_menu),
+        MessageHandler(filters.Regex(btn_new_2fa_re), handle_2fa_gmail_start),
+        MessageHandler(filters.Regex(btn_old_2fa_re), handle_2fa_gmail_start),
                 MessageHandler(filters.Regex(btn_bulk_gmail_re), handle_bulk_gmail_menu),
                 MessageHandler(filters.Regex(btn_old_gmail_re), handle_old_gmail_menu),
             ],
             STATE_TASK_NEW_MENU: [
                 MessageHandler(filters.Regex(btn_new_single_re), handle_gmail_menu),
                 MessageHandler(filters.Regex(btn_new_bulk_re), handle_bulk_gmail_menu),
+                MessageHandler(filters.Regex(btn_new_2fa_re), handle_2fa_gmail_start),
+        MessageHandler(filters.Regex(btn_new_2fa_re), handle_2fa_gmail_start),
+        MessageHandler(filters.Regex(btn_old_2fa_re), handle_2fa_gmail_start),
                 MessageHandler(filters.Regex(btn_bulk_gmail_re), handle_bulk_gmail_menu),
                 MessageHandler(filters.Regex(btn_back_gmail_work_re), handle_task_menu),
                 MessageHandler(filters.Regex(btn_old_gmail_re), handle_old_gmail_menu),
@@ -4751,6 +4955,7 @@ def main():
             STATE_TASK_OLD_MENU: [
                 MessageHandler(filters.Regex(btn_old_single_re), handle_old_single_or_bulk_start),
                 MessageHandler(filters.Regex(btn_old_bulk_re), handle_old_single_or_bulk_start),
+                MessageHandler(filters.Regex(btn_old_2fa_re), handle_2fa_gmail_start),
                 MessageHandler(filters.Regex(btn_back_gmail_work_re), handle_task_menu),
                 MessageHandler(filters.Regex(btn_gmail_re), handle_gmail_menu),
                 MessageHandler(filters.Regex(btn_bulk_gmail_re), handle_bulk_gmail_menu),
@@ -4791,6 +4996,18 @@ def main():
                 MessageHandler(filters.Regex(btn_cancel_re), cancel_operation),
                 MessageHandler(filters.Regex(btn_main_menu_re), start_command),
                 MessageHandler(not_menu_text, process_bulk_gmail_submission),
+            ],
+            STATE_TASK_2FA_SECRET: [
+                MessageHandler(filters.Regex(btn_cancel_re), cancel_operation),
+                MessageHandler(filters.Regex(btn_main_menu_re), start_command),
+                MessageHandler(not_menu_text, process_2fa_secret_input),
+            ],
+            STATE_TASK_2FA_GMAIL_INPUT: [
+                CallbackQueryHandler(twofa_done_callback, pattern=r"^twofa_gmail_done$"),
+                CallbackQueryHandler(twofa_cancel_callback, pattern=r"^twofa_gmail_cancel$"),
+                MessageHandler(filters.Regex(btn_cancel_re), cancel_operation),
+                MessageHandler(filters.Regex(btn_main_menu_re), start_command),
+                MessageHandler(not_menu_text, process_2fa_gmail_input),
             ],
             ConversationHandler.TIMEOUT: [
                 MessageHandler(filters.ALL, _conversation_timeout_handler),
