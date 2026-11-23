@@ -363,52 +363,52 @@ def init_db():
 # -----------------------------------------------------------------------------
 MESSAGES = {
     "bn": {
-        "btn_task": "Gmail Work",
-        "btn_wallet": "Wallet",
-        "btn_ref": "My Referrals",
-        "btn_leaderboard": "Leaderboard",
-        "btn_withdraw": "Withdraw",
-        "btn_support": "Support",
-        "btn_lang": "Language",
-        "btn_admin_panel": "Admin Panel",
-        "btn_main_menu": "Main Menu",
-        "btn_cancel": "Cancel",
-        "btn_gmail": "New Gmail Work",
-        "btn_bulk_gmail": "Bulk Gmail Work",
-        "btn_new_single": "Single New Gmail",
-        "btn_new_bulk": "Bulk New Gmail",
-        "btn_new_2fa": "New Gmail 2FA",
-        "btn_old_2fa": "Old Gmail 2FA",
-        "btn_old_gmail": "Old Gmail Work",
-        "btn_old_single": "Single Old Gmail",
-        "btn_old_bulk": "Bulk Old Gmail",
-        "btn_back_gmail_work": "Back to Gmail Work",
-        "btn_old_cats": "Old Gmail Categories",
+        "btn_task": "⚡ Gmail Work",
+        "btn_wallet": "👛 Wallet",
+        "btn_ref": "👥 My Referrals",
+        "btn_leaderboard": "🏆 Leaderboard",
+        "btn_withdraw": "💸 Withdraw",
+        "btn_support": "🎧 Support",
+        "btn_lang": "🌐 Language",
+        "btn_admin_panel": "👑 Admin Panel",
+        "btn_main_menu": "🏠 Main Menu",
+        "btn_cancel": "✖️ Cancel",
+        "btn_gmail": "✦ New Gmail Work",
+        "btn_bulk_gmail": "📦 Bulk Gmail Work",
+        "btn_new_single": "✦ Single New Gmail",
+        "btn_new_bulk": "📦 Bulk New Gmail",
+        "btn_new_2fa": "🔐 New Gmail 2FA",
+        "btn_old_2fa": "🔐 Old Gmail 2FA",
+        "btn_old_gmail": "♻️ Old Gmail Work",
+        "btn_old_single": "♻️ Single Old Gmail",
+        "btn_old_bulk": "📦 Bulk Old Gmail",
+        "btn_back_gmail_work": "↩️ Back to Gmail Work",
+        "btn_old_cats": "♻️ Old Gmail Categories",
         "btn_gen_2fa": "🔑 2FA Code Generate করুন",
         "btn_acct_done": "✅ একাউন্ট খোলা শেষ",
-        "btn_bkash": "Bkash",
-        "btn_nagad": "Nagad",
-        "btn_usdt": "USDT (BEP-20)",
-        "btn_binance_uid": "Binance UID",
-        "btn_binance_uid": "Binance UID",
-        "btn_pending_tasks": "Pending Tasks",
-        "btn_held_tasks": "Held Tasks",
-        "btn_task_search": "Task Search",
-        "btn_user_export": "User Export",
-        "btn_pwd_mgr": "Password Manager",
-        "btn_price_mgr": "Price Manager",
-        "btn_wd_reqs": "Withdraw Requests",
-        "btn_sys_settings": "System Settings",
-        "btn_live_stats": "Live Stats",
-        "btn_broadcast": "Broadcast",
-        "btn_backup_db": "Backup DB",
-        "btn_restore_db": "Restore DB",
+        "btn_bkash": "💳 Bkash",
+        "btn_nagad": "💳 Nagad",
+        "btn_usdt": "💎 USDT (BEP-20)",
+        "btn_binance_uid": "🔶 Binance UID",
+        "btn_binance_uid": "🔶 Binance UID",
+        "btn_pending_tasks": "📩 Pending Tasks",
+        "btn_held_tasks": "⏳ Held Tasks",
+        "btn_task_search": "🔍 Task Search",
+        "btn_user_export": "📂 User Export",
+        "btn_pwd_mgr": "🔑 Password Manager",
+        "btn_price_mgr": "🏷️ Price Manager",
+        "btn_wd_reqs": "💸 Withdraw Requests",
+        "btn_sys_settings": "⚙️ System Settings",
+        "btn_live_stats": "📈 Live Stats",
+        "btn_broadcast": "📢 Broadcast",
+        "btn_backup_db": "💾 Backup DB",
+        "btn_restore_db": "🔄 Restore DB",
 
-        "btn_bulk_approve": "Approve All",
-        "btn_bulk_reject": "Reject All",
-        "btn_excel_export": "Spreadsheet UI",
-        "btn_user_mgmt": "User Management",
-        "btn_admin_mgmt": "Admin Control",
+        "btn_bulk_approve": "✅ Approve All",
+        "btn_bulk_reject": "✖️ Reject All",
+        "btn_excel_export": "📊 Spreadsheet UI",
+        "btn_user_mgmt": "👥 User Management",
+        "btn_admin_mgmt": "👑 Admin Control",
 
         "maintenance_msg": "⚙️ **বটটি বর্তমানে মেইনটেনেন্স মোডে রয়েছে। দয়া করে কিছুক্ষণ পর চেষ্টা করুন।**",
         "banned_msg": "❌ আপনার অ্যাকাউন্টটি সিস্টেমে নিষিদ্ধ করা হয়েছে।",
@@ -423,7 +423,7 @@ MESSAGES = {
         "task_cat_prompt": "📂 **Gmail Work Menu**\n━━━━━━━━━━━━━━━━━━━━━━\nনিচের যেকোনো একটি কাজের ধরন বেছে নিন:",
         "task_off_gmail": "❌ জিমেইলের কাজ বর্তমানে বন্ধ রয়েছে।",
         "gmail_guidelines": "✨ <b>New Gmail Work</b>\n━━━━━━━━━━━━━━━━━━━━━━\n💵 <b>রেট (প্রতি জিমেইল):</b> ৳{price}\n🔑 <b>পাসওয়ার্ড (ট্যাপ করে কপি করুন):</b> <code>{fixed_pass}</code>\n━━━━━━━━━━━━━━━━━━━━━━\n<b>কাজের নিয়মাবলি:</b>\n১. উপরের পাসওয়ার্ড দিয়ে একটি নতুন Gmail তৈরি করুন।\n২. তৈরি করা Gmail অ্যাড্রেসটি নিচে লিখে পাঠান।\n৩. এরপর নিচের <b>Submit Gmail</b> বাটনে চাপ দিন।",
-        "btn_done": "Submit Gmail",
+        "btn_done": "✅ Submit Gmail",
         "file_received_msg": "📄 **ফাইল/ডেটা সফলভাবে গ্রহণ করা হয়েছে!**\n\nকাজটি রিভিউয়ের জন্য জমা দিতে নিচে **'✅ জমা দিন (Done)'** বাটনে চাপ দিন।",
         "no_file_or_data_err": "⚠️ **কোনো ফাইল বা ডেটা পাওয়া যায়নি!**\n\nপ্রথমে এক্সেল ফাইল (.xlsx) বা টেক্সট পাঠান, তারপর **'✅ জমা দিন (Done)'** বাটনে চাপ দিন।",
         "otp_prompt_secret": "🔑 **আপনার 2FA Secret Key-টি প্রদান করুন:**\n\nঅ্যাপ থেকে প্রাপ্ত সিক্রেট কোডটি নিচে মেসেজ করুন:",
@@ -490,55 +490,55 @@ MESSAGES = {
         "admin_export_no_tasks": "❌ এই ইউজারের কোনো টাস্ক নেই।",
         "admin_broadcast_done": "✅ **Broadcast Completed** ✨\n━━━━━━━━━━━━━━━━━━━━━━\n👥 **Total Users:** {total}\n📨 **Message Type:** {msg_type}\n✅ **Successfully Sent:** {count}\n❌ **Failed:** {failed}\n📈 **Success Rate:** {success_rate}%\n⏱️ **Total Time:** {time_taken}s\n━━━━━━━━━━━━━━━━━━━━━━\n📊 **Failure Breakdown:**\n• 🚫 Bot Blocked: {blocked}\n• 🗑️ Account Deleted / Chat Not Found: {deleted}\n• ⚠️ Other Errors: {other}",
         "admin_rej_custom_prompt": "📝 **রিজেক্ট করার কাস্টম কারণটি লিখে পাঠান:**",
-        "btn_admin_menu": "Admin Menu",
+        "btn_admin_menu": "👑 Admin Menu",
         "admin_bulk_app_prompt": "✅ **বাল্ক এপ্রুভ (Bulk Approve):**\n━━━━━━━━━━━━━━━━━━━━━━\nএখানে একসাথে ৫০-২০০টি Username / UID / Gmail পেস্ট করে সেন্ড করুন (প্রতি লাইনে একটি করে অথবা কমা/স্পেস দিয়ে):\n\nবট অটোম্যাটিক্যালি এগুলো চেক করে **শুধুমাত্র ইনপুট দেওয়া টাস্কগুলো এপ্রুভ** করবে ও ইউজারকে ওয়ালেট ব্যালেন্সসহ নোটিফিকেশন পাঠাবে।",
         "admin_bulk_rej_prompt": "❌ **বাল্ক রিজেক্ট (Bulk Reject):**\n━━━━━━━━━━━━━━━━━━━━━━\nএখানে একসাথে ৫০-২০০টি Username / UID / Gmail পেস্ট করে সেন্ড করুন (প্রতি লাইনে একটি করে অথবা কমা/স্পেস দিয়ে):\n\nবট অটোম্যাটিক্যালি এগুলো চেক করে **শুধুমাত্র ইনপুট দেওয়া টাস্কগুলো রিজেক্ট** করবে ও সংশ্লিষ্ট ইউজারকে নোটিফিকেশন পাঠাবে।",
     },
     "en": {
-        "btn_task": "Gmail Work",
-        "btn_wallet": "Wallet",
-        "btn_ref": "My Referrals",
-        "btn_leaderboard": "Leaderboard",
-        "btn_withdraw": "Withdraw",
-        "btn_support": "Support",
-        "btn_lang": "Language",
-        "btn_admin_panel": "Admin Panel",
-        "btn_main_menu": "Main Menu",
-        "btn_cancel": "Cancel",
-        "btn_gmail": "New Gmail Work",
-        "btn_bulk_gmail": "Bulk Gmail Work",
-        "btn_new_single": "Single New Gmail",
-        "btn_new_bulk": "Bulk New Gmail",
-        "btn_new_2fa": "New Gmail 2FA",
-        "btn_old_2fa": "Old Gmail 2FA",
-        "btn_old_gmail": "Old Gmail Work",
-        "btn_old_single": "Single Old Gmail",
-        "btn_old_bulk": "Bulk Old Gmail",
-        "btn_back_gmail_work": "Back to Gmail Work",
-        "btn_old_cats": "Old Gmail Categories",
+        "btn_task": "⚡ Gmail Work",
+        "btn_wallet": "👛 Wallet",
+        "btn_ref": "👥 My Referrals",
+        "btn_leaderboard": "🏆 Leaderboard",
+        "btn_withdraw": "💸 Withdraw",
+        "btn_support": "🎧 Support",
+        "btn_lang": "🌐 Language",
+        "btn_admin_panel": "👑 Admin Panel",
+        "btn_main_menu": "🏠 Main Menu",
+        "btn_cancel": "✖️ Cancel",
+        "btn_gmail": "✦ New Gmail Work",
+        "btn_bulk_gmail": "📦 Bulk Gmail Work",
+        "btn_new_single": "✦ Single New Gmail",
+        "btn_new_bulk": "📦 Bulk New Gmail",
+        "btn_new_2fa": "🔐 New Gmail 2FA",
+        "btn_old_2fa": "🔐 Old Gmail 2FA",
+        "btn_old_gmail": "♻️ Old Gmail Work",
+        "btn_old_single": "♻️ Single Old Gmail",
+        "btn_old_bulk": "📦 Bulk Old Gmail",
+        "btn_back_gmail_work": "↩️ Back to Gmail Work",
+        "btn_old_cats": "♻️ Old Gmail Categories",
         "btn_gen_2fa": "🔑 Generate 2FA Code",
         "btn_acct_done": "✅ Account Creation Done",
-        "btn_bkash": "Bkash",
-        "btn_nagad": "Nagad",
-        "btn_usdt": "USDT (BEP-20)",
-        "btn_pending_tasks": "Pending Tasks",
-        "btn_held_tasks": "Held Tasks",
-        "btn_task_search": "Task Search",
-        "btn_user_export": "User Export",
-        "btn_pwd_mgr": "Password Manager",
-        "btn_price_mgr": "Price Manager",
-        "btn_wd_reqs": "Withdraw Requests",
-        "btn_sys_settings": "System Settings",
-        "btn_live_stats": "Live Stats",
-        "btn_broadcast": "Broadcast",
-        "btn_backup_db": "Backup DB",
-        "btn_restore_db": "Restore DB",
+        "btn_bkash": "💳 Bkash",
+        "btn_nagad": "💳 Nagad",
+        "btn_usdt": "💎 USDT (BEP-20)",
+        "btn_pending_tasks": "📩 Pending Tasks",
+        "btn_held_tasks": "⏳ Held Tasks",
+        "btn_task_search": "🔍 Task Search",
+        "btn_user_export": "📂 User Export",
+        "btn_pwd_mgr": "🔑 Password Manager",
+        "btn_price_mgr": "🏷️ Price Manager",
+        "btn_wd_reqs": "💸 Withdraw Requests",
+        "btn_sys_settings": "⚙️ System Settings",
+        "btn_live_stats": "📈 Live Stats",
+        "btn_broadcast": "📢 Broadcast",
+        "btn_backup_db": "💾 Backup DB",
+        "btn_restore_db": "🔄 Restore DB",
 
-        "btn_bulk_approve": "Approve All",
-        "btn_bulk_reject": "Reject All",
-        "btn_excel_export": "Spreadsheet UI",
-        "btn_user_mgmt": "User Management",
-        "btn_admin_mgmt": "Admin Control",
+        "btn_bulk_approve": "✅ Approve All",
+        "btn_bulk_reject": "✖️ Reject All",
+        "btn_excel_export": "📊 Spreadsheet UI",
+        "btn_user_mgmt": "👥 User Management",
+        "btn_admin_mgmt": "👑 Admin Control",
 
         "maintenance_msg": "⚙️ **The bot is currently under maintenance. Please try again later.**",
         "banned_msg": "❌ Your account has been banned from the system.",
@@ -553,7 +553,7 @@ MESSAGES = {
         "task_cat_prompt": "📂 **Gmail Work Menu**\n━━━━━━━━━━━━━━━━━━━━━━\nSelect a task option below:",
         "task_off_gmail": "❌ Gmail tasks are currently disabled.",
         "gmail_guidelines": "✨ <b>New Gmail Work</b>\n━━━━━━━━━━━━━━━━━━━━━━\n💵 <b>Rate (Per Gmail):</b> ৳{price}\n🔑 <b>Password (Tap to copy):</b> <code>{fixed_pass}</code>\n━━━━━━━━━━━━━━━━━━━━━━\n<b>Instructions:</b>\n1. Create a new Gmail account using the password above.\n2. Send your created Gmail address below.\n3. Tap <b>Submit Gmail</b> to complete.",
-        "btn_done": "Submit Gmail",
+        "btn_done": "✅ Submit Gmail",
         "file_received_msg": "📄 **File/Data received successfully!**\n\nPress **'✅ Submit (Done)'** below to send it to the admin.",
         "no_file_or_data_err": "⚠️ **No file or data found!**\n\nPlease send an Excel file (.xlsx) or text first, then press **'✅ Submit (Done)'**.",
         "otp_prompt_secret": "🔑 **Provide your 2FA Secret Key:**\n\nSend the secret code obtained from the app here:",
@@ -620,7 +620,7 @@ MESSAGES = {
         "admin_export_no_tasks": "❌ This user has no tasks.",
         "admin_broadcast_done": "✅ **Broadcast Completed**\n\n👥 **Total Users:** {total}\n📨 **Message Type:** {msg_type}\n✅ **Successfully Sent:** {count}\n❌ **Failed:** {failed}\n📈 **Success Rate:** {success_rate}%\n⏱️ **Total Time:** {time_taken}s\n\n📊 **Failure Breakdown:**\n• 🚫 Bot Blocked: {blocked}\n• 🗑️ Account Deleted / Chat Not Found: {deleted}\n• ⚠️ Other Errors: {other}",
         "admin_rej_custom_prompt": "📝 **Type the custom rejection reason:**",
-        "btn_admin_menu": "Admin Menu",
+        "btn_admin_menu": "👑 Admin Menu",
         "admin_bulk_app_prompt": "✅ **Bulk Approve:**\n\nPaste 50-200 Usernames / UIDs / Gmails here (one per line or separated by space/comma):\n\nBot will match and **Approve ONLY the matched tasks**.",
         "admin_bulk_rej_prompt": "❌ **Bulk Reject:**\n\nPaste 50-200 Usernames / UIDs / Gmails here (one per line or separated by space/comma):\n\nBot will match and **Reject ONLY the matched tasks**.",
     }
@@ -1003,14 +1003,7 @@ def get_gmail_done_keyboard(user_id: int = None):
 def is_menu_or_admin_button(text: str) -> bool:
     if not text:
         return False
-    known_buttons = [
-        "Gmail Work", "New Gmail Work", "Bulk Gmail Work", "Single New Gmail", "Bulk New Gmail", "New Gmail 2FA", "Old Gmail 2FA", "Old Gmail Work", "Single Old Gmail", "Bulk Old Gmail", "Back to Gmail Work", "Old Gmail Categories", "Wallet", "My Referrals", "Leaderboard",
-        "Withdraw", "Support", "Language", "Admin Panel", "Main Menu", "Cancel",
-        "Submit Gmail", "Pending Tasks", "Held Tasks", "Approve All", "Reject All",
-        "Password Manager", "Price Manager", "Task Search", "User Export",
-        "Spreadsheet UI", "Withdraw Requests", "User Management", "Admin Control",
-        "System Settings", "Live Stats", "Broadcast", "Backup DB", "Restore DB"
-    ]
+    known_buttons = ['↩️ Back to Gmail Work', '⏳ Held Tasks', '♻️ Old Gmail Categories', '♻️ Old Gmail Work', '♻️ Single Old Gmail', '⚙️ System Settings', '⚡ Gmail Work', '✅ Approve All', '✅ Submit Gmail', '✖️ Cancel', '✖️ Reject All', '✦ New Gmail Work', '✦ Single New Gmail', '🌐 Language', '🎧 Support', '🏆 Leaderboard', '🏠 Main Menu', '🏷️ Price Manager', '👑 Admin Control', '👑 Admin Menu', '👑 Admin Panel', '👛 Wallet', '👥 My Referrals', '👥 User Management', '💎 USDT (BEP-20)', '💳 Bkash', '💳 Nagad', '💸 Withdraw', '💸 Withdraw Requests', '💾 Backup DB', '📂 User Export', '📈 Live Stats', '📊 Spreadsheet UI', '📢 Broadcast', '📦 Bulk Gmail Work', '📦 Bulk New Gmail', '📦 Bulk Old Gmail', '📩 Pending Tasks', '🔄 Restore DB', '🔍 Task Search', '🔐 New Gmail 2FA', '🔐 Old Gmail 2FA', '🔑 Password Manager', '🔶 Binance UID']
     return text in known_buttons
 
 FIRST_NAMES = ["Sohan", "Kamal", "Robi", "Arif", "Nayan", "Sumon", "Rashed", "Alim", "Nusrat", "Riya", "Fariha", "Mim"]
@@ -1091,8 +1084,8 @@ def get_new_gmail_menu_keyboard(user_id: int = None, lang: str = None) -> ReplyK
     l = lang or get_user_lang(user_id)
     keyboard = [
         [kb_btn(tr(l, "btn_new_single"), style="success")],
-        [kb_btn(tr(l, "btn_new_bulk"), style="danger"), kb_btn(tr(l, "btn_new_2fa"), style="primary")],
-        [kb_btn(tr(l, "btn_back_gmail_work"), style="success"), kb_btn(tr(l, "btn_main_menu"), style="danger")]
+        [kb_btn(tr(l, "btn_new_bulk"), style="primary"), kb_btn(tr(l, "btn_new_2fa"), style="success")],
+        [kb_btn(tr(l, "btn_back_gmail_work"), style="danger"), kb_btn(tr(l, "btn_main_menu"), style="danger")]
     ]
     return ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
 
@@ -1100,8 +1093,8 @@ def get_old_gmail_menu_keyboard(user_id: int = None, lang: str = None) -> ReplyK
     l = lang or get_user_lang(user_id)
     keyboard = [
         [kb_btn(tr(l, "btn_old_single"), style="success")],
-        [kb_btn(tr(l, "btn_old_bulk"), style="danger"), kb_btn(tr(l, "btn_old_2fa"), style="primary")],
-        [kb_btn(tr(l, "btn_back_gmail_work"), style="success"), kb_btn(tr(l, "btn_main_menu"), style="danger")]
+        [kb_btn(tr(l, "btn_old_bulk"), style="primary"), kb_btn(tr(l, "btn_old_2fa"), style="success")],
+        [kb_btn(tr(l, "btn_back_gmail_work"), style="danger"), kb_btn(tr(l, "btn_main_menu"), style="danger")]
     ]
     return ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
 
@@ -2346,16 +2339,16 @@ async def handle_withdraw_method(update: Update, context: ContextTypes.DEFAULT_T
         return ConversationHandler.END
 
     method = None
-    if text.startswith("Bkash") or text.startswith("বিকাশ"):
+    if "Bkash" in text or "বিকাশ" in text:
         if get_setting_val("wd_bkash_active", "ON") == "ON":
             method = "bkash"
-    elif text.startswith("Nagad") or text.startswith("নগদ"):
+    elif "Nagad" in text or "নগদ" in text:
         if get_setting_val("wd_nagad_active", "ON") == "ON":
             method = "nagad"
-    elif text in ["USDT (BEP-20)"]:
+    elif "USDT (BEP-20)" in text:
         if get_setting_val("wd_usdt_active", "ON") == "ON":
             method = "usdt"
-    elif text in ["Binance UID"]:
+    elif "Binance UID" in text:
         if get_setting_val("wd_usdt_active", "ON") == "ON":
             method = "binance_uid"
 
@@ -4833,62 +4826,55 @@ def main():
     app.add_error_handler(global_error_handler)
 
     # Regex filters for clean English buttons
-    btn_task_re = r"^Gmail Work$"
-    btn_wallet_re = r"^Wallet$"
-    btn_withdraw_re = r"^Withdraw$"
-    btn_ref_re = r"^My Referrals$"
-    btn_leaderboard_re = r"^Leaderboard$"
-    btn_support_re = r"^Support$"
-    btn_lang_re = r"^Language$"
-    btn_admin_re = r"^Admin Panel$"
-    btn_main_menu_re = r"^Main Menu$"
-    btn_cancel_re = r"^Cancel$"
-    btn_done_re = r"^Submit Gmail$"
+    btn_task_re = r"^⚡\ Gmail\ Work$"
+    btn_wallet_re = r"^👛\ Wallet$"
+    btn_withdraw_re = r"^💸\ Withdraw$"
+    btn_ref_re = r"^👥\ My\ Referrals$"
+    btn_leaderboard_re = r"^🏆\ Leaderboard$"
+    btn_support_re = r"^🎧\ Support$"
+    btn_lang_re = r"^🌐\ Language$"
+    btn_admin_re = r"^👑\ Admin\ Panel$"
+    btn_main_menu_re = r"^🏠\ Main\ Menu$"
+    btn_cancel_re = r"^✖️\ Cancel$"
+    btn_done_re = r"^✅\ Submit\ Gmail$"
 
-    btn_gmail_re = r"^New Gmail Work$"
-    btn_bulk_gmail_re = r"^Bulk Gmail Work$"
-    btn_new_single_re = r"^Single New Gmail$"
-    btn_new_bulk_re = r"^Bulk New Gmail$"
-    btn_new_2fa_re = r"^New Gmail 2FA$"
-    btn_old_2fa_re = r"^Old Gmail 2FA$"
-    btn_old_gmail_re = r"^Old Gmail Work$"
-    btn_old_single_re = r"^Single Old Gmail$"
-    btn_old_bulk_re = r"^Bulk Old Gmail$"
-    btn_back_gmail_work_re = r"^Back to Gmail Work$"
+    btn_gmail_re = r"^✦\ New\ Gmail\ Work$"
+    btn_bulk_gmail_re = r"^📦\ Bulk\ Gmail\ Work$"
+    btn_new_single_re = r"^✦\ Single\ New\ Gmail$"
+    btn_new_bulk_re = r"^📦\ Bulk\ New\ Gmail$"
+    btn_new_2fa_re = r"^🔐\ New\ Gmail\ 2FA$"
+    btn_old_2fa_re = r"^🔐\ Old\ Gmail\ 2FA$"
+    btn_old_gmail_re = r"^♻️\ Old\ Gmail\ Work$"
+    btn_old_single_re = r"^♻️\ Single\ Old\ Gmail$"
+    btn_old_bulk_re = r"^📦\ Bulk\ Old\ Gmail$"
+    btn_back_gmail_work_re = r"^↩️\ Back\ to\ Gmail\ Work$"
 
-    btn_bkash_re = r"^Bkash(?: -> .*)?$"
-    btn_nagad_re = r"^Nagad(?: -> .*)?$"
-    btn_usdt_re = r"^USDT \(BEP-20\)$"
-    btn_binance_uid_re = r"^Binance UID$"
+    btn_bkash_re = r"^💳\ Bkash(?: -> .*)?$"
+    btn_nagad_re = r"^💳\ Nagad(?: -> .*)?$"
+    btn_usdt_re = r"^💎\ USDT\ \(BEP\-20\)$"
+    btn_binance_uid_re = r"^🔶\ Binance\ UID$"
 
-    btn_adm_pending_re = r"^Pending Tasks$"
-    btn_adm_held_re = r"^Held Tasks$"
-    btn_adm_search_re = r"^Task Search$"
-    btn_adm_export_re = r"^User Export$"
-    btn_adm_pwd_re = r"^Password Manager$"
-    btn_adm_price_re = r"^Price Manager$"
-    btn_adm_wd_re = r"^Withdraw Requests$"
-    btn_adm_sys_re = r"^System Settings$"
-    btn_adm_stats_re = r"^Live Stats$"
-    btn_adm_bcast_re = r"^Broadcast$"
-    btn_adm_backup_re = r"^Backup DB$"
-    btn_adm_restore_re = r"^Restore DB$"
-    btn_adm_old_cats_re = r"^Old Gmail Categories$"
+    btn_adm_pending_re = r"^📩\ Pending\ Tasks$"
+    btn_adm_held_re = r"^⏳\ Held\ Tasks$"
+    btn_adm_search_re = r"^🔍\ Task\ Search$"
+    btn_adm_export_re = r"^📂\ User\ Export$"
+    btn_adm_pwd_re = r"^🔑\ Password\ Manager$"
+    btn_adm_price_re = r"^🏷️\ Price\ Manager$"
+    btn_adm_wd_re = r"^💸\ Withdraw\ Requests$"
+    btn_adm_sys_re = r"^⚙️\ System\ Settings$"
+    btn_adm_stats_re = r"^📈\ Live\ Stats$"
+    btn_adm_bcast_re = r"^📢\ Broadcast$"
+    btn_adm_backup_re = r"^💾\ Backup\ DB$"
+    btn_adm_restore_re = r"^🔄\ Restore\ DB$"
+    btn_adm_old_cats_re = r"^♻️\ Old\ Gmail\ Categories$"
 
-    btn_adm_bulk_app_re = r"^Approve All$"
-    btn_adm_bulk_rej_re = r"^Reject All$"
-    btn_adm_excel_re = r"^Spreadsheet UI$"
-    btn_adm_user_mgmt_re = r"^User Management$"
-    btn_adm_admin_mgmt_re = r"^Admin Control$"
+    btn_adm_bulk_app_re = r"^✅\ Approve\ All$"
+    btn_adm_bulk_rej_re = r"^✖️\ Reject\ All$"
+    btn_adm_excel_re = r"^📊\ Spreadsheet\ UI$"
+    btn_adm_user_mgmt_re = r"^👥\ User\ Management$"
+    btn_adm_admin_mgmt_re = r"^👑\ Admin\ Control$"
 
-    all_menu_buttons_re = (
-        r"^(Gmail Work|New Gmail Work|Bulk Gmail Work|Single New Gmail|Bulk New Gmail|New Gmail 2FA|Old Gmail 2FA|Old Gmail Work|"
-        r"Single Old Gmail|Bulk Old Gmail|Back to Gmail Work|"
-        r"Wallet|Withdraw|My Referrals|Leaderboard|Support|Language|Admin Panel|Main Menu|Cancel|"
-        r"Pending Tasks|Held Tasks|Approve All|Reject All|Password Manager|Price Manager|"
-        r"Task Search|User Export|Spreadsheet UI|Withdraw Requests|User Management|"
-        r"Admin Control|System Settings|Live Stats|Broadcast|Backup DB|Old Gmail Categories|Restore DB)$"
-    )
+    all_menu_buttons_re = r"^(⚡\ Gmail\ Work|👛\ Wallet|👥\ My\ Referrals|🏆\ Leaderboard|💸\ Withdraw|🎧\ Support|🌐\ Language|👑\ Admin\ Panel|🏠\ Main\ Menu|✖️\ Cancel|✦\ New\ Gmail\ Work|📦\ Bulk\ Gmail\ Work|♻️\ Old\ Gmail\ Work|✦\ Single\ New\ Gmail|📦\ Bulk\ New\ Gmail|🔐\ New\ Gmail\ 2FA|♻️\ Single\ Old\ Gmail|📦\ Bulk\ Old\ Gmail|🔐\ Old\ Gmail\ 2FA|↩️\ Back\ to\ Gmail\ Work|✅\ Submit\ Gmail|💳\ Bkash|💳\ Nagad|💎\ USDT\ \(BEP\-20\)|🔶\ Binance\ UID|📩\ Pending\ Tasks|⏳\ Held\ Tasks|🔍\ Task\ Search|📂\ User\ Export|🔑\ Password\ Manager|🏷️\ Price\ Manager|💸\ Withdraw\ Requests|⚙️\ System\ Settings|📈\ Live\ Stats|📢\ Broadcast|💾\ Backup\ DB|🔄\ Restore\ DB|♻️\ Old\ Gmail\ Categories|✅\ Approve\ All|✖️\ Reject\ All|📊\ Spreadsheet\ UI|👥\ User\ Management|👑\ Admin\ Control|👑\ Admin\ Menu)$"
     not_menu_text = filters.TEXT & ~filters.COMMAND & ~filters.Regex(all_menu_buttons_re)
 
     common_nav_fallbacks = [
