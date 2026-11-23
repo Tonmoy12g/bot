@@ -273,6 +273,7 @@ def init_db():
             ("usdt_fee", "REAL"),
             ("usdt_rate", "REAL"),
             ("currency", "TEXT"),
+            ("log_msg_id", "INTEGER"),
         ]:
             try:
                 cursor.execute(f"ALTER TABLE withdrawals ADD COLUMN {col_name} {col_type}")
@@ -323,6 +324,15 @@ def init_db():
             "old_gmail_default_password": "oldpass123",
             "old_gmail_recovery_email": "",
             "maintenance_mode": "OFF",
+            "video_tutorial_active": "OFF",
+            "video_tutorial_value": "",
+            "work_rules_active": "ON",
+            "payout_log_active": "OFF",
+            "payout_log_chat": "",
+            "task_notify_chat": "",
+            "wd_notify_chat": "",
+            "backup_notify_chat": "",
+            "work_rules_text": "📖 <b>কাজের নিয়মাবলি (Work Rules)</b>\n━━━━━━━━━━━━━━━━━━━━━━\n১. প্রতিটি Gmail অবশ্যই নির্ধারিত পাসওয়ার্ড দিয়ে তৈরি করতে হবে।\n২. ভুয়া বা একই Gmail বারবার জমা দেবেন না।\n৩. রিভিউ হতে সাধারণত ২৪–৪৮ ঘণ্টা সময় লাগে।\n৪. মিনিমাম ব্যালেন্স হলেই সাথে সাথে Withdraw করতে পারবেন।",
         }
 
         for key, val in default_settings.items():
@@ -371,6 +381,8 @@ MESSAGES = {
         "btn_support": "🎧 Support",
         "btn_lang": "🌐 Language",
         "btn_admin_panel": "👑 Admin Panel",
+        "btn_video_tutorial": "🎬 Video Tutorial",
+        "btn_work_rules": "📖 Work Rules",
         "btn_main_menu": "🏠 Main Menu",
         "btn_cancel": "✖️ Cancel",
         "btn_gmail": "✦ New Gmail Work",
@@ -412,12 +424,12 @@ MESSAGES = {
 
         "maintenance_msg": "⚙️ **বটটি বর্তমানে মেইনটেনেন্স মোডে রয়েছে। দয়া করে কিছুক্ষণ পর চেষ্টা করুন।**",
         "banned_msg": "❌ আপনার অ্যাকাউন্টটি সিস্টেমে নিষিদ্ধ করা হয়েছে।",
-        "force_join_msg": "📢 **বটটি ব্যবহার করতে আপনাকে আমাদের অফিশিয়াল চ্যানেলে যুক্ত থাকতে হবে:**\n\n📌 অনুগ্রহ করে নিচের সবকটি চ্যানেলে জয়েন করে **✅ ভেরিফাই করুন** বাটনে চাপ দিন:",
+        "force_join_msg": "📢 **চ্যানেল ভেরিফিকেশন**\n━━━━━━━━━━━━━━━━━━━━━━\nবটটি ব্যবহার করতে নিচের অফিশিয়াল চ্যানেলগুলোতে জয়েন করে **Verify** বাটনে চাপ দিন:",
         "btn_join_channel": "Join Channel",
         "btn_verify": "Verify",
         "force_join_success": "✅ **ধন্যবাদ! আপনার চ্যানেল ভেরিফিকেশন সফল হয়েছে।**",
         "force_join_fail": "❌ আপনি এখনো সবগুলো চ্যানেলে জয়েন করেননি! সব চ্যানেলে জয়েন করে পুনরায় চেষ্টা করুন।",
-        "welcome_msg": "💎 **স্বাগতম, {name}!** ✨\n━━━━━━━━━━━━━━━━━━━━━━\n**{bot_name}**-এ আপনাকে স্বাগতম।\nএখানে আপনি সহজ **Gmail** অ্যাকাউন্ট সাবমিট করে দ্রুত ও নিশ্চিত ইনকাম করতে পারবেন।\n━━━━━━━━━━━━━━━━━━━━━━\n👉 **কাজ শুরু করতে নিচের Gmail Work বাটনে চাপ দিন।**",
+        "welcome_msg": "✨ **স্বাগতম, {name}!**\n━━━━━━━━━━━━━━━━━━━━━━\n**{bot_name}**-এ আপনাকে স্বাগতম।\nসহজ **New & Old Gmail** কাজ সম্পন্ন করে দ্রুত ও নিরাপদে আয় করুন।\n━━━━━━━━━━━━━━━━━━━━━━\n⚡ **কাজ শুরু করতে নিচের `⚡ Gmail Work` বাটনে চাপ দিন।**",
         "ref_new_user_joined": "🎉 **নতুন রেফারেল যোগ হয়েছে!**\n━━━━━━━━━━━━━━━━━━━━━━\n👤 **ইউজার:** {name}\n🆔 **ইউজার আইডি:** <code>{user_id}</code>\n\nকর্মী কাজ সম্পন্ন করলে আপনি পাবেন ১০% সরাসরি কমিশন!",
         "wd_all_disabled": "❌ বর্তমানে সকল পেমেন্ট মেথড বন্ধ রয়েছে। অনুগ্রহ করে পরে চেষ্টা করুন।",
         "task_cat_prompt": "📂 **Gmail Work Menu**\n━━━━━━━━━━━━━━━━━━━━━━\nনিচের যেকোনো একটি কাজের ধরন বেছে নিন:",
@@ -438,8 +450,8 @@ MESSAGES = {
         "operation_cancelled": "❌ কাজটি বাতিল করা হয়েছে।",
         "returning_main_menu": "🔙 মূল মেনুতে ফিরে যাচ্ছেন...",
 
-        "wallet_text": "👛 **আপনার অ্যাকাউন্ট ওয়ালেট** 💎\n━━━━━━━━━━━━━━━━━━━━━━\n💰 **বর্তমান ব্যালেন্স:** ৳{balance:.2f}\n💵 **USDT সমমূল্য:** ${usdt_balance:.4f} (রেট: ৳{usdt_rate:.2f}/USDT)\n━━━━━━━━━━━━━━━━━━━━━━\n💸 **পেন্ডিং উইথড্র:** ৳{pending_wd:.2f}\n💰 **মোট আয় (Lifetime):** ৳{lifetime:.2f}\n👥 **রেফারেল আয়:** ৳{ref_earnings:.2f}\n━━━━━━━━━━━━━━━━━━━━━━\n✅ **সম্পন্ন কাজ:** {completed} টি\n⏳ **রিভিউতে আছে:** {pending} টি\n⌛ **হোল্ডে আছে:** {held} টি\n❌ **রিজেক্টেড:** {rejected} টি",
-        "wd_gateway_prompt": "💸 **উইথড্রয়াল পেমেন্ট গেটওয়ে নির্বাচন করুন:**\n━━━━━━━━━━━━━━━━━━━━━━\nপছন্দের মেথড নির্বাচন করুন:",
+        "wallet_text": "👛 **আপনার ওয়ালেট ড্যাশবোর্ড**\n━━━━━━━━━━━━━━━━━━━━━━\n💰 **বর্তমান ব্যালেন্স:** `৳{balance:.2f}`\n💵 **USDT সমমূল্য:** `${usdt_balance:.4f}` *(রেট: ৳{usdt_rate:.2f})*\n━━━━━━━━━━━━━━━━━━━━━━\n💸 **পেন্ডিং উইথড্র:** `৳{pending_wd:.2f}`\n📈 **সর্বমোট আয়:** `৳{lifetime:.2f}`\n👥 **রেফারেল আয়:** `৳{ref_earnings:.2f}`\n━━━━━━━━━━━━━━━━━━━━━━\n✅ **এপ্রুভড:** {completed}  |  ⏳ **পেন্ডিং:** {pending}\n⌛ **হোল্ড:** {held}  |  ❌ **রিজেক্ট:** {rejected}",
+        "wd_gateway_prompt": "💸 **উইথড্র পেমেন্ট মেথড**\n━━━━━━━━━━━━━━━━━━━━━━\nআপনি কোন মাধ্যমে টাকা উত্তোলন করতে চান?",
         "wd_invalid_method": "❌ সঠিক উইথড্রয়াল মেথড নির্বাচন করুন।",
         "wd_enter_account_usdt": "📱 **আপনার USDT (BEP-20) ওয়ালেট অ্যাড্রেস লিখুন:**",
         "wd_enter_account_binance_uid": "🆔 **আপনার Binance UID লিখুন:**",
@@ -451,12 +463,12 @@ MESSAGES = {
         "wd_max_limit_err": "❌ সর্বোচ্চ উইথড্রসীমা ৳{max_limit}! পুনরায় চেষ্টা করুন।",
         "wd_insufficient_bal": "❌ আপনার অ্যাকাউন্টে পর্যাপ্ত ব্যালেন্স নেই! পুনরায় চেষ্টা করুন।",
         "wd_usdt_fee_err": "❌ ফি বাদ দেওয়ার পরে পরিমাণ ০ এর কম! বড় পরিমাণ লিখুন।",
-        "wd_success_msg": "✅ **পেমেন্ট রিকোয়েস্ট সফলভাবে সাবমিট হয়েছে!** ✨\n━━━━━━━━━━━━━━━━━━━━━━\n🆔 **উইথড্র আইডি:** #{wd_id}\n💵 **পরিমাণ:** ৳{amount:.2f}{fee_text}\n📱 **মেথড:** {method} ({number})\n━━━━━━━━━━━━━━━━━━━━━━\n💰 আপনার অ্যাকাউন্ট থেকে ৳{amount:.2f} কেটে নেওয়া হয়েছে।\n⏳ স্ট্যাটাস: পেন্ডিং (১২-২৪ ঘণ্টার মধ্যে রিভিউ সম্পন্ন হবে)",
+        "wd_success_msg": "🧾 **উইথড্র রিসিপ্ট #{wd_id}**\n━━━━━━━━━━━━━━━━━━━━━━\n💳 **মেথড:** {method}\n📞 **অ্যাকাউন্ট:** `{number}`\n💵 **পরিমাণ:** `৳{amount:.2f}`{fee_text}\n⏳ **স্ট্যাটাস:** পেন্ডিং রিভিউ *(১২–২৪ ঘণ্টা)*\n━━━━━━━━━━━━━━━━━━━━━━\n✅ পেমেন্ট সম্পন্ন হলেই আপনাকে নোটিফিকেশন দেওয়া হবে।",
 
         "ref_text": "👥 **আপনার ব্যক্তিগত রেফারেল প্রোগ্রাম** 💎\n━━━━━━━━━━━━━━━━━━━━━━\nআপনার রেফারেল লিঙ্ক ব্যবহার করে বন্ধুদের আমন্ত্রণ জানান। আপনার আমন্ত্রিত কর্মী যতগুলো কাজ সম্পন্ন ও এপ্রুভ করাবে, প্রতিটি কাজের ওপর আপনি পাবেন সরাসরি **{ref_percent}% কমিশন** আপনার ওয়ালেটে।\n\n🔗 **আপনার রেফারেল লিঙ্ক:**\n<code>{ref_link}</code>\n━━━━━━━━━━━━━━━━━━━━━━\n📊 **রেফারেল ট্র্যাকার:**\n• মোট আমন্ত্রিত কর্মী: <code>{ref_count}</code> জন\n• রেফারেল বোনাস থেকে আয়: <code>৳{ref_earnings:.2f}</code>",
         "leaderboard_title": "🏆 **শীর্ষ ১০ উপার্জনকারী কর্মী (Leaderboard):** 👑\n━━━━━━━━━━━━━━━━━━━━━━\n",
         "no_leaderboard_data": "কোনো ডেটা এখনো পাওয়া যায়নি।",
-        "support_text": "🎧 **গ্রাহক সেবা কেন্দ্র (Help Zone)**\n━━━━━━━━━━━━━━━━━━━━━━\n👤 সম্মানিত মেম্বার, আপনার যেকোনো প্রশ্নের জন্য আমাদের সাপোর্ট টিমের সাথে যোগাযোগ করুন।\n📌 অযথা মেসেজ দেওয়া থেকে বিরত থাকুন।",
+        "support_text": "🎧 **সাপোর্ট ও কমিউনিটি সেন্টার**\n━━━━━━━━━━━━━━━━━━━━━━\nযেকোনো সমস্যা, পেমেন্ট তথ্য বা সহায়তার জন্য সরাসরি অ্যাডমিনের সাথে যোগাযোগ করুন এবং অফিশিয়াল চ্যানেলে যুক্ত থাকুন।",
         "btn_admin_support": "Admin Support",
         "btn_official_channel": "Official Channel",
         "lang_select_prompt": "🌐 **ভাষা নির্বাচন করুন / Select Language:**\n\nনিচের বাটন থেকে আপনার পছন্দের ভাষা নির্বাচন করুন:",
@@ -503,6 +515,8 @@ MESSAGES = {
         "btn_support": "🎧 Support",
         "btn_lang": "🌐 Language",
         "btn_admin_panel": "👑 Admin Panel",
+        "btn_video_tutorial": "🎬 Video Tutorial",
+        "btn_work_rules": "📖 Work Rules",
         "btn_main_menu": "🏠 Main Menu",
         "btn_cancel": "✖️ Cancel",
         "btn_gmail": "✦ New Gmail Work",
@@ -547,7 +561,7 @@ MESSAGES = {
         "btn_verify": "Verify",
         "force_join_success": "✅ **Thank you! Your channel verification was successful.**",
         "force_join_fail": "❌ You haven't joined all channels yet! Please join all channels and try again.",
-        "welcome_msg": "💎 **Welcome, {name}!** ✨\n━━━━━━━━━━━━━━━━━━━━━━\nWelcome to **{bot_name}**.\nEarn reliably by completing simple **Gmail** submission tasks.\n━━━━━━━━━━━━━━━━━━━━━━\n👉 **Press Gmail Work below to get started.**",
+        "welcome_msg": "✨ **Welcome, {name}!**\n━━━━━━━━━━━━━━━━━━━━━━\nWelcome to **{bot_name}**.\nComplete simple **New & Old Gmail** tasks for fast, reliable payouts.\n━━━━━━━━━━━━━━━━━━━━━━\n⚡ **Tap `⚡ Gmail Work` below to get started.**",
         "ref_new_user_joined": "🎉 **New Referral Joined!**\n━━━━━━━━━━━━━━━━━━━━━━\n👤 **User:** {name}\n🆔 **User ID:** <code>{user_id}</code>\n\nYou will earn 10% lifetime commission on their completed tasks!",
         "wd_all_disabled": "❌ All withdrawal gateways are currently disabled. Please try again later.",
         "task_cat_prompt": "📂 **Gmail Work Menu**\n━━━━━━━━━━━━━━━━━━━━━━\nSelect a task option below:",
@@ -568,7 +582,7 @@ MESSAGES = {
         "operation_cancelled": "❌ Operation cancelled.",
         "returning_main_menu": "🔙 Returning to Main Menu...",
 
-        "wallet_text": "💵 **Your Balance**\n━━━━━━━━━━━━━━━━━━━━━━\n💰 **Current Balance:** ৳{balance:.2f}\n💵 **USDT Equivalent:** ${usdt_balance:.4f} (Rate: ৳{usdt_rate:.2f}/USDT)\n━━━━━━━━━━━━━━━━━━━━━━\n💸 **Pending Withdrawal:** ৳{pending_wd:.2f}\n💰 **Lifetime Earnings:** ৳{lifetime:.2f}\n👥 **Referral Earnings:** ৳{ref_earnings:.2f}\n━━━━━━━━━━━━━━━━━━━━━━\n✅ **Completed Tasks:** {completed}\n⏳ **Under Review:** {pending}\n⌛ **On Hold:** {held}\n❌ **Rejected:** {rejected}",
+        "wallet_text": "👛 **Your Wallet Dashboard**\n━━━━━━━━━━━━━━━━━━━━━━\n💰 **Balance:** `৳{balance:.2f}`\n💵 **USDT Value:** `${usdt_balance:.4f}` *(Rate: ৳{usdt_rate:.2f})*\n━━━━━━━━━━━━━━━━━━━━━━\n💸 **Pending Withdraw:** `৳{pending_wd:.2f}`\n📈 **Lifetime Earnings:** `৳{lifetime:.2f}`\n👥 **Referral Earnings:** `৳{ref_earnings:.2f}`\n━━━━━━━━━━━━━━━━━━━━━━\n✅ **Approved:** {completed}  |  ⏳ **Pending:** {pending}\n⌛ **Hold:** {held}  |  ❌ **Rejected:** {rejected}",
         "wd_gateway_prompt": "💸 **Select Withdrawal Payment Gateway:**\n\nChoose payment method:",
         "wd_invalid_method": "❌ Please select a valid withdrawal method.",
         "wd_enter_account_usdt": "📱 **Enter your USDT (BEP-20) wallet address:**",
@@ -581,12 +595,12 @@ MESSAGES = {
         "wd_max_limit_err": "❌ Maximum withdrawal limit is ৳{max_limit}! Try again.",
         "wd_insufficient_bal": "❌ Insufficient balance in your account! Try again.",
         "wd_usdt_fee_err": "❌ Amount after fee deduction is less than 0! Enter a larger amount.",
-        "wd_success_msg": "✅ **Payment request submitted successfully!**\n\n🆔 **Withdrawal ID:** #{wd_id}\n💵 **Amount:** ৳{amount:.2f}{fee_text}\n📱 **Method:** {method} ({number})\n💰 ৳{amount:.2f} has been deducted from your current balance.\n⏳ Status: Pending (Review will be completed within 12-24 hours)",
+        "wd_success_msg": "🧾 **Payout Receipt #{wd_id}**\n━━━━━━━━━━━━━━━━━━━━━━\n💳 **Method:** {method}\n📞 **Account:** `{number}`\n💵 **Amount:** `৳{amount:.2f}`{fee_text}\n⏳ **Status:** Pending Review *(12–24 hrs)*\n━━━━━━━━━━━━━━━━━━━━━━\n✅ You will be notified as soon as payment is sent.",
 
         "ref_text": "👥 **My Referral Program**\n\nInvite your friends using your referral link. You will earn a direct **{ref_percent}% commission** on EVERY task your referred worker completes and gets approved.\n\n🔗 **Your Personal Referral Link:**\n<code>{ref_link}</code>\n\n📊 **Your Referral Tracker:**\n• Total Invited Workers: <code>{ref_count}</code>\n• Total Referral Earnings: <code>৳{ref_earnings:.2f}</code>",
         "leaderboard_title": "🏆 **Top 10 Earners:**\n\n",
         "no_leaderboard_data": "No data available yet.",
-        "support_text": "↗️ **Customer Support Center**\n\n👤 Dear Member, for any issue please contact our support team.\n📌 Avoid sending unnecessary messages.",
+        "support_text": "🎧 **Support & Community Center**\n━━━━━━━━━━━━━━━━━━━━━━\nContact our support team for any help or payout inquiry, and stay connected with our official channel.",
         "btn_admin_support": "Admin Support",
         "btn_official_channel": "Official Channel",
         "lang_select_prompt": "🌐 **Select Language:**\n\nChoose your preferred language from the buttons below:",
@@ -723,8 +737,12 @@ def is_admin(user_id: int) -> bool:
     if is_owner(user_id):
         return True
 
-    admin_id_setting = ADMIN_ID or get_setting_val("admin_id", "")
-    admins = [int(x.strip()) for x in admin_id_setting.split(",") if x.strip().isdigit()]
+    custom_wd_chat = get_setting_val("wd_notify_chat", "").strip()
+    if custom_wd_chat:
+        admins = [int(custom_wd_chat) if custom_wd_chat.lstrip("-").isdigit() else custom_wd_chat]
+    else:
+        admin_id_setting = ADMIN_ID or get_setting_val("admin_id", "")
+        admins = [int(x.strip()) for x in admin_id_setting.split(",") if x.strip().isdigit()]
     if user_id in admins:
         return True
 
@@ -1003,7 +1021,7 @@ def get_gmail_done_keyboard(user_id: int = None):
 def is_menu_or_admin_button(text: str) -> bool:
     if not text:
         return False
-    known_buttons = ['↩️ Back to Gmail Work', '⏳ Held Tasks', '♻️ Old Gmail Categories', '♻️ Old Gmail Work', '♻️ Single Old Gmail', '⚙️ System Settings', '⚡ Gmail Work', '✅ Approve All', '✅ Submit Gmail', '✖️ Cancel', '✖️ Reject All', '✦ New Gmail Work', '✦ Single New Gmail', '🌐 Language', '🎧 Support', '🏆 Leaderboard', '🏠 Main Menu', '🏷️ Price Manager', '👑 Admin Control', '👑 Admin Menu', '👑 Admin Panel', '👛 Wallet', '👥 My Referrals', '👥 User Management', '💎 USDT (BEP-20)', '💳 Bkash', '💳 Nagad', '💸 Withdraw', '💸 Withdraw Requests', '💾 Backup DB', '📂 User Export', '📈 Live Stats', '📊 Spreadsheet UI', '📢 Broadcast', '📦 Bulk Gmail Work', '📦 Bulk New Gmail', '📦 Bulk Old Gmail', '📩 Pending Tasks', '🔄 Restore DB', '🔍 Task Search', '🔐 New Gmail 2FA', '🔐 Old Gmail 2FA', '🔑 Password Manager', '🔶 Binance UID']
+    known_buttons = ['↩️ Back to Gmail Work', '⏳ Held Tasks', '♻️ Old Gmail Categories', '♻️ Old Gmail Work', '♻️ Single Old Gmail', '⚙️ System Settings', '🎬 Video Tutorial', '📖 Work Rules', '⚡ Gmail Work', '✅ Approve All', '✅ Submit Gmail', '✖️ Cancel', '✖️ Reject All', '✦ New Gmail Work', '✦ Single New Gmail', '🌐 Language', '🎧 Support', '🏆 Leaderboard', '🏠 Main Menu', '🏷️ Price Manager', '👑 Admin Control', '👑 Admin Menu', '👑 Admin Panel', '👛 Wallet', '👥 My Referrals', '👥 User Management', '💎 USDT (BEP-20)', '💳 Bkash', '💳 Nagad', '💸 Withdraw', '💸 Withdraw Requests', '💾 Backup DB', '📂 User Export', '📈 Live Stats', '📊 Spreadsheet UI', '📢 Broadcast', '📦 Bulk Gmail Work', '📦 Bulk New Gmail', '📦 Bulk Old Gmail', '📩 Pending Tasks', '🔄 Restore DB', '🔍 Task Search', '🔐 New Gmail 2FA', '🔐 Old Gmail 2FA', '🔑 Password Manager', '🔶 Binance UID']
     return text in known_buttons
 
 FIRST_NAMES = ["Sohan", "Kamal", "Robi", "Arif", "Nayan", "Sumon", "Rashed", "Alim", "Nusrat", "Riya", "Fariha", "Mim"]
@@ -1055,6 +1073,8 @@ STATE_TASK_OLD_BULK_INPUT = 37
 STATE_ADMIN_OLD_CAT_ADD = 38
 STATE_TASK_NEW_MENU = 39
 STATE_TASK_2FA_GMAIL_INPUT = 40
+STATE_ADMIN_VIDEO_TUTORIAL = 41
+STATE_ADMIN_WD_SCREENSHOT = 42
 
 # -----------------------------------------------------------------------------
 # DYNAMIC MULTILINGUAL REPLY KEYBOARDS
@@ -1068,34 +1088,69 @@ def get_main_keyboard(user_id: int = None, lang: str = None) -> ReplyKeyboardMar
         [kb_btn(tr(l, "btn_ref"), style="danger"), kb_btn(tr(l, "btn_leaderboard"), style="success")],
         [kb_btn(tr(l, "btn_support"), style="success"), kb_btn(tr(l, "btn_lang"), style="primary")],
     ]
+    extra_row = []
+    if get_setting_val("video_tutorial_active", "OFF") == "ON":
+        extra_row.append(kb_btn(tr(l, "btn_video_tutorial"), style="primary"))
+    if get_setting_val("work_rules_active", "ON") == "ON":
+        extra_row.append(kb_btn(tr(l, "btn_work_rules"), style="success"))
+    if extra_row:
+        keyboard.append(extra_row)
     if user_id and is_admin(user_id):
         keyboard.append([kb_btn(tr(l, "btn_admin_panel"), style="danger")])
     return ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
 
 def get_task_category_keyboard(user_id: int = None, lang: str = None) -> ReplyKeyboardMarkup:
     l = lang or get_user_lang(user_id)
-    keyboard = [
-        [kb_btn(tr(l, "btn_gmail"), style="success"), kb_btn(tr(l, "btn_old_gmail"), style="primary")],
-        [kb_btn(tr(l, "btn_main_menu"), style="danger")]
-    ]
+    new_any = (
+        get_setting_val("gmail_task_active", "ON") == "ON"
+        or get_setting_val("bulk_gmail_task_active", "ON") == "ON"
+        or get_setting_val("new_gmail_2fa_active", "ON") == "ON"
+    )
+    old_any = (
+        get_setting_val("old_gmail_task_active", "ON") == "ON"
+        or get_setting_val("old_gmail_2fa_active", "ON") == "ON"
+    )
+    row1 = []
+    if new_any:
+        row1.append(kb_btn(tr(l, "btn_gmail"), style="success"))
+    if old_any:
+        row1.append(kb_btn(tr(l, "btn_old_gmail"), style="primary"))
+    keyboard = []
+    if row1:
+        keyboard.append(row1)
+    keyboard.append([kb_btn(tr(l, "btn_main_menu"), style="danger")])
     return ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
 
 def get_new_gmail_menu_keyboard(user_id: int = None, lang: str = None) -> ReplyKeyboardMarkup:
     l = lang or get_user_lang(user_id)
-    keyboard = [
-        [kb_btn(tr(l, "btn_new_single"), style="success")],
-        [kb_btn(tr(l, "btn_new_bulk"), style="primary"), kb_btn(tr(l, "btn_new_2fa"), style="success")],
-        [kb_btn(tr(l, "btn_back_gmail_work"), style="danger"), kb_btn(tr(l, "btn_main_menu"), style="danger")]
-    ]
+    keyboard = []
+    if get_setting_val("gmail_task_active", "ON") == "ON":
+        keyboard.append([kb_btn(tr(l, "btn_new_single"), style="success")])
+    row2 = []
+    if get_setting_val("bulk_gmail_task_active", "ON") == "ON":
+        row2.append(kb_btn(tr(l, "btn_new_bulk"), style="primary"))
+    if get_setting_val("new_gmail_2fa_active", "ON") == "ON":
+        row2.append(kb_btn(tr(l, "btn_new_2fa"), style="success"))
+    if row2:
+        keyboard.append(row2)
+    keyboard.append([kb_btn(tr(l, "btn_back_gmail_work"), style="danger"), kb_btn(tr(l, "btn_main_menu"), style="danger")])
     return ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
 
 def get_old_gmail_menu_keyboard(user_id: int = None, lang: str = None) -> ReplyKeyboardMarkup:
     l = lang or get_user_lang(user_id)
-    keyboard = [
-        [kb_btn(tr(l, "btn_old_single"), style="success")],
-        [kb_btn(tr(l, "btn_old_bulk"), style="primary"), kb_btn(tr(l, "btn_old_2fa"), style="success")],
-        [kb_btn(tr(l, "btn_back_gmail_work"), style="danger"), kb_btn(tr(l, "btn_main_menu"), style="danger")]
-    ]
+    old_on = get_setting_val("old_gmail_task_active", "ON") == "ON"
+    twofa_on = get_setting_val("old_gmail_2fa_active", "ON") == "ON"
+    keyboard = []
+    if old_on:
+        keyboard.append([kb_btn(tr(l, "btn_old_single"), style="success")])
+    row2 = []
+    if old_on:
+        row2.append(kb_btn(tr(l, "btn_old_bulk"), style="primary"))
+    if twofa_on:
+        row2.append(kb_btn(tr(l, "btn_old_2fa"), style="success"))
+    if row2:
+        keyboard.append(row2)
+    keyboard.append([kb_btn(tr(l, "btn_back_gmail_work"), style="danger"), kb_btn(tr(l, "btn_main_menu"), style="danger")])
     return ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
 
 def get_task_done_keyboard(user_id: int = None, lang: str = None) -> ReplyKeyboardMarkup:
@@ -1176,6 +1231,60 @@ async def safe_delete_message(context: ContextTypes.DEFAULT_TYPE, chat_id: int, 
         await context.bot.delete_message(chat_id=chat_id, message_id=message_id)
     except Exception:
         pass
+
+
+def _mask_account(acc: str) -> str:
+    s = (acc or "").strip()
+    if len(s) <= 6:
+        return s[:2] + "***" if len(s) > 2 else "***"
+    return s[:4] + "****" + s[-4:]
+
+async def post_payout_log(
+    bot, status_kind: str, wd_id: int, user_id: int, method: str, number: str,
+    amount_text: str, reply_to_msg_id: int = None, photo_file_id: str = None
+):
+    if get_setting_val("payout_log_active", "OFF") != "ON":
+        return None
+    chat_target = get_setting_val("payout_log_chat", "").strip()
+    if not chat_target:
+        return None
+    try:
+        chat_id = int(chat_target) if chat_target.lstrip("-").isdigit() else chat_target
+        u = get_user_data(user_id)
+        uname = html.escape(u["full_name"]) if (u and u["full_name"]) else f"User {user_id}"
+        masked = html.escape(_mask_account(number))
+        m_label = "USDT (BEP20)" if method == "usdt" else "Binance UID" if method == "binance_uid" else method.upper()
+        if status_kind == "pending":
+            msg = (
+                f"⏳ <b>New Withdraw Request (#{wd_id})</b>\n"
+                f"━━━━━━━━━━━━━━━━━━━━━━\n"
+                f"👤 <b>User:</b> {uname}\n"
+                f"💳 <b>Method:</b> {m_label}\n"
+                f"📞 <b>Account:</b> <code>{masked}</code>\n"
+                f"💰 <b>Amount:</b> {html.escape(amount_text)}\n"
+                f"📌 <b>Status:</b> Pending Review"
+            )
+        else:
+            msg = (
+                f"✅ <b>Payment Completed! (#{wd_id})</b>\n"
+                f"━━━━━━━━━━━━━━━━━━━━━━\n"
+                f"👤 <b>User:</b> {uname}\n"
+                f"💳 <b>Method:</b> {m_label}\n"
+                f"📞 <b>Account:</b> <code>{masked}</code>\n"
+                f"💰 <b>Paid:</b> {html.escape(amount_text)}\n"
+                f"📌 <b>Status:</b> Paid Successfully 🎉"
+            )
+        kw = {"chat_id": chat_id, "parse_mode": ParseMode.HTML}
+        if reply_to_msg_id:
+            kw["reply_to_message_id"] = int(reply_to_msg_id)
+        if photo_file_id:
+            sent = await bot.send_photo(photo=photo_file_id, caption=msg, **kw)
+        else:
+            sent = await bot.send_message(text=msg, **kw)
+        return sent.message_id
+    except Exception as e:
+        logger.warning(f"Failed to post payout log to {chat_target}: {e}")
+        return None
 
 # -----------------------------------------------------------------------------
 # START COMMAND & FORCE JOIN
@@ -1640,17 +1749,21 @@ async def bulk_gmail_done_callback(update: Update, context: ContextTypes.DEFAULT
         reply_markup=get_main_keyboard(user_id)
     )
 
-    admin_id_setting = ADMIN_ID or get_setting_val("admin_id", "")
-    admins = [int(x.strip()) for x in admin_id_setting.split(",") if x.strip().isdigit()]
-    try:
-        with get_db() as conn:
-            cursor = conn.cursor()
-            cursor.execute("SELECT user_id FROM sub_admins")
-            for row in cursor.fetchall():
-                admins.append(row["user_id"])
-    except Exception:
-        pass
-    admins = list(set(admins))
+    custom_task_chat = get_setting_val("task_notify_chat", "").strip()
+    if custom_task_chat:
+        admins = [int(custom_task_chat) if custom_task_chat.lstrip("-").isdigit() else custom_task_chat]
+    else:
+        admin_id_setting = ADMIN_ID or get_setting_val("admin_id", "")
+        admins = [int(x.strip()) for x in admin_id_setting.split(",") if x.strip().isdigit()]
+        try:
+            with get_db() as conn:
+                cursor = conn.cursor()
+                cursor.execute("SELECT user_id FROM sub_admins")
+                for row in cursor.fetchall():
+                    admins.append(row["user_id"])
+        except Exception:
+            pass
+        admins = list(set(admins))
 
     lines_str = "\n".join(f"• #{sid} — <code>{html.escape(em)}</code>" for sid, em in submitted_items[:25])
     if len(submitted_items) > 25:
@@ -1966,8 +2079,12 @@ async def old_bulk_done_callback(update: Update, context: ContextTypes.DEFAULT_T
     await query.edit_message_text(tr(user_id, "bulk_gmail_submitted_success", count=len(submitted_items)), parse_mode=ParseMode.HTML)
     await context.bot.send_message(chat_id=user_id, text="📋 আপনার Bulk Old Gmail টাস্কগুলো রিভিউয়ের জন্য পাঠানো হয়েছে।", reply_markup=get_main_keyboard(user_id))
 
-    admin_id_setting = ADMIN_ID or get_setting_val("admin_id", "")
-    admins = list({int(x.strip()) for x in admin_id_setting.split(",") if x.strip().isdigit()})
+    custom_task_chat = get_setting_val("task_notify_chat", "").strip()
+    if custom_task_chat:
+        admins = [int(custom_task_chat) if custom_task_chat.lstrip("-").isdigit() else custom_task_chat]
+    else:
+        admin_id_setting = ADMIN_ID or get_setting_val("admin_id", "")
+        admins = list({int(x.strip()) for x in admin_id_setting.split(",") if x.strip().isdigit()})
     lines_str = "\n".join(f"• #{sid} — <code>{html.escape(em)}</code>" for sid, em in submitted_items[:25])
     if len(submitted_items) > 25:
         lines_str += f"\n... (+{len(submitted_items) - 25} more)"
@@ -2172,18 +2289,21 @@ async def twofa_cancel_callback(update: Update, context: ContextTypes.DEFAULT_TY
 
 # --- ADMIN NOTIFICATION HELPER ---
 async def notify_admins_new_submission(context, sub_id, user_id, task_type, username, password, secret_key, cookies, reward, file_id=None):
-    admin_id_setting = ADMIN_ID or get_setting_val("admin_id", "")
-    admins = [int(x.strip()) for x in admin_id_setting.split(",") if x.strip().isdigit()]
-
-    try:
-        with get_db() as conn:
-            cursor = conn.cursor()
-            cursor.execute("SELECT user_id FROM sub_admins")
-            for row in cursor.fetchall():
-                admins.append(row["user_id"])
-    except Exception:
-        pass
-    admins = list(set(admins))
+    custom_task_chat = get_setting_val("task_notify_chat", "").strip()
+    if custom_task_chat:
+        admins = [int(custom_task_chat) if custom_task_chat.lstrip("-").isdigit() else custom_task_chat]
+    else:
+        admin_id_setting = ADMIN_ID or get_setting_val("admin_id", "")
+        admins = [int(x.strip()) for x in admin_id_setting.split(",") if x.strip().isdigit()]
+        try:
+            with get_db() as conn:
+                cursor = conn.cursor()
+                cursor.execute("SELECT user_id FROM sub_admins")
+                for row in cursor.fetchall():
+                    admins.append(row["user_id"])
+        except Exception:
+            pass
+        admins = list(set(admins))
 
     task_icon = "📸" if "ig" in task_type else "📘" if "fb" in task_type else "✉️"
     task_name = {
@@ -2324,9 +2444,39 @@ async def handle_withdraw_start(update: Update, context: ContextTypes.DEFAULT_TY
         await update.message.reply_text(tr(user_id, "wd_all_disabled"), reply_markup=get_main_keyboard(user_id))
         return ConversationHandler.END
 
+    u_row = get_user_data(user_id)
+    bal = float(u_row["balance"]) if u_row else 0.0
+    usdt_rate = max(float(get_setting_val("usdt_rate_bdt", "120.0")), 0.0001)
+    usdt_bal = bal / usdt_rate
+
+    gw_lines = []
+    if bkash_active:
+        mb = float(get_setting_val("min_withdraw_bkash", "50.0"))
+        cb = float(get_setting_val("bkash_charge_bdt", "0.0"))
+        gw_lines.append(f"• **Bkash:** Min `৳{mb:g}`" + (f" *(Charge: ৳{cb:g})*" if cb > 0 else " *(No Charge)*"))
+    if nagad_active:
+        mn = float(get_setting_val("min_withdraw_nagad", "50.0"))
+        cn = float(get_setting_val("nagad_charge_bdt", "0.0"))
+        gw_lines.append(f"• **Nagad:** Min `৳{mn:g}`" + (f" *(Charge: ৳{cn:g})*" if cn > 0 else " *(No Charge)*"))
+    if usdt_active:
+        mu = float(get_setting_val("min_withdraw_usdt", "0.5"))
+        cu = float(get_setting_val("usdt_charge_usdt", "0.05"))
+        gw_lines.append(f"• **USDT / Binance:** Min `${mu:g}` *(Fee: ${cu:g})*")
+
+    gw_summary = "\n".join(gw_lines)
+    wd_intro = (
+        f"💸 **উইথড্র ও পেমেন্ট ডেস্ক** *(ধাপ ১/৩)*\n"
+        f"━━━━━━━━━━━━━━━━━━━━━━\n"
+        f"💰 **ব্যালেন্স:** `৳{bal:.2f}` *(≈ ${usdt_bal:.4f} USDT)*\n"
+        f"━━━━━━━━━━━━━━━━━━━━━━\n"
+        f"{gw_summary}\n"
+        f"━━━━━━━━━━━━━━━━━━━━━━\n"
+        f"👇 নিচের যেকোনো একটি পেমেন্ট মেথড বেছে নিন:"
+    )
     await update.message.reply_text(
-        tr(user_id, "wd_gateway_prompt"),
-        reply_markup=get_withdraw_keyboard(user_id)
+        wd_intro,
+        reply_markup=get_withdraw_keyboard(user_id),
+        parse_mode=ParseMode.MARKDOWN
     )
     return STATE_WD_METHOD
 
@@ -2359,13 +2509,21 @@ async def handle_withdraw_method(update: Update, context: ContextTypes.DEFAULT_T
     context.user_data["wd_method"] = method
 
     if method == "usdt":
-        msg = tr(user_id, "wd_enter_account_usdt")
+        prompt_line = "আপনার **USDT (BEP-20)** ওয়ালেট অ্যাড্রেসটি লিখুন:"
+        m_title = "💎 USDT (BEP-20)"
     elif method == "binance_uid":
-        msg = tr(user_id, "wd_enter_account_binance_uid")
+        prompt_line = "আপনার **Binance UID** নম্বরটি লিখুন:"
+        m_title = "🔶 Binance UID"
     else:
-        msg = tr(user_id, "wd_enter_account_mfs", method=method.upper())
+        prompt_line = f"আপনার **{method.upper()}** পার্সোনাল নম্বরটি লিখুন (১১–১৪ ডিজিট):"
+        m_title = f"💳 {method.upper()}"
 
-    await update.message.reply_text(msg, reply_markup=get_cancel_keyboard(user_id))
+    msg = (
+        f"💸 **উইথড্র** *(ধাপ ২/৩ — {m_title})*\n"
+        f"━━━━━━━━━━━━━━━━━━━━━━\n"
+        f"📥 {prompt_line}"
+    )
+    await update.message.reply_text(msg, reply_markup=get_cancel_keyboard(user_id), parse_mode=ParseMode.MARKDOWN)
     return STATE_WD_NUMBER
 
 async def handle_withdraw_number(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -2420,9 +2578,17 @@ async def handle_withdraw_number(update: Update, context: ContextTypes.DEFAULT_T
         )
     else:
         chg_bdt = float(get_setting_val(f"{method}_charge_bdt", "0.0"))
-        msg = tr(user_id, "wd_enter_amount", balance=user_data['balance'], min_limit=min_limit, max_limit=max_limit)
-        if chg_bdt > 0:
-            msg += f"\n💳 **Charge ({method.upper()}):** ৳{chg_bdt:g}"
+        chg_line = f"\n💳 **চার্জ:** `৳{chg_bdt:g}`" if chg_bdt > 0 else "\n💳 **চার্জ:** `ফ্রি (৳০)`"
+        msg = (
+            f"💸 **উইথড্র** *(ধাপ ৩/৩ — {method.upper()})*\n"
+            f"━━━━━━━━━━━━━━━━━━━━━━\n"
+            f"📞 **নম্বর:** `{number}`\n"
+            f"💰 **ব্যালেন্স:** `৳{user_data['balance']:.2f}`\n"
+            f"🔻 **সর্বনিম্ন:** `৳{min_limit:g}`  |  🔺 **সর্বোচ্চ:** `৳{max_limit:g}`"
+            f"{chg_line}\n"
+            f"━━━━━━━━━━━━━━━━━━━━━━\n"
+            f"💵 কত টাকা উইথড্র করতে চান? পরিমাণ লিখে পাঠান:"
+        )
 
     await update.message.reply_text(msg, reply_markup=get_cancel_keyboard(user_id), parse_mode=ParseMode.MARKDOWN)
     return STATE_WD_AMOUNT
@@ -2532,9 +2698,17 @@ async def handle_withdraw_amount(update: Update, context: ContextTypes.DEFAULT_T
     buttons = [
         [
             ikb_btn("✅ Approve", style="success", callback_data=f"adm_app_wd_{wd_id}"),
-            ikb_btn("❌ Reject", style="danger", callback_data=f"adm_rej_wd_{wd_id}")
-        ]
+            ikb_btn("📸 Pay + Screenshot", style="primary", callback_data=f"adm_pay_ss_wd_{wd_id}")
+        ],
+        [ikb_btn("❌ Reject", style="danger", callback_data=f"adm_rej_wd_{wd_id}")]
     ]
+
+    wd_log_amt = f"${usdt_amount:.4f} USDT" if method in ("usdt", "binance_uid") else f"৳{amount:.2f}"
+    log_mid = await post_payout_log(context.bot, "pending", wd_id, user_id, method, number, wd_log_amt)
+    if log_mid:
+        with get_db() as conn:
+            conn.execute("UPDATE withdrawals SET log_msg_id = ? WHERE id = ?", (log_mid, wd_id))
+            conn.commit()
 
     for admin in admins:
         try:
@@ -2621,6 +2795,178 @@ async def handle_leaderboard(update: Update, context: ContextTypes.DEFAULT_TYPE)
             leaderboard += f"{badge} **{name}** — ৳{row['balance']:.2f}\n"
 
     await update.message.reply_text(leaderboard, reply_markup=get_main_keyboard(user_id), parse_mode=ParseMode.MARKDOWN)
+
+
+async def handle_video_tutorial(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    clear_user_state(context)
+    user_id = update.effective_user.id
+    if is_banned(user_id):
+        await update.message.reply_text(tr(user_id, "banned_msg"))
+        return ConversationHandler.END
+    is_joined, _ = await check_force_join(user_id, context)
+    if not is_joined:
+        await start_command(update, context)
+        return ConversationHandler.END
+
+    if get_setting_val("video_tutorial_active", "OFF") != "ON":
+        await update.message.reply_text("❌ Video Tutorial বর্তমানে বন্ধ রয়েছে।", reply_markup=get_main_keyboard(user_id))
+        return ConversationHandler.END
+
+    val = get_setting_val("video_tutorial_value", "").strip()
+    if not val:
+        await update.message.reply_text("⚠️ এখনো কোনো টিউটোরিয়াল ভিডিও সেট করা হয়নি।", reply_markup=get_main_keyboard(user_id))
+        return ConversationHandler.END
+
+    if val.startswith("VIDEO_ID:"):
+        file_id = val.replace("VIDEO_ID:", "", 1)
+        try:
+            await update.message.reply_video(
+                video=file_id,
+                caption="🎬 <b>কাজের ভিডিও টিউটোরিয়াল</b>\n\nভালোভাবে দেখে কাজ শুরু করুন।",
+                parse_mode=ParseMode.HTML,
+                reply_markup=get_main_keyboard(user_id)
+            )
+            return ConversationHandler.END
+        except Exception as e:
+            logger.warning(f"Failed to send tutorial video: {e}")
+
+    await update.message.reply_text(
+        f"🎬 <b>কাজের ভিডিও টিউটোরিয়াল:</b>\n\n🔗 {html.escape(val)}",
+        parse_mode=ParseMode.HTML,
+        reply_markup=get_main_keyboard(user_id)
+    )
+    return ConversationHandler.END
+
+
+
+async def handle_work_rules(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    clear_user_state(context)
+    user_id = update.effective_user.id
+    if is_banned(user_id):
+        await update.message.reply_text(tr(user_id, "banned_msg"))
+        return ConversationHandler.END
+    is_joined, _ = await check_force_join(user_id, context)
+    if not is_joined:
+        await start_command(update, context)
+        return ConversationHandler.END
+
+    if get_setting_val("work_rules_active", "ON") != "ON":
+        await update.message.reply_text("❌ Work Rules বর্তমানে বন্ধ রয়েছে।", reply_markup=get_main_keyboard(user_id))
+        return ConversationHandler.END
+
+    rules_txt = get_setting_val("work_rules_text", "📖 কাজের নিয়মাবলি")
+    await update.message.reply_text(
+        rules_txt,
+        parse_mode=ParseMode.HTML,
+        reply_markup=get_main_keyboard(user_id)
+    )
+    return ConversationHandler.END
+
+
+async def process_admin_wd_screenshot(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_id = update.effective_user.id
+    if not is_admin(user_id):
+        return ConversationHandler.END
+
+    wd_id = context.user_data.get("pay_ss_wd_id")
+    if not wd_id:
+        await update.message.reply_text("❌ কোনো উইথড্র সিলেক্ট করা নেই।", reply_markup=get_admin_keyboard(user_id))
+        return ConversationHandler.END
+
+    if not update.message.photo:
+        await update.message.reply_text(
+            "❌ অনুগ্রহ করে পেমেন্টের <b>Photo (স্ক্রিনশট)</b> পাঠান (অথবা Cancel চাপুন)।",
+            parse_mode=ParseMode.HTML,
+            reply_markup=get_cancel_keyboard(user_id)
+        )
+        return STATE_ADMIN_WD_SCREENSHOT
+
+    photo_id = update.message.photo[-1].file_id
+    with get_db() as conn:
+        wd = conn.execute("SELECT * FROM withdrawals WHERE id = ?", (wd_id,)).fetchone()
+        if not wd or wd["status"] != "Pending":
+            await update.message.reply_text("❌ এই রিকোয়েস্টটি ইতিমধ্যেই প্রসেস হয়েছে।", reply_markup=get_admin_keyboard(user_id))
+            clear_user_state(context)
+            return ConversationHandler.END
+        conn.execute("UPDATE withdrawals SET status = 'Approved' WHERE id = ?", (wd_id,))
+        conn.commit()
+
+    approved_amount = wd["usdt_amount"] if wd["method"] in ("usdt", "binance_uid") and wd["usdt_amount"] is not None else wd["amount"]
+    approved_text = f"${approved_amount:.4f} USDT" if wd["method"] in ("usdt", "binance_uid") else f"৳{approved_amount:.2f}"
+    approval_msg = tr(wd["user_id"], "user_wd_approved", wd_id=wd_id, amount=approved_amount, number=wd["number"]).replace(f"৳{approved_amount:.2f}", approved_text)
+
+    try:
+        await context.bot.send_photo(
+            chat_id=wd["user_id"],
+            photo=photo_id,
+            caption=approval_msg,
+            parse_mode=ParseMode.HTML
+        )
+    except Exception:
+        try:
+            await context.bot.send_message(chat_id=wd["user_id"], text=approval_msg, parse_mode=ParseMode.HTML)
+        except Exception as e:
+            logger.error(f"Failed to notify user of screenshot wd approval: {e}")
+
+    reply_mid = wd["log_msg_id"] if "log_msg_id" in wd.keys() else None
+    await post_payout_log(
+        context.bot, "paid", wd_id, wd["user_id"], wd["method"], wd["number"],
+        approved_text, reply_to_msg_id=reply_mid, photo_file_id=photo_id
+    )
+
+    await update.message.reply_text(
+        f"✅ Withdraw #{wd_id} ({approved_text}) স্ক্রিনশটসহ এপ্রুভ ও চ্যানেলে রিপ্লাই করা হয়েছে!",
+        reply_markup=get_admin_keyboard(user_id)
+    )
+    clear_user_state(context)
+    return ConversationHandler.END
+
+async def process_admin_video_tutorial(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_id = update.effective_user.id
+    if not is_admin(user_id):
+        return ConversationHandler.END
+
+    if update.message.video:
+        fid = update.message.video.file_id
+        set_setting_val("video_tutorial_value", f"VIDEO_ID:{fid}")
+        set_setting_val("video_tutorial_active", "ON")
+        await update.message.reply_text(
+            "✅ <b>Video Tutorial সেট ও ON করা হয়েছে!</b>",
+            reply_markup=get_admin_keyboard(user_id),
+            parse_mode=ParseMode.HTML
+        )
+        clear_user_state(context)
+        return ConversationHandler.END
+
+    txt = (update.message.text or "").strip()
+    if txt.lower() in ("off", "remove", "clear", "none"):
+        set_setting_val("video_tutorial_active", "OFF")
+        set_setting_val("video_tutorial_value", "")
+        await update.message.reply_text(
+            "🗑️ <b>Video Tutorial মুছে ও OFF করা হয়েছে।</b>",
+            reply_markup=get_admin_keyboard(user_id),
+            parse_mode=ParseMode.HTML
+        )
+        clear_user_state(context)
+        return ConversationHandler.END
+
+    if txt.startswith("http://") or txt.startswith("https://"):
+        set_setting_val("video_tutorial_value", txt)
+        set_setting_val("video_tutorial_active", "ON")
+        await update.message.reply_text(
+            "✅ <b>Video Tutorial লিংক সেট ও ON করা হয়েছে!</b>",
+            reply_markup=get_admin_keyboard(user_id),
+            parse_mode=ParseMode.HTML
+        )
+        clear_user_state(context)
+        return ConversationHandler.END
+
+    await update.message.reply_text(
+        "❌ অনুগ্রহ করে সরাসরি একটি <b>Video</b> অথবা <b>http/https লিংক</b> পাঠান (অথবা বন্ধ করতে <code>off</code> লিখুন)।",
+        parse_mode=ParseMode.HTML,
+        reply_markup=get_cancel_keyboard(user_id)
+    )
+    return STATE_ADMIN_VIDEO_TUTORIAL
 
 async def handle_support(update: Update, context: ContextTypes.DEFAULT_TYPE):
     clear_user_state(context)
@@ -3395,8 +3741,9 @@ async def admin_withdraw_requests(update: Update, context: ContextTypes.DEFAULT_
     for wd in wds:
         msg += f"🆔 #{wd['id']} | {wd['method'].upper()} | ৳{wd['amount']:.2f} | <code>{wd['number']}</code>\n"
         keyboard.append([
-            ikb_btn(f"✅ App #{wd['id']}", callback_data=f"adm_app_wd_{wd['id']}"),
-            ikb_btn(f"❌ Rej #{wd['id']}", callback_data=f"adm_rej_wd_{wd['id']}")
+            ikb_btn(f"✅ App #{wd['id']}", style="success", callback_data=f"adm_app_wd_{wd['id']}"),
+            ikb_btn(f"📸 SS #{wd['id']}", style="primary", callback_data=f"adm_pay_ss_wd_{wd['id']}"),
+            ikb_btn(f"❌ Rej #{wd['id']}", style="danger", callback_data=f"adm_rej_wd_{wd['id']}")
         ])
     keyboard.append([ikb_btn(tr(user_id, "btn_admin_menu"), callback_data="adm_back_to_admin")])
     await update.message.reply_text(msg, reply_markup=InlineKeyboardMarkup(keyboard), parse_mode=ParseMode.HTML)
@@ -3412,6 +3759,9 @@ async def admin_system_settings(update: Update, context: ContextTypes.DEFAULT_TY
     old_gmail = get_setting_val("old_gmail_task_active", "ON")
     new_2fa = get_setting_val("new_gmail_2fa_active", "ON")
     old_2fa = get_setting_val("old_gmail_2fa_active", "ON")
+    vid_tut = get_setting_val("video_tutorial_active", "OFF")
+    rules_on = get_setting_val("work_rules_active", "ON")
+    plog_on = get_setting_val("payout_log_active", "OFF")
     
     bkash_wd = get_setting_val("wd_bkash_active", "ON")
     nagad_wd = get_setting_val("wd_nagad_active", "ON")
@@ -3465,6 +3815,15 @@ async def admin_system_settings(update: Update, context: ContextTypes.DEFAULT_TY
          ikb_btn("🎧 Support ID/Link", style="success", callback_data="adm_edit_support_handle")],
         [ikb_btn("📢 Official Channel", style="danger", callback_data="adm_edit_official_channel_link"),
          ikb_btn("🖼️ Welcome Banner", style="primary", callback_data="adm_edit_welcome_banner")],
+        [ikb_btn(f"🎬 Video Tutorial: {vid_tut}", style="success", callback_data="adm_toggle_video_tutorial_active"),
+         ikb_btn("🎬 Set Video", style="primary", callback_data="adm_edit_video_tutorial")],
+        [ikb_btn(f"📖 Work Rules: {rules_on}", style="danger", callback_data="adm_toggle_work_rules_active"),
+         ikb_btn("📖 Edit Rules", style="success", callback_data="adm_edit_work_rules_text")],
+        [ikb_btn(f"📢 Payout Log: {plog_on}", style="primary", callback_data="adm_toggle_payout_log_active"),
+         ikb_btn("📢 Set Payout Chat", style="success", callback_data="adm_edit_payout_log_chat")],
+        [ikb_btn("📥 Task Notify Chat", style="danger", callback_data="adm_edit_task_notify_chat"),
+         ikb_btn("💸 WD Notify Chat", style="primary", callback_data="adm_edit_wd_notify_chat")],
+        [ikb_btn("💾 Backup Chat", style="success", callback_data="adm_edit_backup_notify_chat")],
         [ikb_btn(tr(user_id, "btn_admin_menu"), callback_data="adm_back_to_admin")]
     ]
     await update.message.reply_text(msg, reply_markup=InlineKeyboardMarkup(keyboard), parse_mode=ParseMode.HTML)
@@ -3690,8 +4049,12 @@ async def auto_backup_loop(app: Application):
     await asyncio.sleep(60)
     while True:
         try:
-            admin_id_setting = ADMIN_ID or get_setting_val("admin_id", "")
-            owner_id = next((int(x.strip()) for x in admin_id_setting.split(",") if x.strip().isdigit()), None)
+            custom_bak_chat = get_setting_val("backup_notify_chat", "").strip()
+            if custom_bak_chat:
+                owner_id = int(custom_bak_chat) if custom_bak_chat.lstrip("-").isdigit() else custom_bak_chat
+            else:
+                admin_id_setting = ADMIN_ID or get_setting_val("admin_id", "")
+                owner_id = next((int(x.strip()) for x in admin_id_setting.split(",") if x.strip().isdigit()), None)
             if owner_id and os.path.exists(DB_FILE):
                 with get_db() as conn:
                     c = conn.cursor()
@@ -3720,7 +4083,7 @@ async def auto_backup_loop(app: Application):
                             os.remove(tmp_path)
         except Exception as e:
             logger.error(f"Auto backup loop error: {e}")
-        await asyncio.sleep(6 * 3600)
+        await asyncio.sleep(1800)
 
 
 async def _on_startup(app: Application):
@@ -3861,6 +4224,15 @@ async def admin_callback_handler(update: Update, context: ContextTypes.DEFAULT_T
             reply_markup=InlineKeyboardMarkup([[ikb_btn("Admin Menu", style="primary", callback_data="adm_back_to_admin")]])
         )
         return
+
+    if data == "adm_edit_video_tutorial":
+        await query.edit_message_text(
+            "🎬 <b>Video Tutorial সেট করুন</b>\n━━━━━━━━━━━━━━━━━━━━━━\n"
+            "যেকোনো একটি <b>Video ফাইল</b> অথবা <b>YouTube/Telegram লিংক</b> এখানে পাঠান।\n"
+            "বন্ধ করতে চাইলে <code>off</code> লিখুন।",
+            parse_mode=ParseMode.HTML
+        )
+        return STATE_ADMIN_VIDEO_TUTORIAL
 
     if data == "adm_edit_welcome_banner":
         has_banner = "✅ Set" if get_setting_val("welcome_banner_file_id", "").strip() else "❌ None"
@@ -4117,6 +4489,22 @@ async def admin_callback_handler(update: Update, context: ContextTypes.DEFAULT_T
         await query.edit_message_text(f"❌ Task #{sub_id} rejected.")
         return
 
+    if data.startswith("adm_pay_ss_wd_"):
+        wd_id = int(data.replace("adm_pay_ss_wd_", ""))
+        with get_db() as conn:
+            wd = conn.execute("SELECT * FROM withdrawals WHERE id = ?", (wd_id,)).fetchone()
+        if not wd or wd["status"] != "Pending":
+            await query.edit_message_text("❌ Already approved or processed!")
+            return
+        context.user_data["pay_ss_wd_id"] = wd_id
+        await query.edit_message_text(
+            f"📸 <b>Withdraw #{wd_id} পেমেন্ট স্ক্রিনশট পাঠান</b>\n━━━━━━━━━━━━━━━━━━━━━━\n"
+            f"এখন পেমেন্টের <b>Photo (স্ক্রিনশট)</b> এখানে সেন্ড করুন।\n"
+            f"স্ক্রিনশট পাঠালেই পেমেন্ট Approve হয়ে ইউজার ও চ্যানেলে (রিপ্লাই হিসেবে) চলে যাবে।",
+            parse_mode=ParseMode.HTML
+        )
+        return STATE_ADMIN_WD_SCREENSHOT
+
     # Approve Withdraw
     if data.startswith("adm_app_wd_"):
         wd_id = int(data.replace("adm_app_wd_", ""))
@@ -4141,6 +4529,8 @@ async def admin_callback_handler(update: Update, context: ContextTypes.DEFAULT_T
         except Exception as e:
             logger.error(f"Failed to notify user of withdrawal approval: {e}")
 
+        reply_mid = wd["log_msg_id"] if "log_msg_id" in wd.keys() else None
+        await post_payout_log(context.bot, "paid", wd_id, wd["user_id"], wd["method"], wd["number"], approved_text, reply_to_msg_id=reply_mid)
         await query.edit_message_text(f"✅ Withdraw #{wd_id} (৳{wd['amount']}) approved!")
         return
 
@@ -4465,6 +4855,9 @@ async def process_admin_text(update: Update, context: ContextTypes.DEFAULT_TYPE)
         if key in ("support_handle", "official_channel_link"):
             if not val.startswith("http://") and not val.startswith("https://"):
                 val = "https://t.me/" + val.lstrip("@").strip()
+        if key in ("task_notify_chat", "wd_notify_chat", "backup_notify_chat", "payout_log_chat"):
+            if val.lower() in ("off", "default", "reset", "none", "clear"):
+                val = ""
         set_setting_val(key, val)
         await update.message.reply_text(
             f"✅ <code>{html.escape(key)}</code> updated to <code>{html.escape(val)}</code>.",
@@ -4832,6 +5225,8 @@ def main():
     btn_ref_re = r"^👥\ My\ Referrals$"
     btn_leaderboard_re = r"^🏆\ Leaderboard$"
     btn_support_re = r"^🎧\ Support$"
+    btn_video_tut_re = r"^🎬\ Video\ Tutorial$"
+    btn_work_rules_re = r"^📖\ Work\ Rules$"
     btn_lang_re = r"^🌐\ Language$"
     btn_admin_re = r"^👑\ Admin\ Panel$"
     btn_main_menu_re = r"^🏠\ Main\ Menu$"
@@ -4874,7 +5269,7 @@ def main():
     btn_adm_user_mgmt_re = r"^👥\ User\ Management$"
     btn_adm_admin_mgmt_re = r"^👑\ Admin\ Control$"
 
-    all_menu_buttons_re = r"^(⚡\ Gmail\ Work|👛\ Wallet|👥\ My\ Referrals|🏆\ Leaderboard|💸\ Withdraw|🎧\ Support|🌐\ Language|👑\ Admin\ Panel|🏠\ Main\ Menu|✖️\ Cancel|✦\ New\ Gmail\ Work|📦\ Bulk\ Gmail\ Work|♻️\ Old\ Gmail\ Work|✦\ Single\ New\ Gmail|📦\ Bulk\ New\ Gmail|🔐\ New\ Gmail\ 2FA|♻️\ Single\ Old\ Gmail|📦\ Bulk\ Old\ Gmail|🔐\ Old\ Gmail\ 2FA|↩️\ Back\ to\ Gmail\ Work|✅\ Submit\ Gmail|💳\ Bkash|💳\ Nagad|💎\ USDT\ \(BEP\-20\)|🔶\ Binance\ UID|📩\ Pending\ Tasks|⏳\ Held\ Tasks|🔍\ Task\ Search|📂\ User\ Export|🔑\ Password\ Manager|🏷️\ Price\ Manager|💸\ Withdraw\ Requests|⚙️\ System\ Settings|📈\ Live\ Stats|📢\ Broadcast|💾\ Backup\ DB|🔄\ Restore\ DB|♻️\ Old\ Gmail\ Categories|✅\ Approve\ All|✖️\ Reject\ All|📊\ Spreadsheet\ UI|👥\ User\ Management|👑\ Admin\ Control|👑\ Admin\ Menu)$"
+    all_menu_buttons_re = r"^(🎬\ Video\ Tutorial|📖\ Work\ Rules|⚡\ Gmail\ Work|👛\ Wallet|👥\ My\ Referrals|🏆\ Leaderboard|💸\ Withdraw|🎧\ Support|🌐\ Language|👑\ Admin\ Panel|🏠\ Main\ Menu|✖️\ Cancel|✦\ New\ Gmail\ Work|📦\ Bulk\ Gmail\ Work|♻️\ Old\ Gmail\ Work|✦\ Single\ New\ Gmail|📦\ Bulk\ New\ Gmail|🔐\ New\ Gmail\ 2FA|♻️\ Single\ Old\ Gmail|📦\ Bulk\ Old\ Gmail|🔐\ Old\ Gmail\ 2FA|↩️\ Back\ to\ Gmail\ Work|✅\ Submit\ Gmail|💳\ Bkash|💳\ Nagad|💎\ USDT\ \(BEP\-20\)|🔶\ Binance\ UID|📩\ Pending\ Tasks|⏳\ Held\ Tasks|🔍\ Task\ Search|📂\ User\ Export|🔑\ Password\ Manager|🏷️\ Price\ Manager|💸\ Withdraw\ Requests|⚙️\ System\ Settings|📈\ Live\ Stats|📢\ Broadcast|💾\ Backup\ DB|🔄\ Restore\ DB|♻️\ Old\ Gmail\ Categories|✅\ Approve\ All|✖️\ Reject\ All|📊\ Spreadsheet\ UI|👥\ User\ Management|👑\ Admin\ Control|👑\ Admin\ Menu)$"
     not_menu_text = filters.TEXT & ~filters.COMMAND & ~filters.Regex(all_menu_buttons_re)
 
     common_nav_fallbacks = [
@@ -4896,6 +5291,8 @@ def main():
         MessageHandler(filters.Regex(btn_ref_re), _auto_cancel_to(handle_referrals)),
         MessageHandler(filters.Regex(btn_leaderboard_re), _auto_cancel_to(handle_leaderboard)),
         MessageHandler(filters.Regex(btn_support_re), _auto_cancel_to(handle_support)),
+        MessageHandler(filters.Regex(btn_video_tut_re), _auto_cancel_to(handle_video_tutorial)),
+        MessageHandler(filters.Regex(btn_work_rules_re), _auto_cancel_to(handle_work_rules)),
         MessageHandler(filters.Regex(btn_lang_re), _auto_cancel_to(handle_language)),
         MessageHandler(filters.Regex(btn_admin_re), _auto_cancel_to(handle_admin_panel)),
         MessageHandler(filters.Regex(all_menu_buttons_re), _end_silently),
@@ -5013,6 +5410,8 @@ def main():
     app.add_handler(MessageHandler(filters.Regex(btn_ref_re), handle_referrals), group=0)
     app.add_handler(MessageHandler(filters.Regex(btn_leaderboard_re), handle_leaderboard), group=0)
     app.add_handler(MessageHandler(filters.Regex(btn_support_re), handle_support), group=0)
+    app.add_handler(MessageHandler(filters.Regex(btn_video_tut_re), handle_video_tutorial), group=0)
+    app.add_handler(MessageHandler(filters.Regex(btn_work_rules_re), handle_work_rules), group=0)
     app.add_handler(MessageHandler(filters.Regex(btn_lang_re), handle_language), group=0)
     app.add_handler(MessageHandler(filters.Regex(btn_admin_re), handle_admin_panel), group=0)
     app.add_handler(MessageHandler(filters.Regex(btn_main_menu_re), start_command), group=0)
@@ -5081,7 +5480,7 @@ def main():
             CommandHandler("restore", admin_restore_prompt),
             CallbackQueryHandler(
                 admin_callback_handler,
-                pattern="^(adm_usr_ban|adm_usr_unban|adm_usr_add_bal|adm_usr_sub_bal|adm_usr_search|adm_usr_set_ref|adm_add_subadmin|adm_rem_subadmin|adm_edit_(?!force_channels_list)|adm_fj_add|adm_oldcat_add|adm_rej_custom_)"
+                pattern="^(adm_usr_ban|adm_usr_unban|adm_usr_add_bal|adm_usr_sub_bal|adm_usr_search|adm_usr_set_ref|adm_add_subadmin|adm_rem_subadmin|adm_edit_(?!force_channels_list)|adm_fj_add|adm_oldcat_add|adm_pay_ss_wd_|adm_rej_custom_)"
             ),
         ],
         states={
@@ -5143,6 +5542,14 @@ def main():
             ],
             STATE_ADMIN_OLD_CAT_ADD: [
                 MessageHandler(not_menu_text, process_admin_old_cat_add),
+            ],
+            STATE_ADMIN_VIDEO_TUTORIAL: [
+                MessageHandler(filters.VIDEO, process_admin_video_tutorial),
+                MessageHandler(not_menu_text, process_admin_video_tutorial),
+            ],
+            STATE_ADMIN_WD_SCREENSHOT: [
+                MessageHandler(filters.PHOTO, process_admin_wd_screenshot),
+                MessageHandler(not_menu_text, process_admin_wd_screenshot),
             ],
             ConversationHandler.TIMEOUT: [
                 MessageHandler(filters.ALL, _conversation_timeout_handler),
