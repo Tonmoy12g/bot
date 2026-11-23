@@ -153,6 +153,21 @@ class DatabasePool:
             if conn:
                 self._pool.put(conn)
 
+    def reload_pool(self):
+        old_conns = []
+        while not self._pool.empty():
+            try:
+                old_conns.append(self._pool.get_nowait())
+            except Exception:
+                break
+        for c in old_conns:
+            try:
+                c.close()
+            except Exception:
+                pass
+        self._create_initial_pool()
+        logger.info("Database pool reloaded after restore.")
+
 _db_pool = DatabasePool()
 
 def get_db():
@@ -181,9 +196,14 @@ def init_db():
             ref_earnings REAL DEFAULT 0.0,
             is_banned INTEGER DEFAULT 0,
             joined_at TIMESTAMP,
-            language TEXT DEFAULT 'bn'
+            language TEXT DEFAULT 'bn',
+            custom_ref_fixed REAL DEFAULT NULL
         )
         """)
+        try:
+            cursor.execute("ALTER TABLE users ADD COLUMN custom_ref_fixed REAL DEFAULT NULL")
+        except sqlite3.OperationalError:
+            pass
         cursor.execute("CREATE INDEX IF NOT EXISTS idx_users_referral_code ON users(referral_code)")
         cursor.execute("CREATE INDEX IF NOT EXISTS idx_users_referred_by ON users(referred_by)")
 
@@ -321,6 +341,7 @@ MESSAGES = {
         "btn_main_menu": "Main Menu",
         "btn_cancel": "Cancel",
         "btn_gmail": "New Gmail Work",
+        "btn_bulk_gmail": "Bulk Gmail Work",
         "btn_gen_2fa": "🔑 2FA Code Generate করুন",
         "btn_acct_done": "✅ একাউন্ট খোলা শেষ",
         "btn_bkash": "Bkash",
@@ -338,6 +359,8 @@ MESSAGES = {
         "btn_sys_settings": "System Settings",
         "btn_live_stats": "Live Stats",
         "btn_broadcast": "Broadcast",
+        "btn_backup_db": "Backup DB",
+        "btn_restore_db": "Restore DB",
 
         "btn_bulk_approve": "Approve All",
         "btn_bulk_reject": "Reject All",
@@ -367,6 +390,8 @@ MESSAGES = {
         "otp_need_verify_first": "⚠️ **প্রথমে 2FA সিক্রেট কি ভেরিফাই করুন!**\n\n'🔑 2FA Code Generate করুন' বাটনে চাপ দিন।",
         "enter_username_prompt": "👤 **আপনার অ্যাকাউন্টের ইউজারনেম/ইমেইল/UID টাইপ করে পাঠান:**",
         "task_submitted_success": "🎉 <b>টাস্ক সফলভাবে জমা দেওয়া হয়েছে!</b> ✨\n━━━━━━━━━━━━━━━━━━━━━━\n🆔 <b>টাস্ক আইডি:</b> #{sub_id}\n📱 <b>টাইপ:</b> {task_display}\n👤 <b>ইউজারনেম:</b> <code>{username}</code>\n━━━━━━━━━━━━━━━━━━━━━━\n🔍 <b>আপনার তথ্য সফলভাবে পাওয়া গেছে!</b>\n\nআগামী ২৪ থেকে ৪৮ ঘণ্টার মধ্যে আপনার একাউন্ট চেক করে ব্যালেন্স যোগ করে দেওয়া হবে।\n\nএডমিন রিভিউ করে দ্রুত আপনার ওয়ালেটে ব্যালেন্স যুক্ত করে দেবে।\n\nধন্যবাদ!",
+        "bulk_gmail_guidelines": "📦 <b>Bulk Gmail Work (একসাথে অনেকগুলো জমা)</b>\n━━━━━━━━━━━━━━━━━━━━━━\n💵 <b>রেট (প্রতি জিমেইল):</b> ৳{price}\n🔑 <b>সবগুলোর জন্য একই পাসওয়ার্ড (ট্যাপ করে কপি করুন):</b>\n<code>{fixed_pass}</code>\n━━━━━━━━━━━━━━━━━━━━━━\n<b>কাজের নিয়ম:</b>\n১. উপরের একই পাসওয়ার্ড দিয়ে আপনার সব নতুন Gmail তৈরি করুন।\n২. এরপর সবগুলো Gmail অ্যাড্রেস <b>প্রতি লাইনে ১টি করে</b> নিচে লিখে পাঠান।\n\n<b>উদাহরণ:</b>\n<code>mail1@gmail.com\nmail2@gmail.com\nmail3@gmail.com</code>",
+        "bulk_gmail_submitted_success": "✅ <b>Bulk Gmail সফলভাবে জমা হয়েছে!</b>\n━━━━━━━━━━━━━━━━━━━━━━\n📧 <b>মোট জমা:</b> {count} টি জিমেইল\n⏳ <b>স্ট্যাটাস:</b> রিভিউ পেন্ডিং (২৪–৪৮ ঘণ্টা)\n━━━━━━━━━━━━━━━━━━━━━━\nঅ্যাডমিন চেক করে এপ্রুভ করলেই ব্যালেন্স ওয়ালেটে যোগ হবে।",
         "gmail_submitted_success": "✅ <b>Gmail সফলভাবে জমা হয়েছে!</b>\n━━━━━━━━━━━━━━━━━━━━━━\n🆔 <b>টাস্ক আইডি:</b> #{sub_id}\n⏳ <b>স্ট্যাটাস:</b> রিভিউ পেন্ডিং (২৪–৪৮ ঘণ্টা)\n━━━━━━━━━━━━━━━━━━━━━━\nচেক সম্পন্ন হলেই আপনার ওয়ালেটে ব্যালেন্স যোগ করে দেওয়া হবে।",
         "operation_cancelled": "❌ কাজটি বাতিল করা হয়েছে।",
         "returning_main_menu": "🔙 মূল মেনুতে ফিরে যাচ্ছেন...",
@@ -439,6 +464,7 @@ MESSAGES = {
         "btn_main_menu": "Main Menu",
         "btn_cancel": "Cancel",
         "btn_gmail": "New Gmail Work",
+        "btn_bulk_gmail": "Bulk Gmail Work",
         "btn_gen_2fa": "🔑 Generate 2FA Code",
         "btn_acct_done": "✅ Account Creation Done",
         "btn_bkash": "Bkash",
@@ -454,6 +480,8 @@ MESSAGES = {
         "btn_sys_settings": "System Settings",
         "btn_live_stats": "Live Stats",
         "btn_broadcast": "Broadcast",
+        "btn_backup_db": "Backup DB",
+        "btn_restore_db": "Restore DB",
 
         "btn_bulk_approve": "Approve All",
         "btn_bulk_reject": "Reject All",
@@ -483,6 +511,8 @@ MESSAGES = {
         "otp_need_verify_first": "⚠️ **Please verify your 2FA Secret Key first!**\n\nPress the '🔑 Generate 2FA Code' button.",
         "enter_username_prompt": "👤 **Type and send your account Username/Email/UID:**",
         "task_submitted_success": "🎉 <b>Task submitted successfully!</b> ✨\n━━━━━━━━━━━━━━━━━━━━━━\n🆔 <b>Task ID:</b> #{sub_id}\n📱 <b>Type:</b> {task_display}\n👤 <b>Username:</b> <code>{username}</code>\n━━━━━━━━━━━━━━━━━━━━━━\n🔍 <b>Your information has been received successfully!</b>\n\nYour account will be checked and the balance will be added within 24–48 hours.\n\nThe admin will review your submission and credit your wallet as soon as possible.\n\nThank you!",
+        "bulk_gmail_guidelines": "📦 <b>Bulk Gmail Work (Submit Multiple)</b>\n━━━━━━━━━━━━━━━━━━━━━━\n💵 <b>Rate (Per Gmail):</b> ৳{price}\n🔑 <b>Same Password For All (Tap to copy):</b>\n<code>{fixed_pass}</code>\n━━━━━━━━━━━━━━━━━━━━━━\n<b>Instructions:</b>\n1. Create all your Gmail accounts using the SAME password above.\n2. Send all Gmail addresses below, <b>one per line</b>.\n\n<b>Example:</b>\n<code>mail1@gmail.com\nmail2@gmail.com\nmail3@gmail.com</code>",
+        "bulk_gmail_submitted_success": "✅ <b>Bulk Gmail Submitted Successfully!</b>\n━━━━━━━━━━━━━━━━━━━━━━\n📧 <b>Total Submitted:</b> {count} Gmail(s)\n⏳ <b>Status:</b> Pending Review (24–48 hrs)\n━━━━━━━━━━━━━━━━━━━━━━\nYour wallet will be credited once reviewed and approved.",
         "gmail_submitted_success": "✅ <b>Gmail Submitted Successfully!</b>\n━━━━━━━━━━━━━━━━━━━━━━\n🆔 <b>Task ID:</b> #{sub_id}\n⏳ <b>Status:</b> Pending Review (24–48 hrs)\n━━━━━━━━━━━━━━━━━━━━━━\nYour wallet will be credited as soon as the review is complete.",
         "operation_cancelled": "❌ Operation cancelled.",
         "returning_main_menu": "🔙 Returning to Main Menu...",
@@ -640,6 +670,15 @@ def get_user_data(user_id: int):
             return cursor.fetchone()
     except Exception:
         None
+
+
+def get_referrer_commission(referrer_id: int, reward_amount: float) -> float:
+    """Return fixed custom referral bonus if set for referrer, else global % commission."""
+    ref_user = get_user_data(referrer_id)
+    if ref_user and ref_user["custom_ref_fixed"] is not None:
+        return float(ref_user["custom_ref_fixed"])
+    commission_percent = float(get_setting_val("ref_bonus_percent", "10.0"))
+    return float(reward_amount) * (commission_percent / 100.0)
 
 def register_user(tg_user, referred_by_id=None):
     user_id = tg_user.id
@@ -879,12 +918,12 @@ def is_menu_or_admin_button(text: str) -> bool:
     if not text:
         return False
     known_buttons = [
-        "New Gmail Work", "Wallet", "My Referrals", "Leaderboard",
+        "New Gmail Work", "Bulk Gmail Work", "Wallet", "My Referrals", "Leaderboard",
         "Withdraw", "Support", "Language", "Admin Panel", "Main Menu", "Cancel",
         "Submit Gmail", "Pending Tasks", "Held Tasks", "Approve All", "Reject All",
         "Password Manager", "Price Manager", "Task Search", "User Export",
         "Spreadsheet UI", "Withdraw Requests", "User Management", "Admin Control",
-        "System Settings", "Live Stats", "Broadcast"
+        "System Settings", "Live Stats", "Broadcast", "Backup DB", "Restore DB"
     ]
     return text in known_buttons
 
@@ -926,6 +965,9 @@ LAST_NAMES = ["Ahmed", "Sarker", "Hasan", "Rahman", "Uddin", "Chowdhury", "Akter
     STATE_ADMIN_USER_SEARCH,
     STATE_ADMIN_FORCE_CHANNELS_EDIT,
 ) = range(30)
+STATE_ADMIN_SET_REF_BONUS = 30
+STATE_TASK_BULK_GMAIL_INPUT = 31
+STATE_ADMIN_RESTORE_DB = 32
 
 # -----------------------------------------------------------------------------
 # DYNAMIC MULTILINGUAL REPLY KEYBOARDS
@@ -934,9 +976,9 @@ LAST_NAMES = ["Ahmed", "Sarker", "Hasan", "Rahman", "Uddin", "Chowdhury", "Akter
 def get_main_keyboard(user_id: int = None, lang: str = None) -> ReplyKeyboardMarkup:
     l = lang or get_user_lang(user_id)
     keyboard = [
-        [kb_btn(tr(l, "btn_task"), style="success")],
-        [kb_btn(tr(l, "btn_wallet"), style="primary"), kb_btn(tr(l, "btn_withdraw"), style="danger")],
-        [kb_btn(tr(l, "btn_ref"), style="danger"), kb_btn(tr(l, "btn_leaderboard"), style="success")],
+        [kb_btn(tr(l, "btn_task"), style="success"), kb_btn(tr(l, "btn_bulk_gmail"), style="primary")],
+        [kb_btn(tr(l, "btn_wallet"), style="danger"), kb_btn(tr(l, "btn_withdraw"), style="success")],
+        [kb_btn(tr(l, "btn_ref"), style="primary"), kb_btn(tr(l, "btn_leaderboard"), style="danger")],
         [kb_btn(tr(l, "btn_support"), style="success"), kb_btn(tr(l, "btn_lang"), style="primary")],
     ]
     if user_id and is_admin(user_id):
@@ -1014,7 +1056,8 @@ def get_admin_keyboard(user_id: int = None, lang: str = None) -> ReplyKeyboardMa
         [kb_btn(tr(l, "btn_excel_export"), style="success"), kb_btn(tr(l, "btn_wd_reqs"), style="danger")],
         [kb_btn(tr(l, "btn_user_mgmt"), style="primary"), kb_btn(tr(l, "btn_admin_mgmt"), style="success")],
         [kb_btn(tr(l, "btn_sys_settings"), style="danger"), kb_btn(tr(l, "btn_live_stats"), style="primary")],
-        [kb_btn(tr(l, "btn_broadcast"), style="success"), kb_btn(tr(l, "btn_main_menu"), style="danger")],
+        [kb_btn(tr(l, "btn_broadcast"), style="success"), kb_btn(tr(l, "btn_backup_db"), style="primary")],
+        [kb_btn(tr(l, "btn_restore_db"), style="danger"), kb_btn(tr(l, "btn_main_menu"), style="primary")],
     ]
     return ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
 
@@ -1269,6 +1312,222 @@ async def gmail_done_callback(update: Update, context: ContextTypes.DEFAULT_TYPE
 
 
 async def gmail_cancel_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    await query.answer()
+    clear_user_state(context)
+    await query.edit_message_text(tr(query.from_user.id, "operation_cancelled"))
+    await context.bot.send_message(
+        chat_id=query.message.chat_id,
+        text=tr(query.from_user.id, "returning_main_menu"),
+        reply_markup=get_main_keyboard(query.from_user.id)
+    )
+    return ConversationHandler.END
+
+
+def get_bulk_gmail_done_keyboard(user_id: int = None, count: int = 0):
+    submit_label = f"Submit All ({count})" if count > 0 else "Submit All"
+    return InlineKeyboardMarkup([
+        [
+            ikb_btn(submit_label, style="success", callback_data="bulk_gmail_done"),
+            ikb_btn(tr(user_id, "btn_cancel"), style="danger", callback_data="bulk_gmail_cancel")
+        ]
+    ])
+
+
+async def handle_bulk_gmail_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    clear_user_state(context)
+    user_id = update.effective_user.id
+    if is_banned(user_id):
+        await update.message.reply_text(tr(user_id, "banned_msg"))
+        return ConversationHandler.END
+
+    is_joined, _ = await check_force_join(user_id, context)
+    if not is_joined:
+        await start_command(update, context)
+        return ConversationHandler.END
+
+    if get_setting_val("gmail_task_active", "ON") == "OFF":
+        await update.message.reply_text(tr(user_id, "task_off_gmail"), reply_markup=get_main_keyboard(user_id))
+        return ConversationHandler.END
+
+    price = get_setting_val("gmail_task_price", "22.00")
+    fixed_pass = get_setting_val("gmail_default_password", "aass1122")
+
+    context.user_data["task_type"] = "gmail"
+    context.user_data["reward_amount"] = float(price)
+    context.user_data["assigned_pass"] = fixed_pass
+    context.user_data.pop("bulk_gmails", None)
+
+    msg = tr(user_id, "bulk_gmail_guidelines", price=price, fixed_pass=fixed_pass)
+    sent_m = await update.message.reply_text(
+        msg,
+        reply_markup=get_bulk_gmail_done_keyboard(user_id, 0),
+        parse_mode=ParseMode.HTML
+    )
+    context.user_data["cred_msg_id"] = sent_m.message_id
+    return STATE_TASK_BULK_GMAIL_INPUT
+
+
+async def process_bulk_gmail_submission(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_id = update.effective_user.id
+    raw_text = (update.message.text or "").strip()
+
+    if is_menu_or_admin_button(raw_text):
+        clear_user_state(context)
+        return ConversationHandler.END
+
+    lines = [ln.strip().lower() for ln in re.split(r"[\r\n,\s]+", raw_text) if ln.strip()]
+    unique_lines = list(dict.fromkeys(lines))
+
+    valid_gmails = []
+    invalid_gmails = []
+    dup_gmails = []
+
+    with get_db() as conn:
+        cursor = conn.cursor()
+        for email in unique_lines:
+            if not is_valid_gmail_address(email):
+                invalid_gmails.append(email)
+                continue
+            cursor.execute(
+                """
+                SELECT 1 FROM task_submissions
+                WHERE LOWER(TRIM(submitted_username)) = ?
+                  AND task_type = 'gmail'
+                  AND status IN ('Pending', 'Hold', 'Approved')
+                LIMIT 1
+                """,
+                (email,)
+            )
+            if cursor.fetchone():
+                dup_gmails.append(email)
+            else:
+                valid_gmails.append(email)
+
+    if not valid_gmails:
+        await update.message.reply_text(
+            f"❌ কোনো নতুন বৈধ Gmail পাওয়া যায়নি!\n"
+            f"• ভুল ফরম্যাট: {len(invalid_gmails)} টি\n"
+            f"• আগে জমা দেওয়া (ডুপ্লিকেট): {len(dup_gmails)} টি\n\n"
+            f"সঠিক নতুন Gmail-গুলো প্রতি লাইনে একটি করে পাঠান।",
+            reply_markup=get_bulk_gmail_done_keyboard(user_id, 0)
+        )
+        return STATE_TASK_BULK_GMAIL_INPUT
+
+    context.user_data["bulk_gmails"] = valid_gmails[:50]
+    chosen = context.user_data["bulk_gmails"]
+    preview = "\n".join(f"• <code>{html.escape(g)}</code>" for g in chosen[:15])
+    if len(chosen) > 15:
+        preview += f"\n... এবং আরও {len(chosen) - 15} টি"
+
+    extra_note = ""
+    if invalid_gmails or dup_gmails:
+        extra_note = f"\n⚠️ বাদ গেছে — ভুল: {len(invalid_gmails)} টি | ডুপ্লিকেট: {len(dup_gmails)} টি"
+
+    await update.message.reply_text(
+        f"✅ <b>মোট {len(chosen)} টি বৈধ Gmail পাওয়া গেছে:</b>\n{preview}{extra_note}\n\n"
+        f"সবগুলো জমা দিতে নিচের <b>Submit All ({len(chosen)})</b> বাটনে চাপ দিন।",
+        reply_markup=get_bulk_gmail_done_keyboard(user_id, len(chosen)),
+        parse_mode=ParseMode.HTML
+    )
+    return STATE_TASK_BULK_GMAIL_INPUT
+
+
+async def bulk_gmail_done_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    user_id = query.from_user.id
+    gmails = context.user_data.get("bulk_gmails") or []
+
+    if not gmails:
+        await query.answer("❌ আগে প্রতি লাইনে একটি করে Gmail লিখে পাঠান!", show_alert=True)
+        return STATE_TASK_BULK_GMAIL_INPUT
+
+    password = context.user_data.get("assigned_pass", "aass1122")
+    reward = context.user_data.get("reward_amount", 22.0)
+    now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    submitted_items = []
+    with get_db() as conn:
+        cursor = conn.cursor()
+        for email in gmails:
+            cursor.execute(
+                """
+                SELECT 1 FROM task_submissions
+                WHERE LOWER(TRIM(submitted_username)) = ?
+                  AND task_type = 'gmail'
+                  AND status IN ('Pending', 'Hold', 'Approved')
+                LIMIT 1
+                """,
+                (email,)
+            )
+            if cursor.fetchone():
+                continue
+            cursor.execute(
+                """
+                INSERT INTO task_submissions
+                (user_id, task_type, submitted_username, submitted_password,
+                 secret_key_2fa, status, reward_amount, is_archived, created_at, updated_at)
+                VALUES (?, 'gmail', ?, ?, 'N/A', 'Pending', ?, 0, ?, ?)
+                """,
+                (user_id, email, password, reward, now, now)
+            )
+            submitted_items.append((cursor.lastrowid, email))
+        conn.commit()
+
+    if not submitted_items:
+        await query.answer("❌ এই Gmail-গুলো ইতিমধ্যেই জমা হয়ে গেছে!", show_alert=True)
+        return STATE_TASK_BULK_GMAIL_INPUT
+
+    await query.answer()
+
+    if "cred_msg_id" in context.user_data:
+        await safe_delete_message(context, query.message.chat_id, context.user_data["cred_msg_id"])
+
+    await query.edit_message_text(
+        tr(user_id, "bulk_gmail_submitted_success", count=len(submitted_items)),
+        parse_mode=ParseMode.HTML
+    )
+    await context.bot.send_message(
+        chat_id=user_id,
+        text="📋 আপনার Bulk Gmail টাস্কগুলো রিভিউয়ের জন্য পাঠানো হয়েছে।",
+        reply_markup=get_main_keyboard(user_id)
+    )
+
+    admin_id_setting = ADMIN_ID or get_setting_val("admin_id", "")
+    admins = [int(x.strip()) for x in admin_id_setting.split(",") if x.strip().isdigit()]
+    try:
+        with get_db() as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT user_id FROM sub_admins")
+            for row in cursor.fetchall():
+                admins.append(row["user_id"])
+    except Exception:
+        pass
+    admins = list(set(admins))
+
+    lines_str = "\n".join(f"• #{sid} — <code>{html.escape(em)}</code>" for sid, em in submitted_items[:25])
+    if len(submitted_items) > 25:
+        lines_str += f"\n... (+{len(submitted_items) - 25} more)"
+
+    admin_msg = (
+        f"📦 <b>নতুন Bulk Gmail সাবমিশন! ({len(submitted_items)} টি)</b>\n\n"
+        f"👤 <b>User ID:</b> <code>{user_id}</code>\n"
+        f"🔑 <b>Password:</b> <code>{html.escape(password)}</code>\n"
+        f"💵 <b>Rate:</b> ৳{reward:.2f} / each\n\n"
+        f"{lines_str}\n\n"
+        f"<i>(Pending Tasks বা Spreadsheet UI থেকে এপ্রুভ/রিজেক্ট করুন)</i>"
+    )
+    for admin in admins:
+        try:
+            await context.bot.send_message(chat_id=admin, text=admin_msg, parse_mode=ParseMode.HTML)
+        except Exception as e:
+            logger.error(f"Failed to notify admin {admin} of bulk gmail: {e}")
+
+    clear_user_state(context)
+    return ConversationHandler.END
+
+
+async def bulk_gmail_cancel_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
     clear_user_state(context)
@@ -1678,14 +1937,33 @@ async def handle_referrals(update: Update, context: ContextTypes.DEFAULT_TYPE):
     ref_link = f"https://t.me/{bot_username}?start={user_id}"
     ref_percent = get_setting_val("ref_bonus_percent", "10.0")
 
-    ref_text = tr(
-        user_id, "ref_text",
-        ref_link=ref_link,
-        ref_count=user_data['ref_count'],
-        ref_earnings=user_data['ref_earnings'],
-        ref_percent=ref_percent
-    )
-    await update.message.reply_text(ref_text, reply_markup=get_main_keyboard(user_id), parse_mode=ParseMode.HTML)
+    custom_fixed = user_data["custom_ref_fixed"] if "custom_ref_fixed" in user_data.keys() else None
+    if custom_fixed is not None:
+        ref_text = (
+            f"👥 <b>আপনার ব্যক্তিগত রেফারেল প্রোগ্রাম</b> 💎\n"
+            f"━━━━━━━━━━━━━━━━━━━━━━\n"
+            f"আপনার রেফারকৃত কর্মী প্রতিটি কাজ সম্পন্ন ও এপ্রুভ করালে আপনি পাবেন সরাসরি <b>৳{float(custom_fixed):g}</b> করে বোনাস (রিজেক্ট হলে কোনো বোনাস পাবেন না)।\n\n"
+            f"🔗 <b>আপনার রেফারেল লিঙ্ক:</b>\n<code>{ref_link}</code>\n"
+            f"━━━━━━━━━━━━━━━━━━━━━━\n"
+            f"📊 <b>রেফারেল ট্র্যাকার:</b>\n"
+            f"• মোট আমন্ত্রিত কর্মী: <code>{user_data['ref_count']}</code> জন\n"
+            f"• রেফারেল বোনাস থেকে আয়: <code>৳{user_data['ref_earnings']:.2f}</code>"
+        )
+    else:
+        ref_text = tr(
+            user_id, "ref_text",
+            ref_link=ref_link,
+            ref_count=user_data['ref_count'],
+            ref_earnings=user_data['ref_earnings'],
+            ref_percent=ref_percent
+        )
+    from urllib.parse import quote as _url_quote
+    share_text = "💎 Join & earn money by submitting Gmail accounts! Start now:"
+    share_url = f"https://t.me/share/url?url={_url_quote(ref_link, safe='')}&text={_url_quote(share_text, safe='')}"
+    share_kb = InlineKeyboardMarkup([
+        [ikb_btn("Share Referral Link", style="success", url=share_url)]
+    ])
+    await update.message.reply_text(ref_text, reply_markup=share_kb, parse_mode=ParseMode.HTML)
 
 async def handle_leaderboard(update: Update, context: ContextTypes.DEFAULT_TYPE):
     clear_user_state(context)
@@ -1939,8 +2217,7 @@ async def process_bulk_approve(update: Update, context: ContextTypes.DEFAULT_TYP
                 user_ref = cursor.fetchone()
                 if user_ref and user_ref["referred_by"]:
                     referrer_id = user_ref["referred_by"]
-                    commission_percent = float(get_setting_val("ref_bonus_percent", "10.0"))
-                    commission_bonus = float(reward) * (commission_percent / 100.0)
+                    commission_bonus = get_referrer_commission(referrer_id, float(reward))
                     if commission_bonus > 0:
                         cursor.execute(
                             "UPDATE users SET balance = balance + ?, ref_earnings = ref_earnings + ? WHERE user_id = ?",
@@ -2316,7 +2593,8 @@ async def admin_user_management(update: Update, context: ContextTypes.DEFAULT_TY
         [ikb_btn("Ban User", callback_data="adm_usr_ban"), ikb_btn("Unban User", callback_data="adm_usr_unban")],
         [ikb_btn("Add Balance", callback_data="adm_usr_add_bal"), ikb_btn("Deduct Balance", callback_data="adm_usr_sub_bal")],
         [ikb_btn("Reset All Balances", callback_data="adm_usr_reset_balances")],
-        [ikb_btn("Banned List", callback_data="adm_usr_banned_list"), ikb_btn("Search User Profile", callback_data="adm_usr_search")],
+        [ikb_btn("Custom Ref Bonus (৳)", style="primary", callback_data="adm_usr_set_ref"), ikb_btn("Banned List", callback_data="adm_usr_banned_list")],
+        [ikb_btn("Search User Profile", style="success", callback_data="adm_usr_search")],
         [ikb_btn("Admin Menu", callback_data="adm_back_to_admin")]
     ]
 
@@ -2508,6 +2786,195 @@ async def admin_live_stats(update: Update, context: ContextTypes.DEFAULT_TYPE):
         total_balance=total_balance
     )
     await update.message.reply_text(msg, reply_markup=get_admin_keyboard(user_id), parse_mode=ParseMode.MARKDOWN)
+
+
+async def admin_backup_db(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_id = update.effective_user.id
+    if not is_admin(user_id):
+        return
+
+    if not os.path.exists(DB_FILE):
+        await update.message.reply_text("❌ ডাটাবেস ফাইল পাওয়া যায়নি।", reply_markup=get_admin_keyboard(user_id))
+        return
+
+    ts = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+    tmp_path = f"backup_{ts}.db"
+    try:
+        src_conn = sqlite3.connect(DB_FILE, timeout=30.0)
+        dst_conn = sqlite3.connect(tmp_path)
+        with dst_conn:
+            src_conn.backup(dst_conn)
+        dst_conn.close()
+        src_conn.close()
+
+        with get_db() as conn:
+            c = conn.cursor()
+            c.execute("SELECT COUNT(*) FROM users")
+            u_cnt = c.fetchone()[0]
+            c.execute("SELECT COUNT(*) FROM task_submissions")
+            t_cnt = c.fetchone()[0]
+
+        with open(tmp_path, "rb") as f:
+            await update.message.reply_document(
+                document=f,
+                filename=tmp_path,
+                caption=(
+                    f"💾 <b>Database Backup Complete</b>\n"
+                    f"━━━━━━━━━━━━━━━━━━━━━━\n"
+                    f"👥 <b>Total Users:</b> {u_cnt}\n"
+                    f"📧 <b>Total Tasks:</b> {t_cnt}\n"
+                    f"🕒 <b>Time:</b> {ts}"
+                ),
+                parse_mode=ParseMode.HTML,
+                reply_markup=get_admin_keyboard(user_id)
+            )
+    except Exception as e:
+        logger.error(f"Database backup failed: {e}")
+        await update.message.reply_text(f"❌ ব্যাকআপ নিতে সমস্যা হয়েছে: {e}", reply_markup=get_admin_keyboard(user_id))
+    finally:
+        if os.path.exists(tmp_path):
+            try:
+                os.remove(tmp_path)
+            except Exception:
+                pass
+
+
+async def admin_restore_prompt(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_id = update.effective_user.id
+    if not is_admin(user_id):
+        return ConversationHandler.END
+    await update.message.reply_text(
+        "📥 <b>Restore Database</b>\n━━━━━━━━━━━━━━━━━━━━━━\n"
+        "আপনার ব্যাকআপ <code>.db</code> ফাইলটি এখানে Document হিসেবে পাঠান।\n"
+        "⚠️ এটি বর্তমান ডাটাবেসকে ব্যাকআপের ডাটা দিয়ে প্রতিস্থাপন করবে।",
+        reply_markup=get_cancel_keyboard(user_id),
+        parse_mode=ParseMode.HTML
+    )
+    return STATE_ADMIN_RESTORE_DB
+
+
+async def process_admin_restore_db(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_id = update.effective_user.id
+    if not is_admin(user_id):
+        return ConversationHandler.END
+
+    if not update.message.document:
+        await update.message.reply_text(
+            "❌ অনুগ্রহ করে একটি <code>.db</code> ব্যাকআপ ফাইল পাঠান (অথবা Cancel চাপুন)।",
+            reply_markup=get_cancel_keyboard(user_id),
+            parse_mode=ParseMode.HTML
+        )
+        return STATE_ADMIN_RESTORE_DB
+
+    doc = update.message.document
+    if not (doc.file_name or "").lower().endswith(".db"):
+        await update.message.reply_text(
+            "❌ শুধু <code>.db</code> ফরম্যাটের ব্যাকআপ ফাইল গ্রহণযোগ্য।",
+            reply_markup=get_cancel_keyboard(user_id),
+            parse_mode=ParseMode.HTML
+        )
+        return STATE_ADMIN_RESTORE_DB
+
+    tmp_restore = f"restore_tmp_{int(time.time())}.db"
+    try:
+        tg_file = await doc.get_file()
+        await tg_file.download_to_drive(tmp_restore)
+
+        # Validate SQLite integrity and required tables
+        test_conn = sqlite3.connect(tmp_restore)
+        cur = test_conn.cursor()
+        cur.execute("PRAGMA integrity_check")
+        chk = cur.fetchone()
+        if not chk or chk[0].lower() != "ok":
+            test_conn.close()
+            raise ValueError("Invalid or corrupted SQLite database file.")
+        cur.execute("SELECT name FROM sqlite_master WHERE type='table' AND name IN ('users', 'task_submissions')")
+        tables = {r[0] for r in cur.fetchall()}
+        if not {"users", "task_submissions"}.issubset(tables):
+            test_conn.close()
+            raise ValueError("Missing required bot tables in backup file.")
+
+        cur.execute("SELECT COUNT(*) FROM users")
+        u_cnt = cur.fetchone()[0]
+        cur.execute("SELECT COUNT(*) FROM task_submissions")
+        t_cnt = cur.fetchone()[0]
+
+        # Restore into active DB_FILE safely
+        dst_conn = sqlite3.connect(DB_FILE, timeout=30.0)
+        with dst_conn:
+            test_conn.backup(dst_conn)
+        dst_conn.close()
+        test_conn.close()
+
+        _db_pool.reload_pool()
+        init_db()
+
+        await update.message.reply_text(
+            f"✅ <b>Database Restored Successfully!</b>\n"
+            f"━━━━━━━━━━━━━━━━━━━━━━\n"
+            f"👥 <b>Restored Users:</b> {u_cnt}\n"
+            f"📧 <b>Restored Tasks:</b> {t_cnt}",
+            reply_markup=get_admin_keyboard(user_id),
+            parse_mode=ParseMode.HTML
+        )
+    except Exception as e:
+        logger.error(f"Database restore failed: {e}")
+        await update.message.reply_text(
+            f"❌ রিস্টোর করা যায়নি: {html.escape(str(e))}",
+            reply_markup=get_admin_keyboard(user_id),
+            parse_mode=ParseMode.HTML
+        )
+    finally:
+        if os.path.exists(tmp_restore):
+            try:
+                os.remove(tmp_restore)
+            except Exception:
+                pass
+
+    clear_user_state(context)
+    return ConversationHandler.END
+
+
+async def auto_backup_loop(app: Application):
+    """Automatically send a safe DB backup to the primary owner every 6 hours."""
+    await asyncio.sleep(60)
+    while True:
+        try:
+            admin_id_setting = ADMIN_ID or get_setting_val("admin_id", "")
+            owner_id = next((int(x.strip()) for x in admin_id_setting.split(",") if x.strip().isdigit()), None)
+            if owner_id and os.path.exists(DB_FILE):
+                with get_db() as conn:
+                    c = conn.cursor()
+                    c.execute("SELECT COUNT(*) FROM users")
+                    u_cnt = c.fetchone()[0]
+                if u_cnt > 0:
+                    ts = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+                    tmp_path = f"auto_backup_{ts}.db"
+                    try:
+                        src_conn = sqlite3.connect(DB_FILE, timeout=30.0)
+                        dst_conn = sqlite3.connect(tmp_path)
+                        with dst_conn:
+                            src_conn.backup(dst_conn)
+                        dst_conn.close()
+                        src_conn.close()
+                        with open(tmp_path, "rb") as f:
+                            await app.bot.send_document(
+                                chat_id=owner_id,
+                                document=f,
+                                filename=tmp_path,
+                                caption=f"🔄 <b>Auto Backup</b> ({u_cnt} users) — {ts}",
+                                parse_mode=ParseMode.HTML
+                            )
+                    finally:
+                        if os.path.exists(tmp_path):
+                            os.remove(tmp_path)
+        except Exception as e:
+            logger.error(f"Auto backup loop error: {e}")
+        await asyncio.sleep(6 * 3600)
+
+
+async def _on_startup(app: Application):
+    asyncio.create_task(auto_backup_loop(app))
 
 async def admin_broadcast_prompt(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
@@ -2713,6 +3180,15 @@ async def admin_callback_handler(update: Update, context: ContextTypes.DEFAULT_T
         await query.edit_message_text(msg, reply_markup=InlineKeyboardMarkup(buttons), parse_mode=ParseMode.HTML)
         return
 
+    if data == "adm_usr_set_ref":
+        await query.edit_message_text(
+            "🎁 <b>নির্দিষ্ট ইউজারের জন্য কাস্টম রেফার বোনাস সেট করুন:</b>\n\n"
+            "• প্রতি এপ্রুভড কাজে ৪ বা ৫ টাকা দিতে লিখুন: <code>ইউজার_আইডি টাকা</code> (যেমন: <code>123456789 5</code>)\n"
+            "• আগের সাধারণ নিয়মে (%) ফেরত নিতে লিখুন: <code>ইউজার_আইডি default</code>",
+            parse_mode=ParseMode.HTML
+        )
+        return STATE_ADMIN_SET_REF_BONUS
+
     if data == "adm_usr_search":
         await query.edit_message_text("🔍 **প্রোফাইল সার্চ করতে ইউজারের Telegram ID বা Username লিখুন:**")
         return STATE_ADMIN_USER_SEARCH
@@ -2745,8 +3221,7 @@ async def admin_callback_handler(update: Update, context: ContextTypes.DEFAULT_T
             user_ref = cursor.fetchone()
             if user_ref and user_ref["referred_by"]:
                 referrer_id = user_ref["referred_by"]
-                commission_percent = float(get_setting_val("ref_bonus_percent", "10.0"))
-                commission_bonus = float(sub["reward_amount"]) * (commission_percent / 100.0)
+                commission_bonus = get_referrer_commission(referrer_id, float(sub["reward_amount"]))
                 if commission_bonus > 0:
                     cursor.execute(
                         "UPDATE users SET balance = balance + ?, ref_earnings = ref_earnings + ? WHERE user_id = ?",
@@ -3295,6 +3770,7 @@ async def process_admin_user_search(update: Update, context: ContextTypes.DEFAUL
             f"📅 **Joined Date:** {u['joined_at'] or 'N/A'}\n"
             f"👥 **Referral Count:** {u['ref_count']} জন\n"
             f"💵 **Referral Earnings:** ৳{u['ref_earnings']:.2f}\n"
+            + (f"🎁 **Custom Ref Bonus:** ৳{float(u['custom_ref_fixed']):g} / approved task\n" if u["custom_ref_fixed"] is not None else "🎁 **Ref Bonus:** Default (%)\n")
             f"━━━━━━━━━━━━━━━━━━━━━━"
         )
         await update.message.reply_text(
@@ -3461,6 +3937,60 @@ async def process_admin_sub_bal(update: Update, context: ContextTypes.DEFAULT_TY
     clear_user_state(context)
     return ConversationHandler.END
 
+
+async def process_admin_set_ref_bonus(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_id = update.effective_user.id
+    if not is_admin(user_id):
+        return ConversationHandler.END
+
+    text = update.message.text.strip()
+    parts = text.split()
+    if len(parts) != 2 or not parts[0].isdigit():
+        await update.message.reply_text(
+            "❌ সঠিক ফরম্যাটে পাঠান (যেমন: <code>123456789 5</code> অথবা <code>123456789 default</code>)",
+            parse_mode=ParseMode.HTML,
+            reply_markup=get_cancel_keyboard(user_id)
+        )
+        return STATE_ADMIN_SET_REF_BONUS
+
+    target_id = int(parts[0])
+    val_str = parts[1].lower()
+    if val_str in ("default", "reset", "off", "0"):
+        new_val = None
+    else:
+        try:
+            new_val = float(val_str)
+            if new_val < 0:
+                raise ValueError
+        except ValueError:
+            await update.message.reply_text("❌ সঠিক টাকার পরিমাণ দিন (যেমন: 4 বা 5)।")
+            return STATE_ADMIN_SET_REF_BONUS
+
+    with get_db() as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT user_id FROM users WHERE user_id = ?", (target_id,))
+        if not cursor.fetchone():
+            await update.message.reply_text("❌ এই আইডির কোনো ইউজার পাওয়া যায়নি।", reply_markup=get_admin_keyboard(user_id))
+            clear_user_state(context)
+            return ConversationHandler.END
+        cursor.execute("UPDATE users SET custom_ref_fixed = ? WHERE user_id = ?", (new_val, target_id))
+        conn.commit()
+
+    if new_val is None:
+        await update.message.reply_text(
+            f"✅ ইউজার <code>{target_id}</code>-এর রেফার বোনাস ডিফল্ট (%) নিয়মে রিসেট করা হয়েছে।",
+            reply_markup=get_admin_keyboard(user_id),
+            parse_mode=ParseMode.HTML
+        )
+    else:
+        await update.message.reply_text(
+            f"✅ ইউজার <code>{target_id}</code>-এর জন্য প্রতি এপ্রুভড রেফার কাজে <b>৳{new_val:g}</b> সেট করা হয়েছে (রিজেক্ট হলে কিছু পাবে না)।",
+            reply_markup=get_admin_keyboard(user_id),
+            parse_mode=ParseMode.HTML
+        )
+    clear_user_state(context)
+    return ConversationHandler.END
+
 async def _end_silently(update: Update, context: ContextTypes.DEFAULT_TYPE):
     clear_user_state(context)
     return ConversationHandler.END
@@ -3496,7 +4026,7 @@ def main():
     token = BOT_TOKEN
     if not token:
         raise RuntimeError("BOT_TOKEN is not set. Add your NEW BotFather token as the BOT_TOKEN environment variable.")
-    app = ApplicationBuilder().token(token).build()
+    app = ApplicationBuilder().token(token).post_init(_on_startup).build()
 
     app.add_error_handler(global_error_handler)
 
@@ -3514,6 +4044,7 @@ def main():
     btn_done_re = r"^Submit Gmail$"
 
     btn_gmail_re = r"^New Gmail Work$"
+    btn_bulk_gmail_re = r"^Bulk Gmail Work$"
 
     btn_bkash_re = r"^Bkash(?: -> .*)?$"
     btn_nagad_re = r"^Nagad(?: -> .*)?$"
@@ -3530,6 +4061,8 @@ def main():
     btn_adm_sys_re = r"^System Settings$"
     btn_adm_stats_re = r"^Live Stats$"
     btn_adm_bcast_re = r"^Broadcast$"
+    btn_adm_backup_re = r"^Backup DB$"
+    btn_adm_restore_re = r"^Restore DB$"
 
     btn_adm_bulk_app_re = r"^Approve All$"
     btn_adm_bulk_rej_re = r"^Reject All$"
@@ -3549,16 +4082,19 @@ def main():
         MessageHandler(filters.Regex(btn_admin_re), _auto_cancel_to(handle_admin_panel)),
         MessageHandler(filters.Regex(btn_withdraw_re), _end_silently),
         MessageHandler(filters.Regex(btn_gmail_re), _end_silently),
+        MessageHandler(filters.Regex(btn_bulk_gmail_re), _end_silently),
     ]
 
     # --- Task Conversation Handler (Group 0, auto-cancels on navigation or timeout) ---
     task_conv = ConversationHandler(
         entry_points=[
             MessageHandler(filters.Regex(btn_gmail_re), handle_gmail_menu),
+            MessageHandler(filters.Regex(btn_bulk_gmail_re), handle_bulk_gmail_menu),
         ],
         states={
             STATE_TASK_CATEGORY: [
                 MessageHandler(filters.Regex(btn_gmail_re), handle_gmail_menu),
+            MessageHandler(filters.Regex(btn_bulk_gmail_re), handle_bulk_gmail_menu),
             ],
             STATE_TASK_GMAIL_INPUT: [
                 CallbackQueryHandler(gmail_done_callback, pattern=r"^gmail_done$"),
@@ -3566,8 +4102,17 @@ def main():
                 MessageHandler(filters.Regex(btn_cancel_re), cancel_operation),
                 MessageHandler(filters.Regex(btn_main_menu_re), start_command),
                 MessageHandler(filters.TEXT & ~filters.COMMAND & ~filters.Regex(
-                    r"^(New Gmail Work|Wallet|Withdraw|My Referrals|Leaderboard|Support|Language|Admin Panel|Main Menu|Cancel)$"
+                    r"^(New Gmail Work|Bulk Gmail Work|Wallet|Withdraw|My Referrals|Leaderboard|Support|Language|Admin Panel|Main Menu|Cancel)$"
                 ), process_gmail_submission),
+            ],
+            STATE_TASK_BULK_GMAIL_INPUT: [
+                CallbackQueryHandler(bulk_gmail_done_callback, pattern=r"^bulk_gmail_done$"),
+                CallbackQueryHandler(bulk_gmail_cancel_callback, pattern=r"^bulk_gmail_cancel$"),
+                MessageHandler(filters.Regex(btn_cancel_re), cancel_operation),
+                MessageHandler(filters.Regex(btn_main_menu_re), start_command),
+                MessageHandler(filters.TEXT & ~filters.COMMAND & ~filters.Regex(
+                    r"^(New Gmail Work|Bulk Gmail Work|Wallet|Withdraw|My Referrals|Leaderboard|Support|Language|Admin Panel|Main Menu|Cancel)$"
+                ), process_bulk_gmail_submission),
             ],
             ConversationHandler.TIMEOUT: [
                 MessageHandler(filters.ALL, _conversation_timeout_handler),
@@ -3602,6 +4147,8 @@ def main():
     app.add_handler(MessageHandler(filters.Regex(btn_adm_excel_re), admin_excel_export_menu), group=0)
     app.add_handler(MessageHandler(filters.Regex(btn_adm_user_mgmt_re), admin_user_management), group=0)
     app.add_handler(MessageHandler(filters.Regex(btn_adm_admin_mgmt_re), admin_control_panel), group=0)
+    app.add_handler(MessageHandler(filters.Regex(btn_adm_backup_re), admin_backup_db), group=0)
+    app.add_handler(CommandHandler("backup", admin_backup_db), group=0)
 
     # --- Withdraw Conversation Handler (Group 1, auto-cancels on navigation or timeout) ---
     withdraw_conv = ConversationHandler(
@@ -3619,14 +4166,14 @@ def main():
                 MessageHandler(filters.Regex(btn_cancel_re), cancel_operation),
                 MessageHandler(filters.Regex(btn_main_menu_re), start_command),
                 MessageHandler(filters.TEXT & ~filters.COMMAND & ~filters.Regex(
-                    r"^(New Gmail Work|Wallet|Withdraw|My Referrals|Leaderboard|Support|Language|Admin Panel|Main Menu|Cancel)$"
+                    r"^(New Gmail Work|Bulk Gmail Work|Wallet|Withdraw|My Referrals|Leaderboard|Support|Language|Admin Panel|Main Menu|Cancel)$"
                 ), handle_withdraw_number),
             ],
             STATE_WD_AMOUNT: [
                 MessageHandler(filters.Regex(btn_cancel_re), cancel_operation),
                 MessageHandler(filters.Regex(btn_main_menu_re), start_command),
                 MessageHandler(filters.TEXT & ~filters.COMMAND & ~filters.Regex(
-                    r"^(New Gmail Work|Wallet|Withdraw|My Referrals|Leaderboard|Support|Language|Admin Panel|Main Menu|Cancel)$"
+                    r"^(New Gmail Work|Bulk Gmail Work|Wallet|Withdraw|My Referrals|Leaderboard|Support|Language|Admin Panel|Main Menu|Cancel)$"
                 ), handle_withdraw_amount),
             ],
             ConversationHandler.TIMEOUT: [
@@ -3644,6 +4191,7 @@ def main():
             MessageHandler(filters.Regex(btn_lang_re), _end_silently),
             MessageHandler(filters.Regex(btn_admin_re), _end_silently),
             MessageHandler(filters.Regex(btn_gmail_re), _end_silently),
+        MessageHandler(filters.Regex(btn_bulk_gmail_re), _end_silently),
         ],
         conversation_timeout=300,
         per_message=False,
@@ -3659,9 +4207,11 @@ def main():
             MessageHandler(filters.Regex(btn_adm_bcast_re), admin_broadcast_prompt),
             MessageHandler(filters.Regex(btn_adm_bulk_app_re), admin_bulk_approve_prompt),
             MessageHandler(filters.Regex(btn_adm_bulk_rej_re), admin_bulk_reject_prompt),
+            MessageHandler(filters.Regex(btn_adm_restore_re), admin_restore_prompt),
+            CommandHandler("restore", admin_restore_prompt),
             CallbackQueryHandler(
                 admin_callback_handler,
-                pattern="^(adm_usr_ban|adm_usr_unban|adm_usr_add_bal|adm_usr_sub_bal|adm_usr_search|adm_add_subadmin|adm_rem_subadmin|adm_edit_(?!force_channels_list)|adm_fj_add|adm_rej_custom_)"
+                pattern="^(adm_usr_ban|adm_usr_unban|adm_usr_add_bal|adm_usr_sub_bal|adm_usr_search|adm_usr_set_ref|adm_add_subadmin|adm_rem_subadmin|adm_edit_(?!force_channels_list)|adm_fj_add|adm_rej_custom_)"
             ),
         ],
         states={
@@ -3738,6 +4288,17 @@ def main():
                 MessageHandler(filters.Regex(btn_cancel_re), cancel_operation),
                 MessageHandler(filters.Regex(btn_main_menu_re), start_command),
                 MessageHandler(filters.TEXT & ~filters.COMMAND, process_admin_force_channels_edit),
+            ],
+            STATE_ADMIN_SET_REF_BONUS: [
+                MessageHandler(filters.Regex(btn_cancel_re), cancel_operation),
+                MessageHandler(filters.Regex(btn_main_menu_re), start_command),
+                MessageHandler(filters.TEXT & ~filters.COMMAND, process_admin_set_ref_bonus),
+            ],
+            STATE_ADMIN_RESTORE_DB: [
+                MessageHandler(filters.Regex(btn_cancel_re), cancel_operation),
+                MessageHandler(filters.Regex(btn_main_menu_re), start_command),
+                MessageHandler(filters.Document.ALL, process_admin_restore_db),
+                MessageHandler(filters.TEXT & ~filters.COMMAND, process_admin_restore_db),
             ],
             ConversationHandler.TIMEOUT: [
                 MessageHandler(filters.ALL, _conversation_timeout_handler),
