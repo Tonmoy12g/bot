@@ -4614,6 +4614,15 @@ async def cancel_operation(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(tr(user_id, "operation_cancelled"), reply_markup=get_main_keyboard(user_id))
     return ConversationHandler.END
 
+
+async def expired_callback_fallback(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    if query:
+        try:
+            await query.answer("⚠️ সেশন শেষ হয়ে গেছে! অনুগ্রহ করে আবার মেনু থেকে বাটন চাপুন।", show_alert=True)
+        except Exception:
+            pass
+
 async def global_error_handler(update: object, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Global error handler to prevent internal error notices to users"""
     logger.error("Exception while handling an update:", exc_info=context.error)
@@ -4693,6 +4702,15 @@ def main():
         CommandHandler("start", start_command),
         MessageHandler(filters.Regex(btn_main_menu_re), start_command),
         MessageHandler(filters.Regex(btn_cancel_re), cancel_operation),
+        MessageHandler(filters.Regex(btn_task_re), handle_task_menu),
+        MessageHandler(filters.Regex(btn_gmail_re), handle_new_gmail_submenu),
+        MessageHandler(filters.Regex(btn_new_single_re), handle_gmail_menu),
+        MessageHandler(filters.Regex(btn_new_bulk_re), handle_bulk_gmail_menu),
+        MessageHandler(filters.Regex(btn_bulk_gmail_re), handle_bulk_gmail_menu),
+        MessageHandler(filters.Regex(btn_old_gmail_re), handle_old_gmail_menu),
+        MessageHandler(filters.Regex(btn_old_single_re), handle_old_single_or_bulk_start),
+        MessageHandler(filters.Regex(btn_old_bulk_re), handle_old_single_or_bulk_start),
+        MessageHandler(filters.Regex(btn_back_gmail_work_re), handle_task_menu),
         MessageHandler(filters.Regex(btn_wallet_re), _auto_cancel_to(handle_wallet_menu)),
         MessageHandler(filters.Regex(btn_ref_re), _auto_cancel_to(handle_referrals)),
         MessageHandler(filters.Regex(btn_leaderboard_re), _auto_cancel_to(handle_leaderboard)),
@@ -4711,6 +4729,9 @@ def main():
             MessageHandler(filters.Regex(btn_new_bulk_re), handle_bulk_gmail_menu),
             MessageHandler(filters.Regex(btn_bulk_gmail_re), handle_bulk_gmail_menu),
             MessageHandler(filters.Regex(btn_old_gmail_re), handle_old_gmail_menu),
+            MessageHandler(filters.Regex(btn_old_single_re), handle_old_single_or_bulk_start),
+            MessageHandler(filters.Regex(btn_old_bulk_re), handle_old_single_or_bulk_start),
+            MessageHandler(filters.Regex(btn_back_gmail_work_re), handle_task_menu),
         ],
         states={
             STATE_TASK_CATEGORY: [
@@ -4944,6 +4965,8 @@ def main():
         admin_callback_handler,
         pattern="^(adm_app_sub_|adm_hold_sub_|adm_rej_prompt_|adm_rej_act_|adm_app_wd_|adm_rej_wd_|adm_back_to_admin|adm_toggle_|adm_edit_force_channels_list|adm_fj_del_|adm_fj_clear|adm_oldcat_del_|adm_usr_banned_list|adm_usr_reset_balances)"
     ))
+
+    app.add_handler(CallbackQueryHandler(expired_callback_fallback), group=0)
 
     logger.info("Gmail Work BD Bot successfully started!")
     app.run_polling()
