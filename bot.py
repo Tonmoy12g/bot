@@ -1090,18 +1090,18 @@ def get_task_category_keyboard(user_id: int = None, lang: str = None) -> ReplyKe
 def get_new_gmail_menu_keyboard(user_id: int = None, lang: str = None) -> ReplyKeyboardMarkup:
     l = lang or get_user_lang(user_id)
     keyboard = [
-        [kb_btn(tr(l, "btn_new_single"), style="success"), kb_btn(tr(l, "btn_new_bulk"), style="primary")],
-        [kb_btn(tr(l, "btn_new_2fa"), style="danger"), kb_btn(tr(l, "btn_back_gmail_work"), style="primary")],
-        [kb_btn(tr(l, "btn_main_menu"), style="danger")]
+        [kb_btn(tr(l, "btn_new_single"), style="success")],
+        [kb_btn(tr(l, "btn_new_bulk"), style="danger"), kb_btn(tr(l, "btn_new_2fa"), style="primary")],
+        [kb_btn(tr(l, "btn_back_gmail_work"), style="success"), kb_btn(tr(l, "btn_main_menu"), style="danger")]
     ]
     return ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
 
 def get_old_gmail_menu_keyboard(user_id: int = None, lang: str = None) -> ReplyKeyboardMarkup:
     l = lang or get_user_lang(user_id)
     keyboard = [
-        [kb_btn(tr(l, "btn_old_single"), style="success"), kb_btn(tr(l, "btn_old_bulk"), style="primary")],
-        [kb_btn(tr(l, "btn_old_2fa"), style="danger"), kb_btn(tr(l, "btn_back_gmail_work"), style="primary")],
-        [kb_btn(tr(l, "btn_main_menu"), style="danger")]
+        [kb_btn(tr(l, "btn_old_single"), style="success")],
+        [kb_btn(tr(l, "btn_old_bulk"), style="danger"), kb_btn(tr(l, "btn_old_2fa"), style="primary")],
+        [kb_btn(tr(l, "btn_back_gmail_work"), style="success"), kb_btn(tr(l, "btn_main_menu"), style="danger")]
     ]
     return ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
 
