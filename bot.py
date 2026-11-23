@@ -4,7 +4,7 @@ keep_alive()
 
 # -*- coding: utf-8 -*-
 """
-Trust Vault Mails Style - Telegram Micro Tasking Bot (Ultimate Edition)
+Gmail Work BD - Telegram Micro Tasking Bot (Ultimate Edition)
 Fully Optimized, High-Speed Broadcast, Auto-Delete Credentials, Multi-Channel Force Join, 
 Dynamic Withdraw Control (ON/OFF & Min/Max), Instant Referral Alerts & Enhanced UI.
 """
@@ -94,7 +94,7 @@ logging.basicConfig(
         logging.FileHandler("bot.log", encoding="utf-8"),
     ],
 )
-logger = logging.getLogger("Nexora_Work_Style")
+logger = logging.getLogger("Gmail_Work_BD")
 
 # -----------------------------------------------------------------------------
 # DATABASE CONNECTION POOL & INIT
@@ -293,6 +293,7 @@ def init_db():
             "usdt_charge_enabled": "ON",
             "usdt_charge_usdt": "0.05",
             "admin_id": ADMIN_ID,
+            "bot_display_name": "Gmail Work BD",
             "support_handle": "https://t.me/TrustVaultMailsOwners",
             "official_channel_link": "https://t.me/TrustVaultMailsOfficial",
             "ref_bonus_percent": "10.0",
@@ -375,7 +376,7 @@ MESSAGES = {
         "btn_verify": "Verify",
         "force_join_success": "✅ **ধন্যবাদ! আপনার চ্যানেল ভেরিফিকেশন সফল হয়েছে।**",
         "force_join_fail": "❌ আপনি এখনো সবগুলো চ্যানেলে জয়েন করেননি! সব চ্যানেলে জয়েন করে পুনরায় চেষ্টা করুন।",
-        "welcome_msg": "💎 **স্বাগতম, {name}!** ✨\n━━━━━━━━━━━━━━━━━━━━━━\n**Trust Vault Mails** প্রিমিয়াম প্ল্যাটফর্মে আপনাকে স্বাগতম।\nএখানে আপনি সহজ **Gmail** অ্যাকাউন্ট সাবমিট করে দ্রুত ও নিশ্চিত ইনকাম করতে পারবেন।\n━━━━━━━━━━━━━━━━━━━━━━\n👉 **কাজ শুরু করতে নিচের New Gmail Work বাটনে চাপ দিন।**",
+        "welcome_msg": "💎 **স্বাগতম, {name}!** ✨\n━━━━━━━━━━━━━━━━━━━━━━\n**{bot_name}** প্রিমিয়াম প্ল্যাটফর্মে আপনাকে স্বাগতম।\nএখানে আপনি সহজ **Gmail** অ্যাকাউন্ট সাবমিট করে দ্রুত ও নিশ্চিত ইনকাম করতে পারবেন।\n━━━━━━━━━━━━━━━━━━━━━━\n👉 **কাজ শুরু করতে নিচের New Gmail Work বাটনে চাপ দিন।**",
         "ref_new_user_joined": "🎉 **নতুন রেফারেল যোগ হয়েছে!**\n━━━━━━━━━━━━━━━━━━━━━━\n👤 **ইউজার:** {name}\n🆔 **ইউজার আইডি:** <code>{user_id}</code>\n\nকর্মী কাজ সম্পন্ন করলে আপনি পাবেন ১০% সরাসরি কমিশন!",
         "wd_all_disabled": "❌ বর্তমানে সকল পেমেন্ট মেথড বন্ধ রয়েছে। অনুগ্রহ করে পরে চেষ্টা করুন।",
         "task_cat_prompt": "💎 **প্রিমিয়ার টাস্ক মেনু**\n━━━━━━━━━━━━━━━━━━━━━━\n👉 কাজ শুরু করতে নিচের **📧 জিমেইল (Gmail)** বাটনে চাপ দিন:",
@@ -428,7 +429,7 @@ MESSAGES = {
         "user_wd_approved": "✅ <b>আপনার উইথড্র রিকোয়েস্ট #{wd_id} সফলভাবে সম্পন্ন হয়েছে!</b>\n💵 <b>৳{amount:.2f}</b> আপনার <code>{number}</code> নম্বরে পাঠানো হয়েছে।",
         "user_wd_rejected": "❌ <b>আপনার উইথড্র রিকোয়েস্ট #{wd_id} রিজেক্ট করা হয়েছে।</b>\n💵 <b>৳{amount:.2f}</b> আপনার ওয়ালেটে রিফান্ড (ফেরত) করা হয়েছে।",
 
-        "admin_dash_title": "👑 **Trust Vault Mails Style: অ্যাডমিন প্যানেল** 👑\n━━━━━━━━━━━━━━━━━━━━━━\n👥 **মোট ইউজার:** {total_users} জন\n⏳ **পেন্ডিং কাজ:** {pending_tasks} টি\n⌛ **হোল্ড কাজ:** {held_tasks} টি\n💸 **পেন্ডিং উইথড্র:** {pending_wd} টি\n━━━━━━━━━━━━━━━━━━━━━━\nযেকোনো বিষয় কনফিগার বা ভেরিফাই করতে নিচের মেনুগুলো ব্যবহার করুন।",
+        "admin_dash_title": "👑 **{bot_name}: অ্যাডমিন প্যানেল** 👑\n━━━━━━━━━━━━━━━━━━━━━━\n👥 **মোট ইউজার:** {total_users} জন\n⏳ **পেন্ডিং কাজ:** {pending_tasks} টি\n⌛ **হোল্ড কাজ:** {held_tasks} টি\n💸 **পেন্ডিং উইথড্র:** {pending_wd} টি\n━━━━━━━━━━━━━━━━━━━━━━\nযেকোনো বিষয় কনফিগার বা ভেরিফাই করতে নিচের মেনুগুলো ব্যবহার করুন।",
         "admin_no_pending_tasks": "✅ কোনো পেন্ডিং টাস্ক নেই।",
         "admin_pending_tasks_title": "📩 **পেন্ডিং টাস্ক লিস্ট (সর্বশেষ ১০টি):**\n\n",
         "admin_no_held_tasks": "⏳ কোনো হোল্ড টাস্ক নেই।",
@@ -439,7 +440,7 @@ MESSAGES = {
         "admin_price_mgr_title": "🏷️ **টাস্ক প্রাইস ম্যানেজার (Task Price Management)**\n━━━━━━━━━━━━━━━━━━━━━━\n✉️ Gmail: <code>৳{gmail}</code>\n👥 Ref Bonus: <code>{ref_bonus}%</code>\n━━━━━━━━━━━━━━━━━━━━━━\nনতুন দাম নির্ধারণ করতে নিচের বাটনে চাপ দিন:",
         "admin_no_pending_wds": "✅ কোনো পেন্ডিং উইথড্র রিকোয়েস্ট নেই।",
         "admin_pending_wds_title": "💸 **পেন্ডিং উইথড্র রিকোয়েস্ট:**\n\n",
-        "admin_sys_settings_title": "⚙️ **সিস্টেম সেটিংস (ON/OFF Toggles & Controls)**\n━━━━━━━━━━━━━━━━━━━━━━\n🔒 Force Join Status: {force_join}\n🛠️ Maintenance Mode: {maint}\n✉️ Gmail: {gmail}\n🟢 Bkash WD: {bkash_wd} (Min: {min_bkash} | Max: {max_bkash} | Charge: ৳{bkash_charge})\n🟠 Nagad WD: {nagad_wd} (Min: {min_nagad} | Max: {max_nagad} | Charge: ৳{nagad_charge})\n🔵 USDT WD: {usdt_wd} (Min: {min_usdt} | Max: {max_usdt})\n💱 USDT Rate: ৳{usdt_rate}/USDT\n💳 USDT Charge: {charge_status} ({charge_usdt} USDT)\n━━━━━━━━━━━━━━━━━━━━━━\nটগল বা পরিবর্তন করতে নিচের বাটন ব্যবহার করুন।",
+        "admin_sys_settings_title": "⚙️ **সিস্টেম সেটিংস (ON/OFF Toggles & Controls)**\n━━━━━━━━━━━━━━━━━━━━━━\n🏷️ Bot Name: {bot_name}\n🎧 Support: {support_link}\n📢 Channel: {channel_link}\n🔒 Force Join Status: {force_join}\n🛠️ Maintenance Mode: {maint}\n✉️ Gmail: {gmail}\n🟢 Bkash WD: {bkash_wd} (Min: {min_bkash} | Max: {max_bkash} | Charge: ৳{bkash_charge})\n🟠 Nagad WD: {nagad_wd} (Min: {min_nagad} | Max: {max_nagad} | Charge: ৳{nagad_charge})\n🔵 USDT WD: {usdt_wd} (Min: {min_usdt} | Max: {max_usdt})\n💱 USDT Rate: ৳{usdt_rate}/USDT\n💳 USDT Charge: {charge_status} ({charge_usdt} USDT)\n━━━━━━━━━━━━━━━━━━━━━━\nটগল বা পরিবর্তন করতে নিচের বাটন ব্যবহার করুন।",
         "admin_live_stats_title": "📊 **লাইভ স্ট্যাটাস** ⚡\n━━━━━━━━━━━━━━━━━━━━━━\n👥 মোট ইউজার: {total_users}\n⏳ পেন্ডিং টাস্ক: {pending_tasks}\n⌛ হোল্ড টাস্ক: {held_tasks}\n✅ এপ্রুভড টাস্ক: {approved_tasks}\n❌ রিজেক্টেড টাস্ক: {rejected_tasks}\n💸 পেন্ডিং উইথড্র: {pending_wd}\n💰 মোট ইউজার ব্যালেন্স: ৳{total_balance:.2f}",
         "admin_broadcast_prompt_msg": "𝚁𝙱𝙺 𝙰𝙿𝙿 𝚂𝚃𝙾𝚁𝙴: 📢 Broadcast Message পাঠান (All Media Supported)\n━━━━━━━━━━━━━━━━━━━━━━\nএখানে পছন্দমতো যেকোনো **Text, Photo 🖼️, Video 🎥, Document 📄, Voice 🎤, Audio 🎵** সেন্ড করুন। ক্যাপশন থাকলে ক্যাপশনসহ ইউজারদের কাছে অরিজিনাল মেসেজ হিসেবে যাবে।",
         "admin_search_no_results": "❌ কোনো টাস্ক পাওয়া যায়নি।",
@@ -496,7 +497,7 @@ MESSAGES = {
         "btn_verify": "Verify",
         "force_join_success": "✅ **Thank you! Your channel verification was successful.**",
         "force_join_fail": "❌ You haven't joined all channels yet! Please join all channels and try again.",
-        "welcome_msg": "💎 **Welcome, {name}!** ✨\n━━━━━━━━━━━━━━━━━━━━━━\nWelcome to **Trust Vault Mails** Premier Platform.\nEarn reliably by completing simple **Gmail** submission tasks.\n━━━━━━━━━━━━━━━━━━━━━━\n👉 **Press New Gmail Work below to get started.**",
+        "welcome_msg": "💎 **Welcome, {name}!** ✨\n━━━━━━━━━━━━━━━━━━━━━━\nWelcome to **{bot_name}** Premier Platform.\nEarn reliably by completing simple **Gmail** submission tasks.\n━━━━━━━━━━━━━━━━━━━━━━\n👉 **Press New Gmail Work below to get started.**",
         "ref_new_user_joined": "🎉 **New Referral Joined!**\n━━━━━━━━━━━━━━━━━━━━━━\n👤 **User:** {name}\n🆔 **User ID:** <code>{user_id}</code>\n\nYou will earn 10% lifetime commission on their completed tasks!",
         "wd_all_disabled": "❌ All withdrawal gateways are currently disabled. Please try again later.",
         "task_cat_prompt": "💎 **Premier Task Menu**\n━━━━━━━━━━━━━━━━━━━━━━\n👉 Press **📧 Gmail** below to start working:",
@@ -549,7 +550,7 @@ MESSAGES = {
         "user_wd_approved": "✅ <b>Your withdrawal request #{wd_id} has been approved successfully!</b>\n💵 <b>৳{amount:.2f}</b> sent to your <code>{number}</code> account.",
         "user_wd_rejected": "❌ <b>Your withdrawal request #{wd_id} was rejected.</b>\n💵 <b>৳{amount:.2f}</b> refunded back to your wallet.",
 
-        "admin_dash_title": "👑 **Trust Vault Mails Style: Admin Panel**\n\n👥 **Total Users:** {total_users}\n⏳ **Pending Tasks:** {pending_tasks}\n⌛ **Hold Tasks:** {held_tasks}\n💸 **Pending Withdrawals:** {pending_wd}\n\nUse the menus below to configure or verify anything.",
+        "admin_dash_title": "👑 **{bot_name}: Admin Panel**\n\n👥 **Total Users:** {total_users}\n⏳ **Pending Tasks:** {pending_tasks}\n⌛ **Hold Tasks:** {held_tasks}\n💸 **Pending Withdrawals:** {pending_wd}\n\nUse the menus below to configure or verify anything.",
         "admin_no_pending_tasks": "✅ No pending tasks.",
         "admin_pending_tasks_title": "📩 **Pending Tasks List (Latest 10):**\n\n",
         "admin_no_held_tasks": "⏳ No held tasks.",
@@ -560,7 +561,7 @@ MESSAGES = {
         "admin_price_mgr_title": "🏷️ **Task Price Manager**\n\n✉️ Gmail: <code>৳{gmail}</code>\n👥 Ref Bonus: <code>{ref_bonus}%</code>\n\nUse buttons below to set new prices:",
         "admin_no_pending_wds": "✅ No pending withdrawal requests.",
         "admin_pending_wds_title": "💸 **Pending Withdrawal Requests:**\n\n",
-        "admin_sys_settings_title": "⚙️ **System Settings (ON/OFF Toggles)**\n\n🔒 Force Join: {force_join}\n🛠️ Maintenance: {maint}\n✉️ Gmail: {gmail}\n🟢 Bkash WD: {bkash_wd} (Min: {min_bkash} | Max: {max_bkash} | Charge: ৳{bkash_charge})\n🟠 Nagad WD: {nagad_wd} (Min: {min_nagad} | Max: {max_nagad} | Charge: ৳{nagad_charge})\n🔵 USDT WD: {usdt_wd} (Min: {min_usdt} | Max: {max_usdt})\n💱 USDT Rate: ৳{usdt_rate}/USDT\n💳 USDT Charge: {charge_status} ({charge_usdt} USDT)\n\nUse buttons below to toggle or edit settings.",
+        "admin_sys_settings_title": "⚙️ **System Settings (ON/OFF Toggles)**\n\n🏷️ Bot Name: {bot_name}\n🎧 Support: {support_link}\n📢 Channel: {channel_link}\n🔒 Force Join: {force_join}\n🛠️ Maintenance: {maint}\n✉️ Gmail: {gmail}\n🟢 Bkash WD: {bkash_wd} (Min: {min_bkash} | Max: {max_bkash} | Charge: ৳{bkash_charge})\n🟠 Nagad WD: {nagad_wd} (Min: {min_nagad} | Max: {max_nagad} | Charge: ৳{nagad_charge})\n🔵 USDT WD: {usdt_wd} (Min: {min_usdt} | Max: {max_usdt})\n💱 USDT Rate: ৳{usdt_rate}/USDT\n💳 USDT Charge: {charge_status} ({charge_usdt} USDT)\n\nUse buttons below to toggle or edit settings.",
         "admin_live_stats_title": "📊 **Live Stats**\n\n👥 Total Users: {total_users}\n⏳ Pending Tasks: {pending_tasks}\n⌛ Hold Tasks: {held_tasks}\n✅ Approved Tasks: {approved_tasks}\n❌ Rejected Tasks: {rejected_tasks}\n💸 Pending Withdrawals: {pending_wd}\n💰 Total User Balance: ৳{total_balance:.2f}",
         "admin_broadcast_prompt_msg": "𝚁𝙱𝙺 𝙰𝙿𝙿 𝚂𝚃𝙾𝚁𝙴: 📢 Broadcast Message পাঠান (All Media Supported)\n━━━━━━━━━━━━━━━━━━━━━━\nSend any **Text, Photo 🖼️, Video 🎥, Document 📄, Voice 🎤, Audio 🎵**. Caption will be preserved.",
         "admin_search_no_results": "❌ No tasks found.",
@@ -1116,7 +1117,7 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await send_force_join_prompt(update, context, unjoined_channels)
         return ConversationHandler.END
 
-    welcome_msg = tr(user_id, "welcome_msg", name=html.escape(user.first_name))
+    welcome_msg = tr(user_id, "welcome_msg", name=html.escape(user.first_name), bot_name=get_setting_val("bot_display_name", "Gmail Work BD"))
 
     await update.message.reply_text(
         welcome_msg,
@@ -2069,6 +2070,7 @@ async def handle_admin_panel(update: Update, context: ContextTypes.DEFAULT_TYPE)
 
     dash_msg = tr(
         user_id, "admin_dash_title",
+        bot_name=get_setting_val("bot_display_name", "Gmail Work BD"),
         total_users=total_users,
         pending_tasks=pending_tasks,
         held_tasks=held_tasks,
@@ -2619,7 +2621,7 @@ async def admin_control_panel(update: Update, context: ContextTypes.DEFAULT_TYPE
     sub_list_str = "\n".join([f"• <code>{row['user_id']}</code>" for row in sub_admins]) if sub_admins else "কোনো সাব-এডমিন নেই।"
 
     buttons = [
-        [ikb_btn(f"🔒 Force Join: {force_join}", callback_data="adm_toggle_force_join_enabled"),
+        [ikb_btn(f"🏷️ Bot Name: {bot_name}\n🎧 Support: {support_link}\n📢 Channel: {channel_link}\n🔒 Force Join: {force_join}", callback_data="adm_toggle_force_join_enabled"),
          ikb_btn("📢 Edit Force Channels List", callback_data="adm_edit_force_channels_list")],
         [ikb_btn("➕ Add Sub-Admin", callback_data="adm_add_subadmin"), ikb_btn("➖ Remove Sub-Admin", callback_data="adm_rem_subadmin")],
         [ikb_btn("Admin Menu", callback_data="adm_back_to_admin")]
@@ -2727,6 +2729,9 @@ async def admin_system_settings(update: Update, context: ContextTypes.DEFAULT_TY
 
     msg = tr(
         user_id, "admin_sys_settings_title",
+        bot_name=get_setting_val("bot_display_name", "Gmail Work BD"),
+        support_link=get_setting_val("support_handle", ""),
+        channel_link=get_setting_val("official_channel_link", ""),
         force_join=force_join, maint=maint, gmail=gmail,
         bkash_wd=bkash_wd, nagad_wd=nagad_wd, usdt_wd=usdt_wd,
         min_bkash=min_bkash, max_bkash=max_bkash,
@@ -2749,7 +2754,10 @@ async def admin_system_settings(update: Update, context: ContextTypes.DEFAULT_TY
         [ikb_btn("💱 Edit USDT Rate", callback_data="adm_edit_usdt_rate_bdt"),
          ikb_btn(f"💳 Charge: {charge_status}", callback_data="adm_toggle_usdt_charge_enabled")],
         [ikb_btn("✏️ Edit Charge (USDT)", callback_data="adm_edit_usdt_charge_usdt")],
-        [ikb_btn(f"✉️ Gmail: {gmail}", callback_data="adm_toggle_gmail_task_active")],
+        [ikb_btn(f"✉️ Gmail: {gmail}", style="success", callback_data="adm_toggle_gmail_task_active")],
+        [ikb_btn("🏷️ Bot Name", style="primary", callback_data="adm_edit_bot_display_name"),
+         ikb_btn("🎧 Support ID/Link", style="success", callback_data="adm_edit_support_handle")],
+        [ikb_btn("📢 Official Channel", style="danger", callback_data="adm_edit_official_channel_link")],
         [ikb_btn(tr(user_id, "btn_admin_menu"), callback_data="adm_back_to_admin")]
     ]
     await update.message.reply_text(msg, reply_markup=InlineKeyboardMarkup(keyboard), parse_mode=ParseMode.HTML)
@@ -3648,7 +3656,7 @@ async def process_admin_text(update: Update, context: ContextTypes.DEFAULT_TYPE)
             await update.message.reply_text(tr(user_id, "admin_export_no_tasks"), reply_markup=get_admin_keyboard(user_id))
         else:
             buffer = io.StringIO()
-            buffer.write(f"Trust Vault Mails STYLE - USER {target_id} REPORT\n")
+            buffer.write(f"GMAIL WORK BD - USER {target_id} REPORT\n")
             buffer.write("="*50+"\n")
             for s in subs:
                 buffer.write(f"ID:{s['submission_id']} Type:{s['task_type']} User:{s['submitted_username']} Pass:{s['submitted_password']} Status:{s['status']}\n")
@@ -3683,8 +3691,16 @@ async def process_admin_text(update: Update, context: ContextTypes.DEFAULT_TYPE)
 
     if context.user_data.get("edit_setting_key"):
         key = context.user_data["edit_setting_key"]
-        set_setting_val(key, text)
-        await update.message.reply_text(f"✅ ````{key}```` updated to ````{text}````.", reply_markup=get_admin_keyboard(user_id))
+        val = text
+        if key in ("support_handle", "official_channel_link"):
+            if not val.startswith("http://") and not val.startswith("https://"):
+                val = "https://t.me/" + val.lstrip("@").strip()
+        set_setting_val(key, val)
+        await update.message.reply_text(
+            f"✅ <code>{html.escape(key)}</code> updated to <code>{html.escape(val)}</code>.",
+            reply_markup=get_admin_keyboard(user_id),
+            parse_mode=ParseMode.HTML
+        )
         context.user_data["edit_setting_key"] = None
         return ConversationHandler.END
 
@@ -4332,7 +4348,7 @@ def main():
         pattern="^(adm_app_sub_|adm_hold_sub_|adm_rej_prompt_|adm_rej_act_|adm_app_wd_|adm_rej_wd_|adm_back_to_admin|adm_toggle_|adm_edit_force_channels_list|adm_fj_del_|adm_fj_clear|adm_usr_banned_list|adm_usr_reset_balances)"
     ))
 
-    logger.info("Trust Vault Mails Style Bot successfully started!")
+    logger.info("Gmail Work BD Bot successfully started!")
     app.run_polling()
 
 if __name__ == "__main__":
