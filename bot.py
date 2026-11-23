@@ -294,6 +294,7 @@ def init_db():
             "usdt_charge_usdt": "0.05",
             "admin_id": ADMIN_ID,
             "bot_display_name": "Gmail Work BD",
+            "welcome_banner_file_id": "",
             "support_handle": "https://t.me/TrustVaultMailsOwners",
             "official_channel_link": "https://t.me/TrustVaultMailsOfficial",
             "ref_bonus_percent": "10.0",
@@ -376,7 +377,7 @@ MESSAGES = {
         "btn_verify": "Verify",
         "force_join_success": "✅ **ধন্যবাদ! আপনার চ্যানেল ভেরিফিকেশন সফল হয়েছে।**",
         "force_join_fail": "❌ আপনি এখনো সবগুলো চ্যানেলে জয়েন করেননি! সব চ্যানেলে জয়েন করে পুনরায় চেষ্টা করুন।",
-        "welcome_msg": "💎 **স্বাগতম, {name}!** ✨\n━━━━━━━━━━━━━━━━━━━━━━\n**{bot_name}** প্রিমিয়াম প্ল্যাটফর্মে আপনাকে স্বাগতম।\nএখানে আপনি সহজ **Gmail** অ্যাকাউন্ট সাবমিট করে দ্রুত ও নিশ্চিত ইনকাম করতে পারবেন।\n━━━━━━━━━━━━━━━━━━━━━━\n👉 **কাজ শুরু করতে নিচের New Gmail Work বাটনে চাপ দিন।**",
+        "welcome_msg": "💎 **স্বাগতম, {name}!** ✨\n━━━━━━━━━━━━━━━━━━━━━━\n**{bot_name}**-এ আপনাকে স্বাগতম।\nএখানে আপনি সহজ **Gmail** অ্যাকাউন্ট সাবমিট করে দ্রুত ও নিশ্চিত ইনকাম করতে পারবেন।\n━━━━━━━━━━━━━━━━━━━━━━\n👉 **কাজ শুরু করতে নিচের New Gmail Work বাটনে চাপ দিন।**",
         "ref_new_user_joined": "🎉 **নতুন রেফারেল যোগ হয়েছে!**\n━━━━━━━━━━━━━━━━━━━━━━\n👤 **ইউজার:** {name}\n🆔 **ইউজার আইডি:** <code>{user_id}</code>\n\nকর্মী কাজ সম্পন্ন করলে আপনি পাবেন ১০% সরাসরি কমিশন!",
         "wd_all_disabled": "❌ বর্তমানে সকল পেমেন্ট মেথড বন্ধ রয়েছে। অনুগ্রহ করে পরে চেষ্টা করুন।",
         "task_cat_prompt": "💎 **প্রিমিয়ার টাস্ক মেনু**\n━━━━━━━━━━━━━━━━━━━━━━\n👉 কাজ শুরু করতে নিচের **📧 জিমেইল (Gmail)** বাটনে চাপ দিন:",
@@ -497,7 +498,7 @@ MESSAGES = {
         "btn_verify": "Verify",
         "force_join_success": "✅ **Thank you! Your channel verification was successful.**",
         "force_join_fail": "❌ You haven't joined all channels yet! Please join all channels and try again.",
-        "welcome_msg": "💎 **Welcome, {name}!** ✨\n━━━━━━━━━━━━━━━━━━━━━━\nWelcome to **{bot_name}** Premier Platform.\nEarn reliably by completing simple **Gmail** submission tasks.\n━━━━━━━━━━━━━━━━━━━━━━\n👉 **Press New Gmail Work below to get started.**",
+        "welcome_msg": "💎 **Welcome, {name}!** ✨\n━━━━━━━━━━━━━━━━━━━━━━\nWelcome to **{bot_name}**.\nEarn reliably by completing simple **Gmail** submission tasks.\n━━━━━━━━━━━━━━━━━━━━━━\n👉 **Press New Gmail Work below to get started.**",
         "ref_new_user_joined": "🎉 **New Referral Joined!**\n━━━━━━━━━━━━━━━━━━━━━━\n👤 **User:** {name}\n🆔 **User ID:** <code>{user_id}</code>\n\nYou will earn 10% lifetime commission on their completed tasks!",
         "wd_all_disabled": "❌ All withdrawal gateways are currently disabled. Please try again later.",
         "task_cat_prompt": "💎 **Premier Task Menu**\n━━━━━━━━━━━━━━━━━━━━━━\n👉 Press **📧 Gmail** below to start working:",
@@ -969,6 +970,7 @@ LAST_NAMES = ["Ahmed", "Sarker", "Hasan", "Rahman", "Uddin", "Chowdhury", "Akter
 STATE_ADMIN_SET_REF_BONUS = 30
 STATE_TASK_BULK_GMAIL_INPUT = 31
 STATE_ADMIN_RESTORE_DB = 32
+STATE_ADMIN_WELCOME_BANNER = 33
 
 # -----------------------------------------------------------------------------
 # DYNAMIC MULTILINGUAL REPLY KEYBOARDS
@@ -1119,11 +1121,28 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     welcome_msg = tr(user_id, "welcome_msg", name=html.escape(user.first_name), bot_name=get_setting_val("bot_display_name", "Gmail Work BD"))
 
-    await update.message.reply_text(
-        welcome_msg,
-        reply_markup=get_main_keyboard(user_id),
-        parse_mode=ParseMode.MARKDOWN
-    )
+    banner_id = get_setting_val("welcome_banner_file_id", "").strip()
+    if banner_id:
+        try:
+            await update.message.reply_photo(
+                photo=banner_id,
+                caption=welcome_msg,
+                reply_markup=get_main_keyboard(user_id),
+                parse_mode=ParseMode.MARKDOWN
+            )
+        except Exception as e:
+            logger.warning(f"Failed to send welcome banner photo: {e}")
+            await update.message.reply_text(
+                welcome_msg,
+                reply_markup=get_main_keyboard(user_id),
+                parse_mode=ParseMode.MARKDOWN
+            )
+    else:
+        await update.message.reply_text(
+            welcome_msg,
+            reply_markup=get_main_keyboard(user_id),
+            parse_mode=ParseMode.MARKDOWN
+        )
     return ConversationHandler.END
 
 async def check_force_join_cb(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -2757,7 +2776,8 @@ async def admin_system_settings(update: Update, context: ContextTypes.DEFAULT_TY
         [ikb_btn(f"✉️ Gmail: {gmail}", style="success", callback_data="adm_toggle_gmail_task_active")],
         [ikb_btn("🏷️ Bot Name", style="primary", callback_data="adm_edit_bot_display_name"),
          ikb_btn("🎧 Support ID/Link", style="success", callback_data="adm_edit_support_handle")],
-        [ikb_btn("📢 Official Channel", style="danger", callback_data="adm_edit_official_channel_link")],
+        [ikb_btn("📢 Official Channel", style="danger", callback_data="adm_edit_official_channel_link"),
+         ikb_btn("🖼️ Welcome Banner", style="primary", callback_data="adm_edit_welcome_banner")],
         [ikb_btn(tr(user_id, "btn_admin_menu"), callback_data="adm_back_to_admin")]
     ]
     await update.message.reply_text(msg, reply_markup=InlineKeyboardMarkup(keyboard), parse_mode=ParseMode.HTML)
@@ -2846,6 +2866,41 @@ async def admin_backup_db(update: Update, context: ContextTypes.DEFAULT_TYPE):
             except Exception:
                 pass
 
+
+
+async def process_admin_welcome_banner(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_id = update.effective_user.id
+    if not is_admin(user_id):
+        return ConversationHandler.END
+
+    if update.message.photo:
+        file_id = update.message.photo[-1].file_id
+        set_setting_val("welcome_banner_file_id", file_id)
+        await update.message.reply_text(
+            "✅ <b>Welcome Banner সফলভাবে সেট হয়েছে!</b>\nএখন /start দিলে ওয়েলকাম মেসেজের সাথে এই ব্যানার দেখাবে।",
+            reply_markup=get_admin_keyboard(user_id),
+            parse_mode=ParseMode.HTML
+        )
+        clear_user_state(context)
+        return ConversationHandler.END
+
+    txt = (update.message.text or "").strip().lower()
+    if txt in ("off", "remove", "clear", "none", "delete"):
+        set_setting_val("welcome_banner_file_id", "")
+        await update.message.reply_text(
+            "🗑️ <b>Welcome Banner মুছে ফেলা হয়েছে।</b>",
+            reply_markup=get_admin_keyboard(user_id),
+            parse_mode=ParseMode.HTML
+        )
+        clear_user_state(context)
+        return ConversationHandler.END
+
+    await update.message.reply_text(
+        "❌ অনুগ্রহ করে একটি <b>Photo (ছবি)</b> পাঠান অথবা মুছতে <code>off</code> লিখুন।",
+        reply_markup=get_cancel_keyboard(user_id),
+        parse_mode=ParseMode.HTML
+    )
+    return STATE_ADMIN_WELCOME_BANNER
 
 async def admin_restore_prompt(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
@@ -3101,6 +3156,16 @@ async def admin_callback_handler(update: Update, context: ContextTypes.DEFAULT_T
             parse_mode=ParseMode.MARKDOWN
         )
         return STATE_ADMIN_SETTING_VAL
+
+    if data == "adm_edit_welcome_banner":
+        has_banner = "✅ Set" if get_setting_val("welcome_banner_file_id", "").strip() else "❌ None"
+        await query.edit_message_text(
+            f"🖼️ <b>Welcome Banner ({has_banner})</b>\n━━━━━━━━━━━━━━━━━━━━━━\n"
+            f"ওয়েলকাম মেসেজের সাথে দেখানোর জন্য যেকোনো একটি <b>Photo (ছবি)</b> এখানে পাঠান।\n\n"
+            f"ব্যানার মুছে ফেলতে চাইলে <code>off</code> লিখে পাঠান।",
+            parse_mode=ParseMode.HTML
+        )
+        return STATE_ADMIN_WELCOME_BANNER
 
     if data.startswith("adm_edit_"):
         setting_key = data.replace("adm_edit_", "")
@@ -4315,6 +4380,12 @@ def main():
                 MessageHandler(filters.Regex(btn_main_menu_re), start_command),
                 MessageHandler(filters.Document.ALL, process_admin_restore_db),
                 MessageHandler(filters.TEXT & ~filters.COMMAND, process_admin_restore_db),
+            ],
+            STATE_ADMIN_WELCOME_BANNER: [
+                MessageHandler(filters.Regex(btn_cancel_re), cancel_operation),
+                MessageHandler(filters.Regex(btn_main_menu_re), start_command),
+                MessageHandler(filters.PHOTO, process_admin_welcome_banner),
+                MessageHandler(filters.TEXT & ~filters.COMMAND, process_admin_welcome_banner),
             ],
             ConversationHandler.TIMEOUT: [
                 MessageHandler(filters.ALL, _conversation_timeout_handler),
