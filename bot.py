@@ -342,6 +342,16 @@ def init_db():
             primary_id = next((int(x.strip()) for x in ADMIN_ID.split(",") if x.strip().isdigit()), None)
             if primary_id is not None:
                 cursor.execute("DELETE FROM sub_admins WHERE user_id != ?", (primary_id,))
+        cursor.execute("SELECT value FROM admin_settings WHERE key = 'old_cats_seeded'")
+        if not cursor.fetchone():
+            cursor.execute("SELECT COUNT(*) FROM old_gmail_categories")
+            if cursor.fetchone()[0] == 0:
+                now_ts = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                cursor.execute(
+                    "INSERT OR IGNORE INTO old_gmail_categories (cat_key, label, rate, created_at) VALUES (?, ?, ?, ?)",
+                    ("old1", "2018 - 2024 Old", 35.0, now_ts)
+                )
+            cursor.execute("INSERT OR REPLACE INTO admin_settings (key, value) VALUES ('old_cats_seeded', '1')")
         conn.commit()
     logger.info("Database initialized successfully.")
 
@@ -362,6 +372,8 @@ MESSAGES = {
         "btn_cancel": "Cancel",
         "btn_gmail": "New Gmail Work",
         "btn_bulk_gmail": "Bulk Gmail Work",
+        "btn_new_single": "Single New Gmail",
+        "btn_new_bulk": "Bulk New Gmail",
         "btn_old_gmail": "Old Gmail Work",
         "btn_old_single": "Single Old Gmail",
         "btn_old_bulk": "Bulk Old Gmail",
@@ -490,6 +502,8 @@ MESSAGES = {
         "btn_cancel": "Cancel",
         "btn_gmail": "New Gmail Work",
         "btn_bulk_gmail": "Bulk Gmail Work",
+        "btn_new_single": "Single New Gmail",
+        "btn_new_bulk": "Bulk New Gmail",
         "btn_old_gmail": "Old Gmail Work",
         "btn_old_single": "Single Old Gmail",
         "btn_old_bulk": "Bulk Old Gmail",
@@ -983,7 +997,7 @@ def is_menu_or_admin_button(text: str) -> bool:
     if not text:
         return False
     known_buttons = [
-        "Gmail Work", "New Gmail Work", "Bulk Gmail Work", "Old Gmail Work", "Single Old Gmail", "Bulk Old Gmail", "Back to Gmail Work", "Old Gmail Categories", "Wallet", "My Referrals", "Leaderboard",
+        "Gmail Work", "New Gmail Work", "Bulk Gmail Work", "Single New Gmail", "Bulk New Gmail", "Old Gmail Work", "Single Old Gmail", "Bulk Old Gmail", "Back to Gmail Work", "Old Gmail Categories", "Wallet", "My Referrals", "Leaderboard",
         "Withdraw", "Support", "Language", "Admin Panel", "Main Menu", "Cancel",
         "Submit Gmail", "Pending Tasks", "Held Tasks", "Approve All", "Reject All",
         "Password Manager", "Price Manager", "Task Search", "User Export",
@@ -1039,6 +1053,7 @@ STATE_TASK_OLD_CAT = 35
 STATE_TASK_OLD_SINGLE_INPUT = 36
 STATE_TASK_OLD_BULK_INPUT = 37
 STATE_ADMIN_OLD_CAT_ADD = 38
+STATE_TASK_NEW_MENU = 39
 
 # -----------------------------------------------------------------------------
 # DYNAMIC MULTILINGUAL REPLY KEYBOARDS
@@ -1059,8 +1074,16 @@ def get_main_keyboard(user_id: int = None, lang: str = None) -> ReplyKeyboardMar
 def get_task_category_keyboard(user_id: int = None, lang: str = None) -> ReplyKeyboardMarkup:
     l = lang or get_user_lang(user_id)
     keyboard = [
-        [kb_btn(tr(l, "btn_gmail"), style="success"), kb_btn(tr(l, "btn_bulk_gmail"), style="primary")],
-        [kb_btn(tr(l, "btn_old_gmail"), style="danger"), kb_btn(tr(l, "btn_main_menu"), style="primary")]
+        [kb_btn(tr(l, "btn_gmail"), style="success"), kb_btn(tr(l, "btn_old_gmail"), style="primary")],
+        [kb_btn(tr(l, "btn_main_menu"), style="danger")]
+    ]
+    return ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
+
+def get_new_gmail_menu_keyboard(user_id: int = None, lang: str = None) -> ReplyKeyboardMarkup:
+    l = lang or get_user_lang(user_id)
+    keyboard = [
+        [kb_btn(tr(l, "btn_new_single"), style="success"), kb_btn(tr(l, "btn_new_bulk"), style="primary")],
+        [kb_btn(tr(l, "btn_back_gmail_work"), style="danger"), kb_btn(tr(l, "btn_main_menu"), style="primary")]
     ]
     return ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
 
@@ -1266,6 +1289,30 @@ async def handle_task_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
         parse_mode=ParseMode.MARKDOWN
     )
     return STATE_TASK_CATEGORY
+
+
+async def handle_new_gmail_submenu(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    clear_user_state(context)
+    user_id = update.effective_user.id
+    if is_banned(user_id):
+        await update.message.reply_text(tr(user_id, "banned_msg"))
+        return ConversationHandler.END
+
+    is_joined, _ = await check_force_join(user_id, context)
+    if not is_joined:
+        await start_command(update, context)
+        return ConversationHandler.END
+
+    if get_setting_val("gmail_task_active", "ON") == "OFF" and get_setting_val("bulk_gmail_task_active", "ON") == "OFF":
+        await update.message.reply_text("❌ New Gmail Work বর্তমানে বন্ধ রয়েছে।", reply_markup=get_task_category_keyboard(user_id))
+        return STATE_TASK_CATEGORY
+
+    await update.message.reply_text(
+        "✉️ <b>New Gmail Work</b>\n━━━━━━━━━━━━━━━━━━━━━━\nSingle অথবা Bulk New Gmail বেছে নিন:",
+        reply_markup=get_new_gmail_menu_keyboard(user_id),
+        parse_mode=ParseMode.HTML
+    )
+    return STATE_TASK_NEW_MENU
 
 async def handle_gmail_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
     clear_user_state(context)
@@ -1742,9 +1789,9 @@ async def old_category_selected_callback(update: Update, context: ContextTypes.D
     rec_line = f"💌 <b>Recovery Email (ট্যাপ করে কপি):</b>\n<code>{html.escape(old_rec)}</code>\n" if old_rec else ""
     tfa_line = "🔐 <b>2FA নিয়ম:</b> অবশ্যই অ্যাকাউন্টের 2FA অফ করে জমা দিতে হবে।\n" if twofa_on else ""
     step_line = (
-        "📝 সবগুলো Gmail <b>প্রতি লাইনে ১টি করে</b> নিচে লিখে পাঠান:"
+        "📝 সবগুলো Gmail <b>প্রতি লাইনে ১টি করে</b> নিচে লিখে পাঠান:\n\n<b>উদাহরণ:</b>\n<code>oldmail1@gmail.com\noldmail2@gmail.com</code>"
         if mode == "bulk" else
-        "📝 আপনার Old Gmail অ্যাড্রেসটি নিচে লিখে পাঠান:"
+        "📝 আপনার Old Gmail অ্যাড্রেসটি নিচে লিখে পাঠান:\n\n<b>উদাহরণ:</b> <code>oldmail2020@gmail.com</code>"
     )
 
     msg = (
@@ -4600,6 +4647,8 @@ def main():
 
     btn_gmail_re = r"^New Gmail Work$"
     btn_bulk_gmail_re = r"^Bulk Gmail Work$"
+    btn_new_single_re = r"^Single New Gmail$"
+    btn_new_bulk_re = r"^Bulk New Gmail$"
     btn_old_gmail_re = r"^Old Gmail Work$"
     btn_old_single_re = r"^Single Old Gmail$"
     btn_old_bulk_re = r"^Bulk Old Gmail$"
@@ -4630,6 +4679,16 @@ def main():
     btn_adm_user_mgmt_re = r"^User Management$"
     btn_adm_admin_mgmt_re = r"^Admin Control$"
 
+    all_menu_buttons_re = (
+        r"^(Gmail Work|New Gmail Work|Bulk Gmail Work|Single New Gmail|Bulk New Gmail|Old Gmail Work|"
+        r"Single Old Gmail|Bulk Old Gmail|Back to Gmail Work|"
+        r"Wallet|Withdraw|My Referrals|Leaderboard|Support|Language|Admin Panel|Main Menu|Cancel|"
+        r"Pending Tasks|Held Tasks|Approve All|Reject All|Password Manager|Price Manager|"
+        r"Task Search|User Export|Spreadsheet UI|Withdraw Requests|User Management|"
+        r"Admin Control|System Settings|Live Stats|Broadcast|Backup DB|Old Gmail Categories|Restore DB)$"
+    )
+    not_menu_text = filters.TEXT & ~filters.COMMAND & ~filters.Regex(all_menu_buttons_re)
+
     common_nav_fallbacks = [
         CommandHandler("start", start_command),
         MessageHandler(filters.Regex(btn_main_menu_re), start_command),
@@ -4640,63 +4699,77 @@ def main():
         MessageHandler(filters.Regex(btn_support_re), _auto_cancel_to(handle_support)),
         MessageHandler(filters.Regex(btn_lang_re), _auto_cancel_to(handle_language)),
         MessageHandler(filters.Regex(btn_admin_re), _auto_cancel_to(handle_admin_panel)),
-        MessageHandler(filters.Regex(btn_withdraw_re), _end_silently),
-        MessageHandler(filters.Regex(btn_gmail_re), _end_silently),
-        MessageHandler(filters.Regex(btn_task_re), _end_silently),
-        MessageHandler(filters.Regex(btn_bulk_gmail_re), _end_silently),
-        MessageHandler(filters.Regex(btn_old_gmail_re), _end_silently),
+        MessageHandler(filters.Regex(all_menu_buttons_re), _end_silently),
     ]
 
-    # --- Task Conversation Handler (Group 0, auto-cancels on navigation or timeout) ---
+    # --- Task Conversation Handler (Group 0) ---
     task_conv = ConversationHandler(
         entry_points=[
             MessageHandler(filters.Regex(btn_task_re), handle_task_menu),
-            MessageHandler(filters.Regex(btn_gmail_re), handle_gmail_menu),
+            MessageHandler(filters.Regex(btn_gmail_re), handle_new_gmail_submenu),
+            MessageHandler(filters.Regex(btn_new_single_re), handle_gmail_menu),
+            MessageHandler(filters.Regex(btn_new_bulk_re), handle_bulk_gmail_menu),
             MessageHandler(filters.Regex(btn_bulk_gmail_re), handle_bulk_gmail_menu),
             MessageHandler(filters.Regex(btn_old_gmail_re), handle_old_gmail_menu),
         ],
         states={
             STATE_TASK_CATEGORY: [
-                MessageHandler(filters.Regex(btn_gmail_re), handle_gmail_menu),
+                MessageHandler(filters.Regex(btn_gmail_re), handle_new_gmail_submenu),
+                MessageHandler(filters.Regex(btn_new_single_re), handle_gmail_menu),
+                MessageHandler(filters.Regex(btn_new_bulk_re), handle_bulk_gmail_menu),
                 MessageHandler(filters.Regex(btn_bulk_gmail_re), handle_bulk_gmail_menu),
+                MessageHandler(filters.Regex(btn_old_gmail_re), handle_old_gmail_menu),
+            ],
+            STATE_TASK_NEW_MENU: [
+                MessageHandler(filters.Regex(btn_new_single_re), handle_gmail_menu),
+                MessageHandler(filters.Regex(btn_new_bulk_re), handle_bulk_gmail_menu),
+                MessageHandler(filters.Regex(btn_bulk_gmail_re), handle_bulk_gmail_menu),
+                MessageHandler(filters.Regex(btn_back_gmail_work_re), handle_task_menu),
                 MessageHandler(filters.Regex(btn_old_gmail_re), handle_old_gmail_menu),
             ],
             STATE_TASK_OLD_MENU: [
                 MessageHandler(filters.Regex(btn_old_single_re), handle_old_single_or_bulk_start),
                 MessageHandler(filters.Regex(btn_old_bulk_re), handle_old_single_or_bulk_start),
                 MessageHandler(filters.Regex(btn_back_gmail_work_re), handle_task_menu),
+                MessageHandler(filters.Regex(btn_gmail_re), handle_gmail_menu),
+                MessageHandler(filters.Regex(btn_bulk_gmail_re), handle_bulk_gmail_menu),
             ],
             STATE_TASK_OLD_CAT: [
                 CallbackQueryHandler(old_category_selected_callback, pattern=r"^oldcat_"),
+                MessageHandler(filters.Regex(btn_old_single_re), handle_old_single_or_bulk_start),
+                MessageHandler(filters.Regex(btn_old_bulk_re), handle_old_single_or_bulk_start),
                 MessageHandler(filters.Regex(btn_back_gmail_work_re), handle_task_menu),
+                MessageHandler(filters.Regex(btn_gmail_re), handle_gmail_menu),
+                MessageHandler(filters.Regex(btn_bulk_gmail_re), handle_bulk_gmail_menu),
+                MessageHandler(filters.Regex(btn_old_gmail_re), handle_old_gmail_menu),
             ],
             STATE_TASK_OLD_SINGLE_INPUT: [
                 CallbackQueryHandler(old_single_done_callback, pattern=r"^old_single_done$"),
                 CallbackQueryHandler(old_gmail_cancel_callback, pattern=r"^old_gmail_cancel$"),
                 MessageHandler(filters.Regex(btn_cancel_re), cancel_operation),
                 MessageHandler(filters.Regex(btn_main_menu_re), start_command),
-                MessageHandler(filters.TEXT & ~filters.COMMAND & ~filters.Regex(r"^(Gmail Work|New Gmail Work|Bulk Gmail Work|Old Gmail Work|Single Old Gmail|Bulk Old Gmail|Back to Gmail Work|Wallet|Withdraw|My Referrals|Leaderboard|Support|Language|Admin Panel|Main Menu|Cancel)$"), process_old_single_submission),
+                MessageHandler(not_menu_text, process_old_single_submission),
             ],
             STATE_TASK_OLD_BULK_INPUT: [
                 CallbackQueryHandler(old_bulk_done_callback, pattern=r"^old_bulk_done$"),
                 CallbackQueryHandler(old_gmail_cancel_callback, pattern=r"^old_gmail_cancel$"),
                 MessageHandler(filters.Regex(btn_cancel_re), cancel_operation),
                 MessageHandler(filters.Regex(btn_main_menu_re), start_command),
-                MessageHandler(filters.TEXT & ~filters.COMMAND & ~filters.Regex(r"^(Gmail Work|New Gmail Work|Bulk Gmail Work|Old Gmail Work|Single Old Gmail|Bulk Old Gmail|Back to Gmail Work|Wallet|Withdraw|My Referrals|Leaderboard|Support|Language|Admin Panel|Main Menu|Cancel)$"), process_old_bulk_submission),
+                MessageHandler(not_menu_text, process_old_bulk_submission),
             ],
             STATE_TASK_GMAIL_INPUT: [
                 CallbackQueryHandler(gmail_done_callback, pattern=r"^gmail_done$"),
                 CallbackQueryHandler(gmail_cancel_callback, pattern=r"^gmail_cancel$"),
                 MessageHandler(filters.Regex(btn_cancel_re), cancel_operation),
                 MessageHandler(filters.Regex(btn_main_menu_re), start_command),
-                MessageHandler(filters.TEXT & ~filters.COMMAND & ~filters.Regex(r"^(Gmail Work|New Gmail Work|Bulk Gmail Work|Old Gmail Work|Single Old Gmail|Bulk Old Gmail|Back to Gmail Work|Wallet|Withdraw|My Referrals|Leaderboard|Support|Language|Admin Panel|Main Menu|Cancel)$"), process_gmail_submission),
+                MessageHandler(not_menu_text, process_gmail_submission),
             ],
             STATE_TASK_BULK_GMAIL_INPUT: [
                 CallbackQueryHandler(bulk_gmail_done_callback, pattern=r"^bulk_gmail_done$"),
                 CallbackQueryHandler(bulk_gmail_cancel_callback, pattern=r"^bulk_gmail_cancel$"),
                 MessageHandler(filters.Regex(btn_cancel_re), cancel_operation),
                 MessageHandler(filters.Regex(btn_main_menu_re), start_command),
-                MessageHandler(filters.TEXT & ~filters.COMMAND & ~filters.Regex(r"^(Gmail Work|New Gmail Work|Bulk Gmail Work|Old Gmail Work|Single Old Gmail|Bulk Old Gmail|Back to Gmail Work|Wallet|Withdraw|My Referrals|Leaderboard|Support|Language|Admin Panel|Main Menu|Cancel)$"), process_bulk_gmail_submission),
+                MessageHandler(not_menu_text, process_bulk_gmail_submission),
             ],
             ConversationHandler.TIMEOUT: [
                 MessageHandler(filters.ALL, _conversation_timeout_handler),
@@ -4735,7 +4808,7 @@ def main():
     app.add_handler(CommandHandler("backup", admin_backup_db), group=0)
     app.add_handler(MessageHandler(filters.Regex(btn_adm_old_cats_re), admin_old_categories_menu), group=0)
 
-    # --- Withdraw Conversation Handler (Group 1, auto-cancels on navigation or timeout) ---
+    # --- Withdraw Conversation Handler (Group 1) ---
     withdraw_conv = ConversationHandler(
         entry_points=[
             MessageHandler(filters.Regex(btn_withdraw_re), handle_withdraw_start),
@@ -4750,16 +4823,12 @@ def main():
             STATE_WD_NUMBER: [
                 MessageHandler(filters.Regex(btn_cancel_re), cancel_operation),
                 MessageHandler(filters.Regex(btn_main_menu_re), start_command),
-                MessageHandler(filters.TEXT & ~filters.COMMAND & ~filters.Regex(
-                    r"^(New Gmail Work|Bulk Gmail Work|Wallet|Withdraw|My Referrals|Leaderboard|Support|Language|Admin Panel|Main Menu|Cancel)$"
-                ), handle_withdraw_number),
+                MessageHandler(not_menu_text, handle_withdraw_number),
             ],
             STATE_WD_AMOUNT: [
                 MessageHandler(filters.Regex(btn_cancel_re), cancel_operation),
                 MessageHandler(filters.Regex(btn_main_menu_re), start_command),
-                MessageHandler(filters.TEXT & ~filters.COMMAND & ~filters.Regex(
-                    r"^(New Gmail Work|Bulk Gmail Work|Wallet|Withdraw|My Referrals|Leaderboard|Support|Language|Admin Panel|Main Menu|Cancel)$"
-                ), handle_withdraw_amount),
+                MessageHandler(not_menu_text, handle_withdraw_amount),
             ],
             ConversationHandler.TIMEOUT: [
                 MessageHandler(filters.ALL, _conversation_timeout_handler),
@@ -4767,18 +4836,8 @@ def main():
         },
         fallbacks=[
             CommandHandler("start", _end_silently),
-            MessageHandler(filters.Regex(btn_main_menu_re), _end_silently),
             MessageHandler(filters.Regex(btn_cancel_re), cancel_operation),
-            MessageHandler(filters.Regex(btn_wallet_re), _end_silently),
-            MessageHandler(filters.Regex(btn_ref_re), _end_silently),
-            MessageHandler(filters.Regex(btn_leaderboard_re), _end_silently),
-            MessageHandler(filters.Regex(btn_support_re), _end_silently),
-            MessageHandler(filters.Regex(btn_lang_re), _end_silently),
-            MessageHandler(filters.Regex(btn_admin_re), _end_silently),
-            MessageHandler(filters.Regex(btn_gmail_re), _end_silently),
-        MessageHandler(filters.Regex(btn_task_re), _end_silently),
-        MessageHandler(filters.Regex(btn_bulk_gmail_re), _end_silently),
-        MessageHandler(filters.Regex(btn_old_gmail_re), _end_silently),
+            MessageHandler(filters.Regex(all_menu_buttons_re), _end_silently),
         ],
         conversation_timeout=300,
         per_message=False,
@@ -4786,7 +4845,7 @@ def main():
     )
     app.add_handler(withdraw_conv, group=1)
 
-    # --- Admin Input Conversation Handler (Group 2, auto-cancels on navigation or timeout) ---
+    # --- Admin Input Conversation Handler (Group 2) ---
     admin_text_conv = ConversationHandler(
         entry_points=[
             MessageHandler(filters.Regex(btn_adm_search_re), admin_search_prompt),
@@ -4803,100 +4862,63 @@ def main():
         ],
         states={
             STATE_ADMIN_SEARCH_QUERY: [
-                MessageHandler(filters.Regex(btn_cancel_re), cancel_operation),
-                MessageHandler(filters.Regex(btn_main_menu_re), start_command),
-                MessageHandler(filters.TEXT & ~filters.COMMAND, process_admin_text),
+                MessageHandler(not_menu_text, process_admin_text),
             ],
             STATE_ADMIN_EXPORT_USER: [
-                MessageHandler(filters.Regex(btn_cancel_re), cancel_operation),
-                MessageHandler(filters.Regex(btn_main_menu_re), start_command),
-                MessageHandler(filters.TEXT & ~filters.COMMAND, process_admin_text),
+                MessageHandler(not_menu_text, process_admin_text),
             ],
             STATE_ADMIN_BROADCAST: [
-                MessageHandler(filters.Regex(btn_cancel_re), cancel_operation),
-                MessageHandler(filters.Regex(btn_main_menu_re), start_command),
-                MessageHandler(filters.ALL & ~filters.COMMAND, process_admin_broadcast_media),
+                MessageHandler((filters.ALL & ~filters.COMMAND & ~filters.Regex(all_menu_buttons_re)), process_admin_broadcast_media),
             ],
             STATE_ADMIN_REJECT_REASON: [
-                MessageHandler(filters.Regex(btn_cancel_re), cancel_operation),
-                MessageHandler(filters.TEXT & ~filters.COMMAND, process_admin_reject_reason),
+                MessageHandler(not_menu_text, process_admin_reject_reason),
             ],
             STATE_ADMIN_SETTING_VAL: [
-                MessageHandler(filters.Regex(btn_cancel_re), cancel_operation),
-                MessageHandler(filters.Regex(btn_main_menu_re), start_command),
-                MessageHandler(filters.TEXT & ~filters.COMMAND, process_admin_text),
+                MessageHandler(not_menu_text, process_admin_text),
             ],
             STATE_ADMIN_BULK_APPROVE: [
-                MessageHandler(filters.Regex(btn_cancel_re), cancel_operation),
-                MessageHandler(filters.Regex(btn_main_menu_re), start_command),
-                MessageHandler(filters.TEXT & ~filters.COMMAND, process_bulk_approve),
+                MessageHandler(not_menu_text, process_bulk_approve),
             ],
             STATE_ADMIN_BULK_REJECT: [
-                MessageHandler(filters.Regex(btn_cancel_re), cancel_operation),
-                MessageHandler(filters.Regex(btn_main_menu_re), start_command),
-                MessageHandler(filters.TEXT & ~filters.COMMAND, process_bulk_reject),
+                MessageHandler(not_menu_text, process_bulk_reject),
             ],
             STATE_ADMIN_ADD_SUBADMIN: [
-                MessageHandler(filters.Regex(btn_cancel_re), cancel_operation),
-                MessageHandler(filters.Regex(btn_main_menu_re), start_command),
-                MessageHandler(filters.TEXT & ~filters.COMMAND, process_admin_add_subadmin),
+                MessageHandler(not_menu_text, process_admin_add_subadmin),
             ],
             STATE_ADMIN_REM_SUBADMIN: [
-                MessageHandler(filters.Regex(btn_cancel_re), cancel_operation),
-                MessageHandler(filters.Regex(btn_main_menu_re), start_command),
-                MessageHandler(filters.TEXT & ~filters.COMMAND, process_admin_rem_subadmin),
+                MessageHandler(not_menu_text, process_admin_rem_subadmin),
             ],
             STATE_ADMIN_BAN_USER: [
-                MessageHandler(filters.Regex(btn_cancel_re), cancel_operation),
-                MessageHandler(filters.Regex(btn_main_menu_re), start_command),
-                MessageHandler(filters.TEXT & ~filters.COMMAND, process_admin_ban_user),
+                MessageHandler(not_menu_text, process_admin_ban_user),
             ],
             STATE_ADMIN_UNBAN_USER: [
-                MessageHandler(filters.Regex(btn_cancel_re), cancel_operation),
-                MessageHandler(filters.Regex(btn_main_menu_re), start_command),
-                MessageHandler(filters.TEXT & ~filters.COMMAND, process_admin_unban_user),
+                MessageHandler(not_menu_text, process_admin_unban_user),
             ],
             STATE_ADMIN_ADD_BAL: [
-                MessageHandler(filters.Regex(btn_cancel_re), cancel_operation),
-                MessageHandler(filters.Regex(btn_main_menu_re), start_command),
-                MessageHandler(filters.TEXT & ~filters.COMMAND, process_admin_add_bal),
+                MessageHandler(not_menu_text, process_admin_add_bal),
             ],
             STATE_ADMIN_SUB_BAL: [
-                MessageHandler(filters.Regex(btn_cancel_re), cancel_operation),
-                MessageHandler(filters.Regex(btn_main_menu_re), start_command),
-                MessageHandler(filters.TEXT & ~filters.COMMAND, process_admin_sub_bal),
+                MessageHandler(not_menu_text, process_admin_sub_bal),
             ],
             STATE_ADMIN_USER_SEARCH: [
-                MessageHandler(filters.Regex(btn_cancel_re), cancel_operation),
-                MessageHandler(filters.Regex(btn_main_menu_re), start_command),
-                MessageHandler(filters.TEXT & ~filters.COMMAND, process_admin_user_search),
+                MessageHandler(not_menu_text, process_admin_user_search),
             ],
             STATE_ADMIN_FORCE_CHANNELS_EDIT: [
-                MessageHandler(filters.Regex(btn_cancel_re), cancel_operation),
-                MessageHandler(filters.Regex(btn_main_menu_re), start_command),
-                MessageHandler(filters.TEXT & ~filters.COMMAND, process_admin_force_channels_edit),
+                MessageHandler(not_menu_text, process_admin_force_channels_edit),
             ],
             STATE_ADMIN_SET_REF_BONUS: [
-                MessageHandler(filters.Regex(btn_cancel_re), cancel_operation),
-                MessageHandler(filters.Regex(btn_main_menu_re), start_command),
-                MessageHandler(filters.TEXT & ~filters.COMMAND, process_admin_set_ref_bonus),
+                MessageHandler(not_menu_text, process_admin_set_ref_bonus),
             ],
             STATE_ADMIN_RESTORE_DB: [
-                MessageHandler(filters.Regex(btn_cancel_re), cancel_operation),
-                MessageHandler(filters.Regex(btn_main_menu_re), start_command),
                 MessageHandler(filters.Document.ALL, process_admin_restore_db),
-                MessageHandler(filters.TEXT & ~filters.COMMAND, process_admin_restore_db),
+                MessageHandler(not_menu_text, process_admin_restore_db),
             ],
             STATE_ADMIN_WELCOME_BANNER: [
-                MessageHandler(filters.Regex(btn_cancel_re), cancel_operation),
-                MessageHandler(filters.Regex(btn_main_menu_re), start_command),
                 MessageHandler(filters.PHOTO, process_admin_welcome_banner),
-                MessageHandler(filters.TEXT & ~filters.COMMAND, process_admin_welcome_banner),
+                MessageHandler(not_menu_text, process_admin_welcome_banner),
             ],
             STATE_ADMIN_OLD_CAT_ADD: [
-                MessageHandler(filters.Regex(btn_cancel_re), cancel_operation),
-                MessageHandler(filters.Regex(btn_main_menu_re), start_command),
-                MessageHandler(filters.TEXT & ~filters.COMMAND, process_admin_old_cat_add),
+                MessageHandler(not_menu_text, process_admin_old_cat_add),
             ],
             ConversationHandler.TIMEOUT: [
                 MessageHandler(filters.ALL, _conversation_timeout_handler),
@@ -4904,15 +4926,8 @@ def main():
         },
         fallbacks=[
             CommandHandler("start", _end_silently),
-            MessageHandler(filters.Regex(btn_main_menu_re), _end_silently),
             MessageHandler(filters.Regex(btn_cancel_re), cancel_operation),
-            MessageHandler(filters.Regex(btn_wallet_re), _end_silently),
-            MessageHandler(filters.Regex(btn_withdraw_re), _end_silently),
-            MessageHandler(filters.Regex(btn_ref_re), _end_silently),
-            MessageHandler(filters.Regex(btn_leaderboard_re), _end_silently),
-            MessageHandler(filters.Regex(btn_support_re), _end_silently),
-            MessageHandler(filters.Regex(btn_lang_re), _end_silently),
-            MessageHandler(filters.Regex(btn_admin_re), _end_silently),
+            MessageHandler(filters.Regex(all_menu_buttons_re), _end_silently),
         ],
         conversation_timeout=300,
         per_message=False,
