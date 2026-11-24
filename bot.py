@@ -2486,10 +2486,42 @@ async def old_gmail_cancel_callback(update: Update, context: ContextTypes.DEFAUL
 
 # --- 2FA GMAIL WORKFLOWS (NEW & OLD) ---
 def _twofa_done_kb(user_id: int):
-    return InlineKeyboardMarkup([[
-        ikb_btn("✅ Submit Gmail", style="success", callback_data="twofa_gmail_done"),
-        ikb_btn(tr(user_id, "btn_cancel"), style="danger", callback_data="twofa_gmail_cancel")
-    ]])
+    return InlineKeyboardMarkup([
+        [ikb_btn("🔄 Refresh OTP", style="primary", callback_data="twofa_refresh_otp")],
+        [
+            ikb_btn("✅ Submit Gmail", style="success", callback_data="twofa_gmail_done"),
+            ikb_btn(tr(user_id, "btn_cancel"), style="danger", callback_data="twofa_gmail_cancel")
+        ]
+    ])
+
+async def twofa_refresh_otp_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    user_id = query.from_user.id
+    secret = (context.user_data.get("twofa_secret") or "").strip()
+    email = context.user_data.get("twofa_gmail", "")
+    if not secret:
+        await query.answer("❌ Secret Key পাওয়া যায়নি!", show_alert=True)
+        return STATE_TASK_2FA_SECRET
+    otp = pyotp.TOTP(secret).now()
+    rem = 30 - (int(time.time()) % 30)
+    await query.answer(f"🔄 নতুন OTP: {otp} ({rem}s বাকি)")
+    try:
+        await query.edit_message_text(
+            f"✅ <b>2FA Secret Key ভেরিফাই হয়েছে!</b>\n"
+            f"━━━━━━━━━━━━━━━━━━━━━━\n"
+            f"📧 <b>Gmail:</b> <code>{html.escape(email)}</code>\n"
+            f"🔐 <b>Secret Key:</b> <code>{html.escape(secret)}</code>\n"
+            f"🔢 <b>Live OTP:</b> <code>{otp}</code> (ট্যাপ করে কপি)\n"
+            f"⏳ <b>মেয়াদ বাকি:</b> {rem} সেকেন্ড\n"
+            f"━━━━━━━━━━━━━━━━━━━━━━\n"
+            f"💡 <i>টিপস: ৩০ সেকেন্ডের ভেতর কোড ব্যবহার করতে না পারলে আবার <b>🔄 Refresh OTP</b>-তে ক্লিক করে রিফ্রেশ করে নিয়েন।</i>\nকাজটি জমা দিতে নিচের <b>Submit Gmail</b> বাটনে চাপ দিন।\n"
+            f"⚠️ জমা দেওয়ার সাথে সাথেই ডিভাইস থেকে <b>Logout</b> করে দেবেন!",
+            reply_markup=_twofa_done_kb(user_id),
+            parse_mode=ParseMode.HTML
+        )
+    except Exception:
+        pass
+    return STATE_TASK_2FA_SECRET
 
 
 async def handle_2fa_gmail_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -2634,14 +2666,16 @@ async def process_2fa_secret_input(update: Update, context: ContextTypes.DEFAULT
 
     context.user_data["twofa_secret"] = secret
     email = context.user_data.get("twofa_gmail", "")
+    rem = 30 - (int(time.time()) % 30)
     sent_m = await update.message.reply_text(
         f"✅ <b>2FA Secret Key ভেরিফাই হয়েছে!</b>\n"
         f"━━━━━━━━━━━━━━━━━━━━━━\n"
         f"📧 <b>Gmail:</b> <code>{html.escape(email)}</code>\n"
         f"🔐 <b>Secret Key:</b> <code>{html.escape(secret)}</code>\n"
         f"🔢 <b>Live OTP:</b> <code>{otp}</code> (ট্যাপ করে কপি)\n"
+        f"⏳ <b>মেয়াদ বাকি:</b> {rem} সেকেন্ড\n"
         f"━━━━━━━━━━━━━━━━━━━━━━\n"
-        f"কাজটি জমা দিতে নিচের <b>Submit Gmail</b> বাটনে চাপ দিন।\n"
+        f"💡 <i>টিপস: ৩০ সেকেন্ডের ভেতর কোড ব্যবহার করতে না পারলে আবার <b>🔄 Refresh OTP</b>-তে ক্লিক করে রিফ্রেশ করে নিয়েন।</i>\nকাজটি জমা দিতে নিচের <b>Submit Gmail</b> বাটনে চাপ দিন।\n"
         f"⚠️ জমা দেওয়ার সাথে সাথেই ডিভাইস থেকে <b>Logout</b> করে দেবেন!",
         reply_markup=_twofa_done_kb(user_id),
         parse_mode=ParseMode.HTML
@@ -6125,6 +6159,7 @@ def main():
                 MessageHandler(not_menu_text, process_used_bulk_submission),
             ],
             STATE_TASK_2FA_SECRET: [
+                CallbackQueryHandler(twofa_refresh_otp_callback, pattern=r"^twofa_refresh_otp$"),
                 CallbackQueryHandler(twofa_done_callback, pattern=r"^twofa_gmail_done$"),
                 CallbackQueryHandler(twofa_cancel_callback, pattern=r"^twofa_gmail_cancel$"),
                 MessageHandler(filters.Regex(btn_cancel_re), cancel_operation),
