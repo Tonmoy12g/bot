@@ -472,7 +472,7 @@ MESSAGES = {
         "wd_enter_account_usdt": "📱 **আপনার USDT (BEP-20) ওয়ালেট অ্যাড্রেস লিখুন:**",
         "wd_enter_account_binance_uid": "🆔 **আপনার Binance UID লিখুন:**",
         "wd_enter_account_mfs": "📱 **আপনার {method} অ্যাকাউন্ট নম্বর লিখুন (১১-১৪ ডিজিট):**",
-        "wd_invalid_account": "❌ ভুল অ্যাকাউন্ট নম্বর! সঠিক ১১-১৪ ডিজিটের নম্বর দিন।",
+        "wd_invalid_account": "❌ ভুল অ্যাকাউন্ট নম্বর! সঠিক ১১ ডিজিটের নম্বর দিন।",
         "wd_enter_amount": "💵 **উইথড্র করার পরিমাণ লিখুন:**\n━━━━━━━━━━━━━━━━━━━━━━\n💰 আপনার বর্তমান ব্যালেন্স: ৳{balance:.2f}\n🔻 সর্বনিম্ন সীমা: ৳{min_limit}\n🔺 সর্বোচ্চ সীমা: ৳{max_limit}",
         "wd_invalid_amount_number": "❌ সঠিক সংখ্যা লিখুন (যেমন: ১০০, ২০০.৫):",
         "wd_min_limit_err": "❌ সর্বনিম্ন উইথড্রসীমা ৳{min_limit}! পুনরায় চেষ্টা করুন।",
@@ -2486,43 +2486,43 @@ async def old_gmail_cancel_callback(update: Update, context: ContextTypes.DEFAUL
 
 # --- 2FA GMAIL WORKFLOWS (NEW & OLD) ---
 def _twofa_done_kb(user_id: int):
-    return InlineKeyboardMarkup([
-        [ikb_btn("🔄 Refresh OTP", style="primary", callback_data="twofa_refresh_otp")],
-        [
-            ikb_btn("✅ Submit Gmail", style="success", callback_data="twofa_gmail_done"),
-            ikb_btn(tr(user_id, "btn_cancel"), style="danger", callback_data="twofa_gmail_cancel")
-        ]
-    ])
+    return InlineKeyboardMarkup([[
+        ikb_btn("✅ Submit Gmail", style="success", callback_data="twofa_gmail_done"),
+        ikb_btn(tr(user_id, "btn_cancel"), style="danger", callback_data="twofa_gmail_cancel")
+    ]])
 
-async def twofa_refresh_otp_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    query = update.callback_query
-    user_id = query.from_user.id
-    secret = (context.user_data.get("twofa_secret") or "").strip()
-    email = context.user_data.get("twofa_gmail", "")
-    if not secret:
-        await query.answer("❌ Secret Key পাওয়া যায়নি!", show_alert=True)
-        return STATE_TASK_2FA_SECRET
-    otp = pyotp.TOTP(secret).now()
-    rem = 30 - (int(time.time()) % 30)
-    await query.answer(f"🔄 নতুন OTP: {otp} ({rem}s বাকি)")
-    try:
-        await query.edit_message_text(
-            f"✅ <b>2FA Secret Key ভেরিফাই হয়েছে!</b>\n"
-            f"━━━━━━━━━━━━━━━━━━━━━━\n"
-            f"📧 <b>Gmail:</b> <code>{html.escape(email)}</code>\n"
-            f"🔐 <b>Secret Key:</b> <code>{html.escape(secret)}</code>\n"
-            f"🔢 <b>Live OTP:</b> <code>{otp}</code> (ট্যাপ করে কপি)\n"
-            f"⏳ <b>মেয়াদ বাকি:</b> {rem} সেকেন্ড\n"
-            f"━━━━━━━━━━━━━━━━━━━━━━\n"
-            f"💡 <i>টিপস: ৩০ সেকেন্ডের ভেতর কোড ব্যবহার করতে না পারলে আবার <b>🔄 Refresh OTP</b>-তে ক্লিক করে রিফ্রেশ করে নিয়েন।</i>\nকাজটি জমা দিতে নিচের <b>Submit Gmail</b> বাটনে চাপ দিন।\n"
-            f"⚠️ জমা দেওয়ার সাথে সাথেই ডিভাইস থেকে <b>Logout</b> করে দেবেন!",
-            reply_markup=_twofa_done_kb(user_id),
-            parse_mode=ParseMode.HTML
-        )
-    except Exception:
-        pass
-    return STATE_TASK_2FA_SECRET
+def _format_2fa_otp_msg(email: str, secret: str, otp: str, rem: int) -> str:
+    return (
+        f"✅ <b>2FA Secret Key ভেরিফাই হয়েছে!</b>\n"
+        f"━━━━━━━━━━━━━━━━━━━━━━\n"
+        f"📧 <b>Gmail:</b> <code>{html.escape(email)}</code>\n"
+        f"🔐 <b>Secret Key:</b> <code>{html.escape(secret)}</code>\n"
+        f"🔢 <b>Live OTP:</b> <code>{otp}</code> (ট্যাপ করে কপি)\n"
+        f"⏳ <b>মেয়াদ:</b> ৩০ সেকেন্ড\n"
+        f"🔄 <i>প্রতি ৩০ সেকেন্ড পরপর নতুন OTP অটোমেটিক চলে আসবে।</i>\n"
+        f"━━━━━━━━━━━━━━━━━━━━━━\n"
+        f"⚠️ আগে এই OTP দিয়ে Gmail-এ 2FA ভেরিফাই সম্পন্ন করুন, তারপর <b>Submit Gmail</b> চাপুন—ভেরিফাই ছাড়া জমা দিলে কাজটি <b>Rejected</b> হবে!\n"
+        f"⚠️ জমা দেওয়ার সাথে সাথেই ডিভাইস থেকে <b>Logout</b> করে দেবেন!"
+    )
 
+async def _auto_refresh_2fa_otp(bot, chat_id: int, msg_id: int, email: str, secret: str, user_id: int, user_data: dict, token: str):
+    for _ in range(6):
+        rem = 30 - (int(time.time()) % 30)
+        await asyncio.sleep(rem + 0.5)
+        if user_data.get("otp_task_token") != token:
+            break
+        otp = pyotp.TOTP(secret).now()
+        new_rem = 30 - (int(time.time()) % 30)
+        try:
+            await bot.edit_message_text(
+                chat_id=chat_id,
+                message_id=msg_id,
+                text=_format_2fa_otp_msg(email, secret, otp, new_rem),
+                reply_markup=_twofa_done_kb(user_id),
+                parse_mode=ParseMode.HTML
+            )
+        except Exception:
+            break
 
 async def handle_2fa_gmail_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     clear_user_state(context)
@@ -2668,19 +2668,17 @@ async def process_2fa_secret_input(update: Update, context: ContextTypes.DEFAULT
     email = context.user_data.get("twofa_gmail", "")
     rem = 30 - (int(time.time()) % 30)
     sent_m = await update.message.reply_text(
-        f"✅ <b>2FA Secret Key ভেরিফাই হয়েছে!</b>\n"
-        f"━━━━━━━━━━━━━━━━━━━━━━\n"
-        f"📧 <b>Gmail:</b> <code>{html.escape(email)}</code>\n"
-        f"🔐 <b>Secret Key:</b> <code>{html.escape(secret)}</code>\n"
-        f"🔢 <b>Live OTP:</b> <code>{otp}</code> (ট্যাপ করে কপি)\n"
-        f"⏳ <b>মেয়াদ বাকি:</b> {rem} সেকেন্ড\n"
-        f"━━━━━━━━━━━━━━━━━━━━━━\n"
-        f"💡 <i>টিপস: ৩০ সেকেন্ডের ভেতর কোড ব্যবহার করতে না পারলে আবার <b>🔄 Refresh OTP</b>-তে ক্লিক করে রিফ্রেশ করে নিয়েন।</i>\nকাজটি জমা দিতে নিচের <b>Submit Gmail</b> বাটনে চাপ দিন।\n"
-        f"⚠️ জমা দেওয়ার সাথে সাথেই ডিভাইস থেকে <b>Logout</b> করে দেবেন!",
+        _format_2fa_otp_msg(email, secret, otp, rem),
         reply_markup=_twofa_done_kb(user_id),
         parse_mode=ParseMode.HTML
     )
     context.user_data["otp_msg_id"] = sent_m.message_id
+    token = f"{user_id}_{time.time()}"
+    context.user_data["otp_task_token"] = token
+    asyncio.create_task(_auto_refresh_2fa_otp(
+        context.bot, update.effective_chat.id, sent_m.message_id,
+        email, secret, user_id, context.user_data, token
+    ))
     return STATE_TASK_2FA_SECRET
 
 
@@ -2973,15 +2971,15 @@ async def handle_withdraw_method(update: Update, context: ContextTypes.DEFAULT_T
         prompt_line = "আপনার **Binance UID** নম্বরটি লিখুন:"
         m_title = "🔶 Binance UID"
     else:
-        prompt_line = f"আপনার **{method.upper()}** পার্সোনাল নম্বরটি লিখুন (১১–১৪ ডিজিট):"
+        prompt_line = f"আপনার **{method.upper()}** পার্সোনাল নম্বরটি লিখুন:"
         m_title = f"💳 {method.upper()}"
 
     msg = (
-        f"💸 **উইথড্র** *(ধাপ ২/৩ — {m_title})*\n"
+        f"💸 **উইথড্র — {m_title}**\n"
         f"━━━━━━━━━━━━━━━━━━━━━━\n"
         f"📥 {prompt_line}"
     )
-    await update.message.reply_text(msg, reply_markup=get_cancel_keyboard(user_id), parse_mode=ParseMode.MARKDOWN)
+    await update.message.reply_text(msg, reply_markup=get_cancel_only_keyboard(user_id), parse_mode=ParseMode.MARKDOWN)
     return STATE_WD_NUMBER
 
 async def handle_withdraw_number(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -3002,7 +3000,7 @@ async def handle_withdraw_number(update: Update, context: ContextTypes.DEFAULT_T
         if not re.fullmatch(r"0x[a-fA-F0-9]{40}", number):
             await update.message.reply_text("❌ সঠিক USDT BEP-20 wallet address দিন (0x দিয়ে শুরু, মোট 42 অক্ষর)।", reply_markup=get_cancel_only_keyboard(user_id))
             return STATE_WD_NUMBER
-    elif not re.match(r"^[0-9]{11,14}$", number):
+    elif not re.fullmatch(r"[0-9]{11}", number):
         await update.message.reply_text(tr(user_id, "wd_invalid_account"), reply_markup=get_cancel_only_keyboard(user_id))
         return STATE_WD_NUMBER
 
@@ -3038,7 +3036,7 @@ async def handle_withdraw_number(update: Update, context: ContextTypes.DEFAULT_T
         chg_bdt = float(get_setting_val(f"{method}_charge_bdt", "0.0"))
         chg_line = f"\n💳 **চার্জ:** `৳{chg_bdt:g}`" if chg_bdt > 0 else "\n💳 **চার্জ:** `ফ্রি (৳০)`"
         msg = (
-            f"💸 **উইথড্র** *(ধাপ ৩/৩ — {method.upper()})*\n"
+            f"💸 **উইথড্র — 💳 {method.upper()}**\n"
             f"━━━━━━━━━━━━━━━━━━━━━━\n"
             f"📞 **নম্বর:** `{number}`\n"
             f"💰 **ব্যালেন্স:** `৳{user_data['balance']:.2f}`\n"
@@ -3048,7 +3046,7 @@ async def handle_withdraw_number(update: Update, context: ContextTypes.DEFAULT_T
             f"💵 কত টাকা উইথড্র করতে চান? পরিমাণ লিখে পাঠান:"
         )
 
-    await update.message.reply_text(msg, reply_markup=get_cancel_keyboard(user_id), parse_mode=ParseMode.MARKDOWN)
+    await update.message.reply_text(msg, reply_markup=get_cancel_only_keyboard(user_id), parse_mode=ParseMode.MARKDOWN)
     return STATE_WD_AMOUNT
 
 async def handle_withdraw_amount(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -3128,7 +3126,7 @@ async def handle_withdraw_amount(update: Update, context: ContextTypes.DEFAULT_T
         chg_bdt = float(get_setting_val(f"{method}_charge_bdt", "0.0"))
         if chg_bdt > 0:
             if amount <= chg_bdt:
-                await update.message.reply_text(tr(user_id, "wd_usdt_fee_err"), reply_markup=get_cancel_keyboard(user_id))
+                await update.message.reply_text(tr(user_id, "wd_usdt_fee_err"), reply_markup=get_cancel_only_keyboard(user_id))
                 return STATE_WD_AMOUNT
             net_bdt = amount - chg_bdt
             fee_text = f" (Charge: ৳{chg_bdt:g} | Net: ৳{net_bdt:g})"
@@ -4107,9 +4105,10 @@ async def admin_control_panel(update: Update, context: ContextTypes.DEFAULT_TYPE
     sub_list_str = "\n".join([f"• <code>{row['user_id']}</code>" for row in sub_admins]) if sub_admins else "কোনো সাব-এডমিন নেই।"
 
     buttons = [
-        [ikb_btn(f"🏷️ Bot Name: {bot_name}\n🎧 Support: {support_link}\n📢 Channel: {channel_link}\n🔒 Force Join: {force_join}", callback_data="adm_toggle_force_join_enabled"),
-         ikb_btn("📢 Edit Force Channels List", callback_data="adm_edit_force_channels_list")],
-        [ikb_btn("➕ Add Sub-Admin", callback_data="adm_add_subadmin"), ikb_btn("➖ Remove Sub-Admin", callback_data="adm_rem_subadmin")],
+        [ikb_btn(f"🔒 Force Join: {force_join}", style="primary", callback_data="adm_toggle_force_join_enabled"),
+         ikb_btn("📢 Edit Force Channels", style="success", callback_data="adm_edit_force_channels_list")],
+        [ikb_btn("➕ Add Sub-Admin", style="primary", callback_data="adm_add_subadmin"),
+         ikb_btn("➖ Remove Sub-Admin", style="danger", callback_data="adm_rem_subadmin")],
         [ikb_btn("Admin Menu", style="danger", callback_data="adm_back_to_admin")]
     ]
 
@@ -6159,7 +6158,6 @@ def main():
                 MessageHandler(not_menu_text, process_used_bulk_submission),
             ],
             STATE_TASK_2FA_SECRET: [
-                CallbackQueryHandler(twofa_refresh_otp_callback, pattern=r"^twofa_refresh_otp$"),
                 CallbackQueryHandler(twofa_done_callback, pattern=r"^twofa_gmail_done$"),
                 CallbackQueryHandler(twofa_cancel_callback, pattern=r"^twofa_gmail_cancel$"),
                 MessageHandler(filters.Regex(btn_cancel_re), cancel_operation),
