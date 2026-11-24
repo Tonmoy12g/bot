@@ -1564,9 +1564,10 @@ async def handle_gmail_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     context.user_data.pop("gmail_address", None)
     msg = tr(user_id, "gmail_guidelines", price=price, fixed_pass=fixed_pass)
-    sent_m = await update.message.reply_text(
-        msg,
-        reply_markup=get_inline_cancel_keyboard(user_id, "gmail_cancel"),
+    sent_m = await update.message.reply_text(msg, parse_mode=ParseMode.HTML)
+    await update.message.reply_text(
+        ">> <b>আপনার Fresh Gmail অ্যাড্রেসটি লিখুন:</b>\n<code>example@gmail.com</code>",
+        reply_markup=get_cancel_only_keyboard(user_id),
         parse_mode=ParseMode.HTML
     )
     context.user_data["cred_msg_id"] = sent_m.message_id
@@ -1584,7 +1585,7 @@ async def process_gmail_submission(update: Update, context: ContextTypes.DEFAULT
     if not is_valid_gmail_address(gmail_acc):
         await update.message.reply_text(
             "❌ সঠিক Gmail এড্রেস প্রদান করুন (যেমন: example@gmail.com)!",
-            reply_markup=get_inline_cancel_keyboard(user_id, "gmail_cancel")
+            reply_markup=get_cancel_only_keyboard(user_id)
         )
         return STATE_TASK_GMAIL_INPUT
 
@@ -1717,9 +1718,10 @@ async def handle_bulk_gmail_menu(update: Update, context: ContextTypes.DEFAULT_T
     context.user_data.pop("bulk_gmails", None)
 
     msg = tr(user_id, "bulk_gmail_guidelines", price=price, fixed_pass=fixed_pass)
-    sent_m = await update.message.reply_text(
-        msg,
-        reply_markup=get_inline_cancel_keyboard(user_id, "bulk_gmail_cancel"),
+    sent_m = await update.message.reply_text(msg, parse_mode=ParseMode.HTML)
+    await update.message.reply_text(
+        ">> <b>সবগুলো Fresh Gmail প্রতি লাইনে ১টি করে লিখুন:</b>",
+        reply_markup=get_cancel_only_keyboard(user_id),
         parse_mode=ParseMode.HTML
     )
     context.user_data["cred_msg_id"] = sent_m.message_id
@@ -1758,7 +1760,7 @@ async def process_bulk_gmail_submission(update: Update, context: ContextTypes.DE
             f"• ভুল ফরম্যাট: {len(invalid_gmails)} টি\n"
             f"• আগে জমা দেওয়া (ডুপ্লিকেট): {len(dup_gmails)} টি\n\n"
             f"সঠিক নতুন Gmail-গুলো প্রতি লাইনে একটি করে পাঠান।",
-            reply_markup=get_inline_cancel_keyboard(user_id, "bulk_gmail_cancel")
+            reply_markup=get_cancel_only_keyboard(user_id)
         )
         return STATE_TASK_BULK_GMAIL_INPUT
 
@@ -1949,7 +1951,8 @@ async def handle_used_single_menu(update: Update, context: ContextTypes.DEFAULT_
         f"৩. এরপর <b>Submit Used Gmail</b> বাটনে চাপ দিন।\n\n"
         f"⚠️ <b>সতর্কতা:</b> বটে Gmail জমা দেওয়ার সাথে সাথেই আপনার ডিভাইস থেকে অ্যাকাউন্টটি <b>Logout</b> করে দেবেন, নাহলে কাজটি <b>Rejected</b> হবে!"
     )
-    sent_m = await update.message.reply_text(msg, reply_markup=get_inline_cancel_keyboard(user_id, "used_gmail_cancel"), parse_mode=ParseMode.HTML)
+    sent_m = await update.message.reply_text(msg, parse_mode=ParseMode.HTML)
+    await update.message.reply_text(">> <b>আপনার Used Gmail অ্যাড্রেসটি লিখুন:</b>\n<code>example@gmail.com</code>", reply_markup=get_cancel_only_keyboard(user_id), parse_mode=ParseMode.HTML)
     context.user_data["cred_msg_id"] = sent_m.message_id
     return STATE_TASK_USED_SINGLE_INPUT
 
@@ -1960,7 +1963,7 @@ async def process_used_single_submission(update: Update, context: ContextTypes.D
         clear_user_state(context)
         return ConversationHandler.END
     if not is_valid_gmail_address(email):
-        await update.message.reply_text("❌ সঠিক Gmail এড্রেস দিন (যেমন: example@gmail.com)!", reply_markup=get_inline_cancel_keyboard(user_id, "used_gmail_cancel"))
+        await update.message.reply_text("❌ সঠিক Gmail এড্রেস দিন (যেমন: example@gmail.com)!", reply_markup=get_cancel_only_keyboard(user_id))
         return STATE_TASK_USED_SINGLE_INPUT
     email = email.lower()
     context.user_data["used_gmail_single"] = email
@@ -2035,7 +2038,8 @@ async def handle_used_bulk_menu(update: Update, context: ContextTypes.DEFAULT_TY
         f"<b>উদাহরণ:</b>\n<code>used1@gmail.com\nused2@gmail.com</code>\n\n"
         f"⚠️ <b>সতর্কতা:</b> বটে Gmail জমা দেওয়ার সাথে সাথেই আপনার ডিভাইস থেকে সবগুলো অ্যাকাউন্ট <b>Logout</b> করে দেবেন, নাহলে কাজটি <b>Rejected</b> হবে!"
     )
-    sent_m = await update.message.reply_text(msg, reply_markup=get_inline_cancel_keyboard(user_id, "used_gmail_cancel"), parse_mode=ParseMode.HTML)
+    sent_m = await update.message.reply_text(msg, parse_mode=ParseMode.HTML)
+    await update.message.reply_text(">> <b>সবগুলো Used Gmail প্রতি লাইনে ১টি করে লিখুন:</b>", reply_markup=get_cancel_only_keyboard(user_id), parse_mode=ParseMode.HTML)
     context.user_data["cred_msg_id"] = sent_m.message_id
     return STATE_TASK_USED_BULK_INPUT
 
@@ -2060,7 +2064,7 @@ async def process_used_bulk_submission(update: Update, context: ContextTypes.DEF
     if not valid_gmails:
         await update.message.reply_text(
             f"❌ কোনো নতুন বৈধ Used Gmail পাওয়া যায়নি! (ভুল: {len(invalid_gmails)} | ডুপ্লিকেট: {len(dup_gmails)})",
-            reply_markup=get_inline_cancel_keyboard(user_id, "used_gmail_cancel")
+            reply_markup=get_cancel_only_keyboard(user_id)
         )
         return STATE_TASK_USED_BULK_INPUT
     context.user_data["used_gmail_bulk"] = valid_gmails[:50]
@@ -2274,7 +2278,9 @@ async def old_category_selected_callback(update: Update, context: ContextTypes.D
         f"অ্যাকাউন্টে ওপরের পাসওয়ার্ড{(' ও রিকভারি' if old_rec else '')} সেট করে:\n{step_line}\n\n⚠️ <b>সতর্কতা:</b> বটে Gmail জমা দেওয়ার সাথে সাথেই ডিভাইস থেকে <b>Logout</b> করবেন, নাহলে কাজটি <b>Rejected</b> হবে!"
     )
 
-    sent_m = await query.edit_message_text(msg, reply_markup=get_inline_cancel_keyboard(user_id, "old_gmail_cancel"), parse_mode=ParseMode.HTML)
+    sent_m = await query.edit_message_text(msg, parse_mode=ParseMode.HTML)
+    prompt_txt = ">> <b>সবগুলো Old Gmail প্রতি লাইনে ১টি করে লিখুন:</b>" if mode == "bulk" else ">> <b>আপনার Old Gmail অ্যাড্রেসটি লিখুন:</b>\n<code>example@gmail.com</code>"
+    await context.bot.send_message(chat_id=user_id, text=prompt_txt, reply_markup=get_cancel_only_keyboard(user_id), parse_mode=ParseMode.HTML)
     context.user_data["cred_msg_id"] = sent_m.message_id
     return STATE_TASK_OLD_BULK_INPUT if mode == "bulk" else STATE_TASK_OLD_SINGLE_INPUT
 
@@ -2288,7 +2294,7 @@ async def process_old_single_submission(update: Update, context: ContextTypes.DE
         return ConversationHandler.END
 
     if not is_valid_gmail_address(email):
-        await update.message.reply_text("❌ সঠিক Gmail এড্রেস দিন (যেমন: example@gmail.com)!", reply_markup=get_inline_cancel_keyboard(user_id, "old_gmail_cancel"))
+        await update.message.reply_text("❌ সঠিক Gmail এড্রেস দিন (যেমন: example@gmail.com)!", reply_markup=get_cancel_only_keyboard(user_id))
         return STATE_TASK_OLD_SINGLE_INPUT
 
     email = email.lower()
@@ -2370,7 +2376,7 @@ async def process_old_bulk_submission(update: Update, context: ContextTypes.DEFA
     if not valid_gmails:
         await update.message.reply_text(
             f"❌ কোনো নতুন বৈধ Old Gmail পাওয়া যায়নি! (ভুল: {len(invalid_gmails)} | ডুপ্লিকেট: {len(dup_gmails)})",
-            reply_markup=get_inline_cancel_keyboard(user_id, "old_gmail_cancel")
+            reply_markup=get_cancel_only_keyboard(user_id)
         )
         return STATE_TASK_OLD_BULK_INPUT
 
@@ -2537,7 +2543,8 @@ async def handle_2fa_gmail_start(update: Update, context: ContextTypes.DEFAULT_T
         f"<b>ধাপ ১:</b> অ্যাকাউন্টে উপরের পাসওয়ার্ড সেট করে আপনার <b>Gmail অ্যাড্রেসটি</b> নিচে লিখে পাঠান:\n\n"
         f"⚠️ <b>সতর্কতা:</b> বটে জমা দেওয়ার সাথে সাথেই ডিভাইস থেকে অ্যাকাউন্টটি <b>Logout</b> করতে হবে, নাহলে কাজটি <b>Rejected</b> হবে!"
     )
-    sent_m = await update.message.reply_text(msg, reply_markup=get_inline_cancel_keyboard(user_id, "twofa_gmail_cancel"), parse_mode=ParseMode.HTML)
+    sent_m = await update.message.reply_text(msg, parse_mode=ParseMode.HTML)
+    await update.message.reply_text(">> <b>ধাপ ১ — আপনার Gmail অ্যাড্রেসটি লিখুন:</b>\n<code>example@gmail.com</code>", reply_markup=get_cancel_only_keyboard(user_id), parse_mode=ParseMode.HTML)
     context.user_data["cred_msg_id"] = sent_m.message_id
     return STATE_TASK_2FA_GMAIL_INPUT
 
@@ -2568,7 +2575,8 @@ async def old_2fa_category_selected_callback(update: Update, context: ContextTyp
         f"<b>ধাপ ১:</b> অ্যাকাউন্টে উপরের পাসওয়ার্ড সেট করে আপনার <b>Gmail অ্যাড্রেসটি</b> নিচে লিখে পাঠান:\n\n"
         f"⚠️ <b>সতর্কতা:</b> বটে জমা দেওয়ার সাথে সাথেই ডিভাইস থেকে অ্যাকাউন্টটি <b>Logout</b> করতে হবে, নাহলে কাজটি <b>Rejected</b> হবে!"
     )
-    sent_m = await query.edit_message_text(msg, reply_markup=get_inline_cancel_keyboard(user_id, "twofa_gmail_cancel"), parse_mode=ParseMode.HTML)
+    sent_m = await query.edit_message_text(msg, parse_mode=ParseMode.HTML)
+    await context.bot.send_message(chat_id=user_id, text=">> <b>ধাপ ১ — আপনার Gmail অ্যাড্রেসটি লিখুন:</b>\n<code>example@gmail.com</code>", reply_markup=get_cancel_only_keyboard(user_id), parse_mode=ParseMode.HTML)
     context.user_data["cred_msg_id"] = sent_m.message_id
     return STATE_TASK_2FA_GMAIL_INPUT
 
@@ -2580,13 +2588,13 @@ async def process_2fa_gmail_input(update: Update, context: ContextTypes.DEFAULT_
         return ConversationHandler.END
 
     if not is_valid_gmail_address(email):
-        await update.message.reply_text("❌ সঠিক Gmail এড্রেস দিন (যেমন: example@gmail.com)!", reply_markup=get_inline_cancel_keyboard(user_id, "twofa_gmail_cancel"))
+        await update.message.reply_text("❌ সঠিক Gmail এড্রেস দিন (যেমন: example@gmail.com)!", reply_markup=get_cancel_only_keyboard(user_id))
         return STATE_TASK_2FA_GMAIL_INPUT
 
     email = email.lower()
     with get_db() as conn:
         if is_duplicate_gmail(conn.cursor(), email):
-            await update.message.reply_text("❌ এই Gmail আগে জমা দেওয়া হয়েছে! অন্য Gmail দিন।", reply_markup=get_inline_cancel_keyboard(user_id, "twofa_gmail_cancel"))
+            await update.message.reply_text("❌ এই Gmail আগে জমা দেওয়া হয়েছে! অন্য Gmail দিন।", reply_markup=get_cancel_only_keyboard(user_id))
             return STATE_TASK_2FA_GMAIL_INPUT
 
     context.user_data["twofa_gmail"] = email
@@ -2594,7 +2602,7 @@ async def process_2fa_gmail_input(update: Update, context: ContextTypes.DEFAULT_
         f"✅ Gmail গ্রহণ করা হয়েছে: <code>{html.escape(email)}</code>\n"
         f"━━━━━━━━━━━━━━━━━━━━━━\n"
         f"<b>ধাপ ২:</b> এবার অ্যাকাউন্টে 2FA চালু করে প্রাপ্ত <b>2FA Secret Key</b>-টি নিচে লিখে পাঠান:",
-        reply_markup=get_inline_cancel_keyboard(user_id, "twofa_gmail_cancel"),
+        reply_markup=get_cancel_only_keyboard(user_id),
         parse_mode=ParseMode.HTML
     )
     return STATE_TASK_2FA_SECRET
@@ -2614,7 +2622,7 @@ async def process_2fa_secret_input(update: Update, context: ContextTypes.DEFAULT
         await update.message.reply_text(
             "❌ সঠিক Base32 2FA Secret Key দিন (যেমন: <code>JBSWY3DPEHPK3PXP</code>):",
             parse_mode=ParseMode.HTML,
-            reply_markup=get_inline_cancel_keyboard(user_id, "twofa_gmail_cancel")
+            reply_markup=get_cancel_only_keyboard(user_id)
         )
         return STATE_TASK_2FA_SECRET
 
