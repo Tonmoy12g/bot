@@ -3417,6 +3417,29 @@ async def handle_work_rules(update: Update, context: ContextTypes.DEFAULT_TYPE):
     return ConversationHandler.END
 
 
+
+def _build_wd_approval_info(wd):
+    wd_id = wd["id"]
+    method = wd["method"]
+    if method in ("usdt", "binance_uid") and wd["usdt_amount"] is not None:
+        approved_amount = wd["usdt_amount"]
+        approved_text = f"${approved_amount:.4f} USDT"
+        approval_msg = tr(wd["user_id"], "user_wd_approved", wd_id=wd_id, amount=approved_amount, number=wd["number"]).replace(f"৳{approved_amount:.2f}", approved_text)
+    else:
+        gross = float(wd["amount"])
+        chg = float(get_setting_val(f"{method}_charge_bdt", "0.0"))
+        net = max(0.0, gross - chg) if chg > 0 else gross
+        approved_text = f"৳{net:g} (৳{gross:g} - ৳{chg:g} চার্জ)" if chg > 0 else f"৳{net:g}"
+        if chg > 0:
+            approval_msg = (
+                f"✅ <b>আপনার উইথড্র রিকোয়েস্ট #{wd_id} সফলভাবে সম্পন্ন হয়েছে!</b>\n"
+                f"💵 <b>৳{net:g}</b> আপনার <code>{wd['number']}</code> নম্বরে পাঠানো হয়েছে।\n"
+                f"<i>(৳{gross:g} - ৳{chg:g} চার্জ = ৳{net:g})</i>"
+            )
+        else:
+            approval_msg = tr(wd["user_id"], "user_wd_approved", wd_id=wd_id, amount=gross, number=wd["number"])
+    return approved_text, approval_msg
+
 async def process_admin_wd_screenshot(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
     if not is_admin(user_id):
@@ -3445,9 +3468,7 @@ async def process_admin_wd_screenshot(update: Update, context: ContextTypes.DEFA
         conn.execute("UPDATE withdrawals SET status = 'Approved' WHERE id = ?", (wd_id,))
         conn.commit()
 
-    approved_amount = wd["usdt_amount"] if wd["method"] in ("usdt", "binance_uid") and wd["usdt_amount"] is not None else wd["amount"]
-    approved_text = f"${approved_amount:.4f} USDT" if wd["method"] in ("usdt", "binance_uid") else f"৳{approved_amount:.2f}"
-    approval_msg = tr(wd["user_id"], "user_wd_approved", wd_id=wd_id, amount=approved_amount, number=wd["number"]).replace(f"৳{approved_amount:.2f}", approved_text)
+    approved_text, approval_msg = _build_wd_approval_info(wd)
 
     try:
         await context.bot.send_photo(
@@ -5360,10 +5381,8 @@ async def admin_callback_handler(update: Update, context: ContextTypes.DEFAULT_T
                 return
             cursor.execute("UPDATE withdrawals SET status = 'Approved' WHERE id = ?", (wd_id,))
             conn.commit()
+        approved_text, approval_msg = _build_wd_approval_info(wd)
         try:
-            approved_amount = wd["usdt_amount"] if wd["method"] in ("usdt", "binance_uid") and wd["usdt_amount"] is not None else wd["amount"]
-            approved_text = f"${approved_amount:.4f} USDT" if wd["method"] in ("usdt", "binance_uid") else f"৳{approved_amount:.2f}"
-            approval_msg = tr(wd["user_id"], "user_wd_approved", wd_id=wd_id, amount=approved_amount, number=wd["number"]).replace(f"৳{approved_amount:.2f}", approved_text)
             await context.bot.send_message(
                 chat_id=wd["user_id"],
                 text=approval_msg,
@@ -5575,11 +5594,9 @@ async def process_channel_wd_screenshot(update: Update, context: ContextTypes.DE
         conn.execute("UPDATE withdrawals SET status = 'Approved' WHERE id = ?", (wd_id,))
         conn.commit()
 
-    approved_amount = wd["usdt_amount"] if wd["method"] in ("usdt", "binance_uid") and wd["usdt_amount"] is not None else wd["amount"]
-    approved_text = f"${approved_amount:.4f} USDT" if wd["method"] in ("usdt", "binance_uid") else f"৳{approved_amount:.2f}"
-    approval_msg = tr(wd["user_id"], "user_wd_approved", wd_id=wd_id, amount=approved_amount, number=wd["number"]).replace(f"৳{approved_amount:.2f}", approved_text)
+    approved_text, approval_msg = _build_wd_approval_info(wd)
     try:
-        await context.bot.send_message(chat_id=wd["user_id"], text=approval_msg, parse_mode=ParseMode.HTML)
+        await context.bot.send_photo(chat_id=wd["user_id"], photo=photo_id, caption=approval_msg, parse_mode=ParseMode.HTML)
     except Exception as e:
         logger.error(f"Failed to notify user of channel wd screenshot approval: {e}")
 
