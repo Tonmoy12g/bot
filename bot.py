@@ -3847,6 +3847,7 @@ async def process_bulk_approve(update: Update, context: ContextTypes.DEFAULT_TYP
     if unmatched_list:
         report_msg += f"• **পেন্ডিং/হোল্ডে খুঁজে পাওয়া যায়নি ({len(unmatched_list)} টি):**\n`" + ", ".join(unmatched_list[:20]) + ("..." if len(unmatched_list)>20 else "") + "`"
 
+    await sync_task_notify_status(context.bot, synced_ids)
     await update.message.reply_text(
         report_msg,
         reply_markup=get_admin_keyboard(user_id),
@@ -3926,6 +3927,7 @@ async def process_bulk_reject(update: Update, context: ContextTypes.DEFAULT_TYPE
     if unmatched_list:
         report_msg += f"• **পেন্ডিং/হোল্ডে খুঁজে পাওয়া যায়নি ({len(unmatched_list)} টি):**\n`" + ", ".join(unmatched_list[:20]) + ("..." if len(unmatched_list)>20 else "") + "`"
 
+    await sync_task_notify_status(context.bot, synced_ids)
     await update.message.reply_text(
         report_msg,
         reply_markup=get_admin_keyboard(user_id),
@@ -3943,10 +3945,14 @@ async def admin_excel_export_menu(update: Update, context: ContextTypes.DEFAULT_
     buttons = [
         [ikb_btn("Gmail (Download)", style="success", callback_data="adm_xlsx_gmail"),
          ikb_btn("Clear Gmail", style="danger", callback_data="adm_cls_gmail")],
-        [ikb_btn("New Used Gmail (Download)", style="primary", callback_data="adm_xlsx_new_used_gmail"),
-         ikb_btn("Clear Used Gmail", style="danger", callback_data="adm_cls_new_used_gmail")],
-        [ikb_btn("Old Gmail (Download)", style="success", callback_data="adm_xlsx_old_gmail"),
+        [ikb_btn("Fresh 2FA (Download)", style="primary", callback_data="adm_xlsx_new_gmail_2fa"),
+         ikb_btn("Clear Fresh 2FA", style="danger", callback_data="adm_cls_new_gmail_2fa")],
+        [ikb_btn("New Used (Download)", style="success", callback_data="adm_xlsx_new_used_gmail"),
+         ikb_btn("Clear Used", style="danger", callback_data="adm_cls_new_used_gmail")],
+        [ikb_btn("Old Gmail (Download)", style="primary", callback_data="adm_xlsx_old_gmail"),
          ikb_btn("Clear Old Gmail", style="danger", callback_data="adm_cls_old_gmail")],
+        [ikb_btn("Old 2FA (Download)", style="success", callback_data="adm_xlsx_old_gmail_2fa"),
+         ikb_btn("Clear Old 2FA", style="danger", callback_data="adm_cls_old_gmail_2fa")],
         [ikb_btn("All Tasks (Download)", style="primary", callback_data="adm_xlsx_all"),
          ikb_btn("Clear ALL Data", style="danger", callback_data="adm_cls_all")],
         [ikb_btn(tr(user_id, "btn_admin_menu"), style="danger", callback_data="adm_back_to_admin")]
@@ -3975,23 +3981,16 @@ async def admin_excel_export_download_cb(update: Update, context: ContextTypes.D
         if data == "all":
             cursor.execute("SELECT * FROM task_submissions WHERE status != 'Rejected' AND is_archived = 0 ORDER BY submission_id DESC")
             task_label = "সকল টাস্ক (All Tasks)"
-        elif data == "gmail":
-            cursor.execute("SELECT * FROM task_submissions WHERE task_type IN ('gmail', 'new_gmail_2fa') AND status != 'Rejected' AND is_archived = 0 ORDER BY submission_id DESC")
-            task_label = "New Fresh Gmail"
-        elif data == "old_gmail":
-            cursor.execute("SELECT * FROM task_submissions WHERE task_type IN ('old_gmail', 'old_gmail_2fa') AND status != 'Rejected' AND is_archived = 0 ORDER BY submission_id DESC")
-            task_label = "Old Gmail"
         else:
             cursor.execute("SELECT * FROM task_submissions WHERE task_type = ? AND status != 'Rejected' AND is_archived = 0 ORDER BY submission_id DESC", (data,))
             task_label = {
-                "ig_2fa": "Instagram 2FA",
-                "ig_seed": "Instagram Seed",
-                "fb_2fa": "Facebook 2FA",
-                "fb_cookies": "Facebook Cookies",
-                "gmail": "Gmail",
-            "new_used_gmail": "New Used Gmail",
-            "old_gmail": "Old Gmail",
-                "old_gmail": "Old Gmail"
+                "gmail": "New Fresh Gmail",
+                "new_gmail_2fa": "Fresh Gmail 2FA",
+                "new_used_gmail": "New Used Gmail",
+            "new_gmail_2fa": "Fresh Gmail 2FA",
+            "old_gmail_2fa": "Old Gmail 2FA",
+                "old_gmail": "Old Gmail",
+                "old_gmail_2fa": "Old Gmail 2FA",
             }.get(data, data.upper())
 
         tasks = cursor.fetchall()
@@ -4031,7 +4030,11 @@ async def admin_excel_export_download_cb(update: Update, context: ContextTypes.D
         summary_cell.alignment = Alignment(horizontal="center", vertical="center")
         ws.row_dimensions[1].height = 25
 
-        headers = ["Task ID", "User ID", "Username", "Task Type", "Password", "2FA Secret Key", "Cookies / Data", "Price (BDT)", "Status", "Submitted Time"]
+        is_2fa_sheet = data in ("new_gmail_2fa", "old_gmail_2fa", "all")
+        if is_2fa_sheet:
+            headers = ["Task ID", "User ID", "Gmail", "Task Type", "Password", "2FA Secret Key", "Price (BDT)", "Status", "Submitted Time"]
+        else:
+            headers = ["Task ID", "User ID", "Gmail", "Task Type", "Password", "Price (BDT)", "Status", "Submitted Time"]
         ws.append([])
         ws.append(headers)
         ws.row_dimensions[3].height = 22
@@ -4066,28 +4069,41 @@ async def admin_excel_export_download_cb(update: Update, context: ContextTypes.D
         for task in tasks:
             status = task["status"]
 
-            row_data = [
-                task["submission_id"],
-                task["user_id"],
-                task["submitted_username"],
-                task["task_type"].upper(),
-                task["submitted_password"] or "N/A",
-                task["secret_key_2fa"] or "N/A",
-                task["cookies_data"] or "N/A",
-                task["reward_amount"],
-                status,
-                task["created_at"]
-            ]
+            if is_2fa_sheet:
+                row_data = [
+                    task["submission_id"],
+                    task["user_id"],
+                    task["submitted_username"],
+                    task["task_type"].upper(),
+                    task["submitted_password"] or "N/A",
+                    task["secret_key_2fa"] or "N/A",
+                    task["reward_amount"],
+                    status,
+                    task["created_at"]
+                ]
+                status_col = 8
+            else:
+                row_data = [
+                    task["submission_id"],
+                    task["user_id"],
+                    task["submitted_username"],
+                    task["task_type"].upper(),
+                    task["submitted_password"] or "N/A",
+                    task["reward_amount"],
+                    status,
+                    task["created_at"]
+                ]
+                status_col = 7
             ws.append(row_data)
             current_row = ws.max_row
             ws.row_dimensions[current_row].height = 19
 
-            for col_idx in range(1, 11):
+            for col_idx in range(1, len(headers) + 1):
                 cell = ws.cell(row=current_row, column=col_idx)
                 cell.border = thin_border
                 cell.alignment = Alignment(horizontal="center", vertical="center")
 
-            status_cell = ws.cell(row=current_row, column=9)
+            status_cell = ws.cell(row=current_row, column=status_col)
             if status == "Approved":
                 status_cell.fill = fill_approved
                 status_cell.font = font_approved
@@ -4149,12 +4165,6 @@ async def admin_excel_clear_cb(update: Update, context: ContextTypes.DEFAULT_TYP
             if cat == "all":
                 cursor.execute("UPDATE task_submissions SET is_archived = 1 WHERE is_archived = 0")
                 label = "সকল কাজের"
-            elif cat == "gmail":
-                cursor.execute("UPDATE task_submissions SET is_archived = 1 WHERE task_type IN ('gmail', 'new_gmail_2fa') AND is_archived = 0")
-                label = "New Fresh Gmail"
-            elif cat == "old_gmail":
-                cursor.execute("UPDATE task_submissions SET is_archived = 1 WHERE task_type IN ('old_gmail', 'old_gmail_2fa') AND is_archived = 0")
-                label = "Old Gmail"
             else:
                 cursor.execute("UPDATE task_submissions SET is_archived = 1 WHERE task_type = ? AND is_archived = 0", (cat,))
                 label = {
@@ -4164,6 +4174,8 @@ async def admin_excel_clear_cb(update: Update, context: ContextTypes.DEFAULT_TYP
                     "fb_cookies": "Facebook Cookies",
                     "gmail": "Gmail",
             "new_used_gmail": "New Used Gmail",
+            "new_gmail_2fa": "Fresh Gmail 2FA",
+            "old_gmail_2fa": "Old Gmail 2FA",
             "old_gmail": "Old Gmail",
                 "old_gmail": "Old Gmail"
                 }.get(cat, cat.upper())
@@ -4186,6 +4198,8 @@ async def admin_excel_clear_cb(update: Update, context: ContextTypes.DEFAULT_TYP
             "fb_cookies": "Facebook Cookies",
             "gmail": "Gmail",
             "new_used_gmail": "New Used Gmail",
+            "new_gmail_2fa": "Fresh Gmail 2FA",
+            "old_gmail_2fa": "Old Gmail 2FA",
             "old_gmail": "Old Gmail",
                 "old_gmail": "Old Gmail",
             "all": "সকল কাজের (ALL)"
@@ -4383,8 +4397,10 @@ def _build_fresh_hub(user_id: int):
         [ikb_btn(f"Single: {s_on}", style="success", callback_data="adm_toggle_gmail_task_active"),
          ikb_btn(f"Bulk: {b_on}", style="primary", callback_data="adm_toggle_bulk_gmail_task_active"),
          ikb_btn(f"2FA: {t_on}", style="success", callback_data="adm_toggle_new_gmail_2fa_active")],
-        [ikb_btn("📊 Download Sheet", style="primary", callback_data="adm_xlsx_gmail"),
-         ikb_btn("🗑️ Clear Sheet", style="danger", callback_data="adm_cls_gmail")],
+        [ikb_btn("📊 Fresh Sheet", style="primary", callback_data="adm_xlsx_gmail"),
+         ikb_btn("🗑️ Clear Fresh", style="danger", callback_data="adm_cls_gmail")],
+        [ikb_btn("🔐 Fresh 2FA Sheet", style="success", callback_data="adm_xlsx_new_gmail_2fa"),
+         ikb_btn("🗑️ Clear 2FA", style="danger", callback_data="adm_cls_new_gmail_2fa")],
         [ikb_btn("↩️ Admin Menu", style="danger", callback_data="adm_back_to_admin")]
     ])
     return msg, kb
@@ -4430,8 +4446,10 @@ def _build_old_hub(user_id: int):
          ikb_btn("💌 Old Recovery", style="primary", callback_data="adm_edit_old_gmail_recovery_email")],
         [ikb_btn(f"Old Gmail: {o_on}", style="success", callback_data="adm_toggle_old_gmail_task_active"),
          ikb_btn(f"Old 2FA: {t_on}", style="primary", callback_data="adm_toggle_old_gmail_2fa_active")],
-        [ikb_btn("📊 Download Sheet", style="primary", callback_data="adm_xlsx_old_gmail"),
-         ikb_btn("🗑️ Clear Sheet", style="danger", callback_data="adm_cls_old_gmail")],
+        [ikb_btn("📊 Old Sheet", style="primary", callback_data="adm_xlsx_old_gmail"),
+         ikb_btn("🗑️ Clear Old", style="danger", callback_data="adm_cls_old_gmail")],
+        [ikb_btn("🔐 Old 2FA Sheet", style="success", callback_data="adm_xlsx_old_gmail_2fa"),
+         ikb_btn("🗑️ Clear Old 2FA", style="danger", callback_data="adm_cls_old_gmail_2fa")],
         [ikb_btn("↩️ Admin Menu", style="danger", callback_data="adm_back_to_admin")]
     ])
     return msg, kb
