@@ -2804,6 +2804,11 @@ async def sync_task_notify_status(bot, sub_ids: list[int]):
                     s = subs[0]
                     st = s["status"]
                     badge = "✅ <b>APPROVED</b>" if st == "Approved" else "❌ <b>REJECTED</b>" if st == "Rejected" else "⏳ <b>HOLD</b>" if st == "Hold" else "⏳ Pending"
+                    if st in ("Approved", "Rejected"):
+                        try:
+                            await bot.edit_message_reply_markup(chat_id=cid, message_id=mid, reply_markup=None)
+                        except Exception:
+                            pass
                     try:
                         await bot.send_message(
                             chat_id=cid,
@@ -3827,6 +3832,7 @@ async def process_bulk_approve(update: Update, context: ContextTypes.DEFAULT_TYP
 
                 conn.commit()
                 approved_count += 1
+                synced_ids.append(sub_id)
 
                 sub_username = html.escape(str(sub['submitted_username'] or '').strip())
                 try:
