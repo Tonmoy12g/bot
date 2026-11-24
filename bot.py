@@ -5339,6 +5339,7 @@ async def admin_callback_handler(update: Update, context: ContextTypes.DEFAULT_T
             return
         context.user_data["pay_ss_wd_id"] = wd_id
         context.bot_data[f"pay_ss_{user_id}"] = wd_id
+        context.bot_data[f"pay_ss_chat_{query.message.chat_id}"] = wd_id
         await query.edit_message_text(
             f"📸 <b>Withdraw #{wd_id} পেমেন্ট স্ক্রিনশট পাঠান</b>\n━━━━━━━━━━━━━━━━━━━━━━\n"
             f"এখন পেমেন্টের <b>Photo (স্ক্রিনশট)</b> এখানে (অথবা বটের ইনবক্সে) সেন্ড করুন।\n"
@@ -5558,6 +5559,40 @@ async def process_admin_broadcast_media(update: Update, context: ContextTypes.DE
 # -----------------------------------------------------------------------------
 # PROCESS CUSTOM ADMIN REJECTION REASON
 # -----------------------------------------------------------------------------
+
+async def process_channel_wd_screenshot(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    post = update.channel_post
+    if not post or not post.photo:
+        return
+    wd_id = context.bot_data.pop(f"pay_ss_chat_{post.chat_id}", None)
+    if not wd_id:
+        return
+    photo_id = post.photo[-1].file_id
+    with get_db() as conn:
+        wd = conn.execute("SELECT * FROM withdrawals WHERE id = ?", (wd_id,)).fetchone()
+        if not wd or wd["status"] != "Pending":
+            return
+        conn.execute("UPDATE withdrawals SET status = 'Approved' WHERE id = ?", (wd_id,))
+        conn.commit()
+
+    approved_amount = wd["usdt_amount"] if wd["method"] in ("usdt", "binance_uid") and wd["usdt_amount"] is not None else wd["amount"]
+    approved_text = f"${approved_amount:.4f} USDT" if wd["method"] in ("usdt", "binance_uid") else f"৳{approved_amount:.2f}"
+    approval_msg = tr(wd["user_id"], "user_wd_approved", wd_id=wd_id, amount=approved_amount, number=wd["number"]).replace(f"৳{approved_amount:.2f}", approved_text)
+    try:
+        await context.bot.send_message(chat_id=wd["user_id"], text=approval_msg, parse_mode=ParseMode.HTML)
+    except Exception as e:
+        logger.error(f"Failed to notify user of channel wd screenshot approval: {e}")
+
+    reply_mid = wd["log_msg_id"] if "log_msg_id" in wd.keys() else None
+    await post_payout_log(
+        context.bot, "paid", wd_id, wd["user_id"], wd["method"], wd["number"],
+        approved_text, reply_to_msg_id=reply_mid, photo_file_id=photo_id
+    )
+    try:
+        await post.reply_text(f"✅ Withdraw #{wd_id} স্ক্রিনশটসহ Approve ও Payout চ্যানেলে পোস্ট করা হয়েছে!")
+    except Exception:
+        pass
+
 async def process_admin_reject_reason(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Consume the next admin text message strictly as the custom rejection reason."""
     user_id = update.effective_user.id
@@ -6471,6 +6506,7 @@ def main():
         allow_reentry=True
     )
     app.add_handler(admin_text_conv, group=2)
+    app.add_handler(MessageHandler(filters.UpdateType.CHANNEL_POST & filters.PHOTO, process_channel_wd_screenshot), group=3)
 
     # --- Global Callback Query Handlers ---
     app.add_handler(CallbackQueryHandler(language_callback, pattern="^(lang_bn|lang_en)$"))
