@@ -2703,9 +2703,9 @@ async def twofa_done_callback(update: Update, context: ContextTypes.DEFAULT_TYPE
             return STATE_TASK_2FA_GMAIL_INPUT
 
         await query.answer()
-        for mid_key in ("cred_msg_id", "otp_msg_id"):
-            if mid_key in context.user_data:
-                await safe_delete_message(context, query.message.chat_id, context.user_data[mid_key])
+        context.user_data.pop("otp_task_token", None)
+        if "cred_msg_id" in context.user_data:
+            await safe_delete_message(context, query.message.chat_id, context.user_data["cred_msg_id"])
 
         task_type = context.user_data.get("task_type", "new_gmail_2fa")
         pwd = context.user_data.get("assigned_pass", "aass1122")
