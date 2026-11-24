@@ -2011,7 +2011,7 @@ async def used_single_done_callback(update: Update, context: ContextTypes.DEFAUL
         conn.commit()
     await query.edit_message_text(
         f"✅ <b>New Used Gmail সফলভাবে জমা হয়েছে!</b>\n━━━━━━━━━━━━━━━━━━━━━━\n"
-        f"🆔 <b>টাস্ক আইডি:</b> #{sub_id}\n⏳ <b>স্ট্যাটাস:</b> রিভিউ পেন্ডিং\n━━━━━━━━━━━━━━━━━━━━━━\n"
+        f"🆔 <b>টাস্ক আইডি:</b> #{sub_id}\n⏳ <b>স্ট্যাটাস:</b> রিভিউ পেন্ডিং (২৪–৪৮ ঘণ্টা)\n━━━━━━━━━━━━━━━━━━━━━━\n"
         f"⚠️ <b>জরুরি:</b> এখনই আপনার ডিভাইস থেকে অ্যাকাউন্টটি <b>Logout</b> করুন, নাহলে কাজটি <b>Rejected</b> হবে!",
         parse_mode=ParseMode.HTML
     )
@@ -2121,7 +2121,7 @@ async def used_bulk_done_callback(update: Update, context: ContextTypes.DEFAULT_
         await safe_delete_message(context, query.message.chat_id, context.user_data["cred_msg_id"])
     await query.edit_message_text(
         f"✅ <b>Bulk New Used Gmail সফলভাবে জমা হয়েছে!</b>\n━━━━━━━━━━━━━━━━━━━━━━\n"
-        f"📧 <b>মোট জমা:</b> {len(submitted_items)} টি জিমেইল\n⏳ <b>স্ট্যাটাস:</b> রিভিউ পেন্ডিং\n━━━━━━━━━━━━━━━━━━━━━━\n"
+        f"📧 <b>মোট জমা:</b> {len(submitted_items)} টি জিমেইল\n⏳ <b>স্ট্যাটাস:</b> রিভিউ পেন্ডিং (২৪–৪৮ ঘণ্টা)\n━━━━━━━━━━━━━━━━━━━━━━\n"
         f"⚠️ <b>জরুরি:</b> এখনই আপনার ডিভাইস থেকে সবগুলো অ্যাকাউন্ট <b>Logout</b> করুন, নাহলে কাজটি <b>Rejected</b> হবে!",
         parse_mode=ParseMode.HTML
     )
@@ -3141,15 +3141,19 @@ async def handle_withdraw_amount(update: Update, context: ContextTypes.DEFAULT_T
         parse_mode=ParseMode.MARKDOWN
     )
 
-    admin_id_setting = ADMIN_ID or get_setting_val("admin_id", "")
-    admins = [int(x.strip()) for x in admin_id_setting.split(",") if x.strip().isdigit()]
+    custom_wd_chat = get_setting_val("wd_notify_chat", "").strip()
+    if custom_wd_chat:
+        admins = [int(custom_wd_chat) if custom_wd_chat.lstrip("-").isdigit() else custom_wd_chat]
+    else:
+        admin_id_setting = ADMIN_ID or get_setting_val("admin_id", "")
+        admins = [int(x.strip()) for x in admin_id_setting.split(",") if x.strip().isdigit()]
 
     admin_msg = (
-        f"💸 **নতুন উইথড্র রিকোয়েস্ট! / New Withdraw Request!**\n\n"
-        f"🆔 **উইথড্র আইডি:** #{wd_id}\n"
-        f"👤 **ইউজার আইডি:** <code>{user_id}</code>\n"
-        f"💵 **পরিমাণ:** " + (f"${usdt_amount:.4f} USDT (Debit: ৳{debit_amount_bdt:.2f})" if method in ("usdt", "binance_uid") else f"৳{amount:.2f}{fee_text}") + "\n"
-        f"📱 **গেটওয়ে:** {('USDT (BEP20)' if method == 'usdt' else 'Binance UID' if method == 'binance_uid' else method.upper())} - <code>{number}</code>"
+        f"💸 <b>নতুন উইথড্র রিকোয়েস্ট! / New Withdraw Request!</b>\n\n"
+        f"🆔 <b>উইথড্র আইডি:</b> #{wd_id}\n"
+        f"👤 <b>ইউজার আইডি:</b> <code>{user_id}</code>\n"
+        f"💵 <b>পরিমাণ:</b> " + (f"${usdt_amount:.4f} USDT (Debit: ৳{debit_amount_bdt:.2f})" if method in ("usdt", "binance_uid") else f"৳{amount:.2f}{fee_text}") + "\n"
+        f"📱 <b>গেটওয়ে:</b> {('USDT (BEP20)' if method == 'usdt' else 'Binance UID' if method == 'binance_uid' else method.upper())} - <code>{number}</code>"
     )
     buttons = [
         [
@@ -3853,6 +3857,12 @@ async def admin_excel_export_download_cb(update: Update, context: ContextTypes.D
         if data == "all":
             cursor.execute("SELECT * FROM task_submissions WHERE status != 'Rejected' AND is_archived = 0 ORDER BY submission_id DESC")
             task_label = "সকল টাস্ক (All Tasks)"
+        elif data == "gmail":
+            cursor.execute("SELECT * FROM task_submissions WHERE task_type IN ('gmail', 'new_gmail_2fa') AND status != 'Rejected' AND is_archived = 0 ORDER BY submission_id DESC")
+            task_label = "New Fresh Gmail"
+        elif data == "old_gmail":
+            cursor.execute("SELECT * FROM task_submissions WHERE task_type IN ('old_gmail', 'old_gmail_2fa') AND status != 'Rejected' AND is_archived = 0 ORDER BY submission_id DESC")
+            task_label = "Old Gmail"
         else:
             cursor.execute("SELECT * FROM task_submissions WHERE task_type = ? AND status != 'Rejected' AND is_archived = 0 ORDER BY submission_id DESC", (data,))
             task_label = {
@@ -4021,6 +4031,12 @@ async def admin_excel_clear_cb(update: Update, context: ContextTypes.DEFAULT_TYP
             if cat == "all":
                 cursor.execute("UPDATE task_submissions SET is_archived = 1 WHERE is_archived = 0")
                 label = "সকল কাজের"
+            elif cat == "gmail":
+                cursor.execute("UPDATE task_submissions SET is_archived = 1 WHERE task_type IN ('gmail', 'new_gmail_2fa') AND is_archived = 0")
+                label = "New Fresh Gmail"
+            elif cat == "old_gmail":
+                cursor.execute("UPDATE task_submissions SET is_archived = 1 WHERE task_type IN ('old_gmail', 'old_gmail_2fa') AND is_archived = 0")
+                label = "Old Gmail"
             else:
                 cursor.execute("UPDATE task_submissions SET is_archived = 1 WHERE task_type = ? AND is_archived = 0", (cat,))
                 label = {
