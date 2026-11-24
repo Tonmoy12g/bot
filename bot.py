@@ -252,6 +252,13 @@ def init_db():
         cursor.execute("CREATE INDEX IF NOT EXISTS idx_submissions_status ON task_submissions(status)")
         cursor.execute("CREATE INDEX IF NOT EXISTS idx_submissions_username ON task_submissions(submitted_username)")
         cursor.execute("CREATE INDEX IF NOT EXISTS idx_submissions_archived ON task_submissions(is_archived)")
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS task_notify_msgs (
+            sub_id INTEGER PRIMARY KEY,
+            chat_id TEXT,
+            message_id INTEGER
+        )
+        """)
 
         cursor.execute("""
         CREATE TABLE IF NOT EXISTS admin_settings (
@@ -1149,8 +1156,8 @@ STATE_TASK_USED_SINGLE_INPUT = 42
 STATE_TASK_USED_BULK_INPUT = 43
 STATE_ADMIN_OLD_CAT_EDIT_RATE = 44
 STATE_TASK_OLD_2FA_CAT = 45
-STATE_ADMIN_VIDEO_TUTORIAL = 41
-STATE_ADMIN_WD_SCREENSHOT = 42
+STATE_ADMIN_VIDEO_TUTORIAL = 46
+STATE_ADMIN_WD_SCREENSHOT = 47
 
 # -----------------------------------------------------------------------------
 # DYNAMIC MULTILINGUAL REPLY KEYBOARDS
@@ -1875,7 +1882,9 @@ async def bulk_gmail_done_callback(update: Update, context: ContextTypes.DEFAULT
     )
     for admin in admins:
         try:
-            await context.bot.send_message(chat_id=admin, text=admin_msg, parse_mode=ParseMode.HTML)
+            sent_n = await context.bot.send_message(chat_id=admin, text=admin_msg, parse_mode=ParseMode.HTML)
+            if custom_task_chat:
+                save_task_notify_msgs([sid for sid, _ in submitted_items], admin, sent_n.message_id)
         except Exception as e:
             logger.error(f"Failed to notify admin {admin} of bulk gmail: {e}")
 
@@ -2150,7 +2159,9 @@ async def used_bulk_done_callback(update: Update, context: ContextTypes.DEFAULT_
     )
     for admin in admins:
         try:
-            await context.bot.send_message(chat_id=admin, text=admin_msg, parse_mode=ParseMode.HTML)
+            sent_n = await context.bot.send_message(chat_id=admin, text=admin_msg, parse_mode=ParseMode.HTML)
+            if custom_task_chat:
+                save_task_notify_msgs([sid for sid, _ in submitted_items], admin, sent_n.message_id)
         except Exception as e:
             logger.error(f"Failed to notify admin {admin} of bulk used gmail: {e}")
     clear_user_state(context)
@@ -2467,7 +2478,9 @@ async def old_bulk_done_callback(update: Update, context: ContextTypes.DEFAULT_T
     )
     for admin in admins:
         try:
-            await context.bot.send_message(chat_id=admin, text=admin_msg, parse_mode=ParseMode.HTML)
+            sent_n = await context.bot.send_message(chat_id=admin, text=admin_msg, parse_mode=ParseMode.HTML)
+            if custom_task_chat:
+                save_task_notify_msgs([sid for sid, _ in submitted_items], admin, sent_n.message_id)
         except Exception:
             pass
 
@@ -2741,6 +2754,85 @@ async def twofa_cancel_callback(update: Update, context: ContextTypes.DEFAULT_TY
     return ConversationHandler.END
 
 # --- ADMIN NOTIFICATION HELPER ---
+
+def save_task_notify_msgs(sub_ids: list[int], chat_id, message_id: int):
+    if not sub_ids or not message_id:
+        return
+    try:
+        with get_db() as conn:
+            for sid in sub_ids:
+                conn.execute(
+                    "INSERT OR REPLACE INTO task_notify_msgs (sub_id, chat_id, message_id) VALUES (?, ?, ?)",
+                    (int(sid), str(chat_id), int(message_id))
+                )
+            conn.commit()
+    except Exception as e:
+        logger.error(f"save_task_notify_msgs error: {e}")
+
+async def sync_task_notify_status(bot, sub_ids: list[int]):
+    if not sub_ids:
+        return
+    try:
+        with get_db() as conn:
+            placeholders = ",".join("?" for _ in sub_ids)
+            rows = conn.execute(
+                f"SELECT sub_id, chat_id, message_id FROM task_notify_msgs WHERE sub_id IN ({placeholders})",
+                [int(s) for s in sub_ids]
+            ).fetchall()
+            if not rows:
+                return
+            groups = {}
+            for r in rows:
+                groups.setdefault((r["chat_id"], r["message_id"]), []).append(r["sub_id"])
+
+            for (chat_str, mid), _ in groups.items():
+                cid = int(chat_str) if str(chat_str).lstrip("-").isdigit() else chat_str
+                all_in_msg = conn.execute(
+                    "SELECT sub_id FROM task_notify_msgs WHERE chat_id = ? AND message_id = ?",
+                    (chat_str, mid)
+                ).fetchall()
+                msg_sids = [x["sub_id"] for x in all_in_msg]
+                ph2 = ",".join("?" for _ in msg_sids)
+                subs = conn.execute(
+                    f"SELECT submission_id, submitted_username, status FROM task_submissions WHERE submission_id IN ({ph2}) ORDER BY submission_id ASC",
+                    msg_sids
+                ).fetchall()
+                if not subs:
+                    continue
+
+                if len(subs) == 1:
+                    s = subs[0]
+                    st = s["status"]
+                    badge = "✅ <b>APPROVED</b>" if st == "Approved" else "❌ <b>REJECTED</b>" if st == "Rejected" else "⏳ <b>HOLD</b>" if st == "Hold" else "⏳ Pending"
+                    try:
+                        await bot.send_message(
+                            chat_id=cid,
+                            text=f"📌 <b>Task #{s['submission_id']}</b> (<code>{html.escape(s['submitted_username'])}</code>) → {badge}",
+                            reply_to_message_id=mid,
+                            parse_mode=ParseMode.HTML
+                        )
+                    except Exception:
+                        pass
+                else:
+                    lines = []
+                    for s in subs[:30]:
+                        st = s["status"]
+                        ic = "✅" if st == "Approved" else "❌" if st == "Rejected" else "⏳"
+                        lines.append(f"{ic} #{s['submission_id']} — <code>{html.escape(s['submitted_username'])}</code> ({st})")
+                    if len(subs) > 30:
+                        lines.append(f"... (+{len(subs) - 30} more)")
+                    try:
+                        await bot.send_message(
+                            chat_id=cid,
+                            text="📊 <b>Bulk Status Update:</b>\n" + "\n".join(lines),
+                            reply_to_message_id=mid,
+                            parse_mode=ParseMode.HTML
+                        )
+                    except Exception:
+                        pass
+    except Exception as e:
+        logger.error(f"sync_task_notify_status error: {e}")
+
 async def notify_admins_new_submission(context, sub_id, user_id, task_type, username, password, secret_key, cookies, reward, file_id=None):
     custom_task_chat = get_setting_val("task_notify_chat", "").strip()
     if custom_task_chat:
@@ -2805,12 +2897,14 @@ async def notify_admins_new_submission(context, sub_id, user_id, task_type, user
                     parse_mode=ParseMode.HTML
                 )
             else:
-                await context.bot.send_message(
+                sent_n = await context.bot.send_message(
                     chat_id=admin,
                     text=admin_msg,
                     reply_markup=InlineKeyboardMarkup(buttons),
                     parse_mode=ParseMode.HTML
                 )
+                if custom_task_chat:
+                    save_task_notify_msgs([sub_id], admin, sent_n.message_id)
         except Exception as e:
             logger.error(f"Failed to notify admin {admin}: {e}")
 
@@ -3328,7 +3422,7 @@ async def process_admin_wd_screenshot(update: Update, context: ContextTypes.DEFA
     if not is_admin(user_id):
         return ConversationHandler.END
 
-    wd_id = context.user_data.get("pay_ss_wd_id")
+    wd_id = context.user_data.get("pay_ss_wd_id") or context.bot_data.pop(f"pay_ss_{user_id}", None)
     if not wd_id:
         await update.message.reply_text("❌ কোনো উইথড্র সিলেক্ট করা নেই।", reply_markup=get_admin_keyboard(user_id))
         return ConversationHandler.END
@@ -3663,6 +3757,7 @@ async def process_bulk_approve(update: Update, context: ContextTypes.DEFAULT_TYP
 
     approved_count = 0
     matched_count = 0
+    synced_ids = []
     unmatched_list = []
     now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
@@ -3758,6 +3853,7 @@ async def process_bulk_reject(update: Update, context: ContextTypes.DEFAULT_TYPE
 
     rejected_count = 0
     matched_count = 0
+    synced_ids = []
     unmatched_list = []
     now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     reason = "আপনার Gmail অ্যাকাউন্ট লগইন করা সম্ভব হয়নি। তাই অ্যাকাউন্টটি রিজেক্ট করা হয়েছে।"
@@ -3787,6 +3883,7 @@ async def process_bulk_reject(update: Update, context: ContextTypes.DEFAULT_TYPE
                 )
                 conn.commit()
                 rejected_count += 1
+                synced_ids.append(sub_id)
 
                 sub_username = html.escape(str(sub['submitted_username'] or '').strip())
                 esc_reason = html.escape(reason)
@@ -5228,10 +5325,12 @@ async def admin_callback_handler(update: Update, context: ContextTypes.DEFAULT_T
             except Exception as e:
                 logger.error(f"Error sending reject DM to user {sub['user_id']}: {e}")
 
+        await sync_task_notify_status(context.bot, [sub_id])
         await query.edit_message_text(f"❌ Task #{sub_id} rejected.")
         return
 
     if data.startswith("adm_pay_ss_wd_"):
+        await query.answer()
         wd_id = int(data.replace("adm_pay_ss_wd_", ""))
         with get_db() as conn:
             wd = conn.execute("SELECT * FROM withdrawals WHERE id = ?", (wd_id,)).fetchone()
@@ -5239,9 +5338,10 @@ async def admin_callback_handler(update: Update, context: ContextTypes.DEFAULT_T
             await query.edit_message_text("❌ Already approved or processed!")
             return
         context.user_data["pay_ss_wd_id"] = wd_id
+        context.bot_data[f"pay_ss_{user_id}"] = wd_id
         await query.edit_message_text(
             f"📸 <b>Withdraw #{wd_id} পেমেন্ট স্ক্রিনশট পাঠান</b>\n━━━━━━━━━━━━━━━━━━━━━━\n"
-            f"এখন পেমেন্টের <b>Photo (স্ক্রিনশট)</b> এখানে সেন্ড করুন।\n"
+            f"এখন পেমেন্টের <b>Photo (স্ক্রিনশট)</b> এখানে (অথবা বটের ইনবক্সে) সেন্ড করুন।\n"
             f"স্ক্রিনশট পাঠালেই পেমেন্ট Approve হয়ে ইউজার ও চ্যানেলে (রিপ্লাই হিসেবে) চলে যাবে।",
             parse_mode=ParseMode.HTML
         )
@@ -6367,6 +6467,7 @@ def main():
         ],
         conversation_timeout=300,
         per_message=False,
+        per_chat=False,
         allow_reentry=True
     )
     app.add_handler(admin_text_conv, group=2)
