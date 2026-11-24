@@ -1057,6 +1057,12 @@ def is_valid_gmail_address(email: str) -> bool:
         return False
     if len(set(base)) <= 1:
         return False
+    blocked_examples = {
+        "example", "mail1", "mail2", "mail3",
+        "used1", "used2", "oldmail1", "oldmail2", "oldmail2020",
+    }
+    if base in blocked_examples:
+        return False
     return True
 
 def is_duplicate_gmail(cursor, email: str) -> bool:
@@ -1566,7 +1572,7 @@ async def handle_gmail_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
     msg = tr(user_id, "gmail_guidelines", price=price, fixed_pass=fixed_pass)
     sent_m = await update.message.reply_text(msg, parse_mode=ParseMode.HTML)
     await update.message.reply_text(
-        ">> <b>আপনার Fresh Gmail অ্যাড্রেসটি লিখুন:</b>\n<code>example@gmail.com</code>",
+        ">> <b>আপনার Fresh Gmail অ্যাড্রেসটি লিখুন:</b>",
         reply_markup=get_cancel_only_keyboard(user_id),
         parse_mode=ParseMode.HTML
     )
@@ -1584,7 +1590,7 @@ async def process_gmail_submission(update: Update, context: ContextTypes.DEFAULT
 
     if not is_valid_gmail_address(gmail_acc):
         await update.message.reply_text(
-            "❌ সঠিক Gmail এড্রেস প্রদান করুন (যেমন: example@gmail.com)!",
+            "❌ সঠিক Gmail এড্রেস প্রদান করুন!",
             reply_markup=get_cancel_only_keyboard(user_id)
         )
         return STATE_TASK_GMAIL_INPUT
@@ -1952,7 +1958,7 @@ async def handle_used_single_menu(update: Update, context: ContextTypes.DEFAULT_
         f"⚠️ <b>সতর্কতা:</b> বটে Gmail জমা দেওয়ার সাথে সাথেই আপনার ডিভাইস থেকে অ্যাকাউন্টটি <b>Logout</b> করে দেবেন, নাহলে কাজটি <b>Rejected</b> হবে!"
     )
     sent_m = await update.message.reply_text(msg, parse_mode=ParseMode.HTML)
-    await update.message.reply_text(">> <b>আপনার Used Gmail অ্যাড্রেসটি লিখুন:</b>\n<code>example@gmail.com</code>", reply_markup=get_cancel_only_keyboard(user_id), parse_mode=ParseMode.HTML)
+    await update.message.reply_text(">> <b>আপনার Used Gmail অ্যাড্রেসটি লিখুন:</b>", reply_markup=get_cancel_only_keyboard(user_id), parse_mode=ParseMode.HTML)
     context.user_data["cred_msg_id"] = sent_m.message_id
     return STATE_TASK_USED_SINGLE_INPUT
 
@@ -1963,7 +1969,7 @@ async def process_used_single_submission(update: Update, context: ContextTypes.D
         clear_user_state(context)
         return ConversationHandler.END
     if not is_valid_gmail_address(email):
-        await update.message.reply_text("❌ সঠিক Gmail এড্রেস দিন (যেমন: example@gmail.com)!", reply_markup=get_cancel_only_keyboard(user_id))
+        await update.message.reply_text("❌ সঠিক Gmail এড্রেস দিন!", reply_markup=get_cancel_only_keyboard(user_id))
         return STATE_TASK_USED_SINGLE_INPUT
     email = email.lower()
     context.user_data["used_gmail_single"] = email
@@ -2279,7 +2285,7 @@ async def old_category_selected_callback(update: Update, context: ContextTypes.D
     )
 
     sent_m = await query.edit_message_text(msg, parse_mode=ParseMode.HTML)
-    prompt_txt = ">> <b>সবগুলো Old Gmail প্রতি লাইনে ১টি করে লিখুন:</b>" if mode == "bulk" else ">> <b>আপনার Old Gmail অ্যাড্রেসটি লিখুন:</b>\n<code>example@gmail.com</code>"
+    prompt_txt = ">> <b>সবগুলো Old Gmail প্রতি লাইনে ১টি করে লিখুন:</b>" if mode == "bulk" else ">> <b>আপনার Old Gmail অ্যাড্রেসটি লিখুন:</b>"
     await context.bot.send_message(chat_id=user_id, text=prompt_txt, reply_markup=get_cancel_only_keyboard(user_id), parse_mode=ParseMode.HTML)
     context.user_data["cred_msg_id"] = sent_m.message_id
     return STATE_TASK_OLD_BULK_INPUT if mode == "bulk" else STATE_TASK_OLD_SINGLE_INPUT
@@ -2294,7 +2300,7 @@ async def process_old_single_submission(update: Update, context: ContextTypes.DE
         return ConversationHandler.END
 
     if not is_valid_gmail_address(email):
-        await update.message.reply_text("❌ সঠিক Gmail এড্রেস দিন (যেমন: example@gmail.com)!", reply_markup=get_cancel_only_keyboard(user_id))
+        await update.message.reply_text("❌ সঠিক Gmail এড্রেস দিন!", reply_markup=get_cancel_only_keyboard(user_id))
         return STATE_TASK_OLD_SINGLE_INPUT
 
     email = email.lower()
@@ -2544,7 +2550,7 @@ async def handle_2fa_gmail_start(update: Update, context: ContextTypes.DEFAULT_T
         f"⚠️ <b>সতর্কতা:</b> বটে জমা দেওয়ার সাথে সাথেই ডিভাইস থেকে অ্যাকাউন্টটি <b>Logout</b> করতে হবে, নাহলে কাজটি <b>Rejected</b> হবে!"
     )
     sent_m = await update.message.reply_text(msg, parse_mode=ParseMode.HTML)
-    await update.message.reply_text(">> <b>ধাপ ১ — আপনার Gmail অ্যাড্রেসটি লিখুন:</b>\n<code>example@gmail.com</code>", reply_markup=get_cancel_only_keyboard(user_id), parse_mode=ParseMode.HTML)
+    await update.message.reply_text(">> <b>ধাপ ১ — আপনার Gmail অ্যাড্রেসটি লিখুন:</b>", reply_markup=get_cancel_only_keyboard(user_id), parse_mode=ParseMode.HTML)
     context.user_data["cred_msg_id"] = sent_m.message_id
     return STATE_TASK_2FA_GMAIL_INPUT
 
@@ -2576,7 +2582,7 @@ async def old_2fa_category_selected_callback(update: Update, context: ContextTyp
         f"⚠️ <b>সতর্কতা:</b> বটে জমা দেওয়ার সাথে সাথেই ডিভাইস থেকে অ্যাকাউন্টটি <b>Logout</b> করতে হবে, নাহলে কাজটি <b>Rejected</b> হবে!"
     )
     sent_m = await query.edit_message_text(msg, parse_mode=ParseMode.HTML)
-    await context.bot.send_message(chat_id=user_id, text=">> <b>ধাপ ১ — আপনার Gmail অ্যাড্রেসটি লিখুন:</b>\n<code>example@gmail.com</code>", reply_markup=get_cancel_only_keyboard(user_id), parse_mode=ParseMode.HTML)
+    await context.bot.send_message(chat_id=user_id, text=">> <b>ধাপ ১ — আপনার Gmail অ্যাড্রেসটি লিখুন:</b>", reply_markup=get_cancel_only_keyboard(user_id), parse_mode=ParseMode.HTML)
     context.user_data["cred_msg_id"] = sent_m.message_id
     return STATE_TASK_2FA_GMAIL_INPUT
 
@@ -2588,7 +2594,7 @@ async def process_2fa_gmail_input(update: Update, context: ContextTypes.DEFAULT_
         return ConversationHandler.END
 
     if not is_valid_gmail_address(email):
-        await update.message.reply_text("❌ সঠিক Gmail এড্রেস দিন (যেমন: example@gmail.com)!", reply_markup=get_cancel_only_keyboard(user_id))
+        await update.message.reply_text("❌ সঠিক Gmail এড্রেস দিন!", reply_markup=get_cancel_only_keyboard(user_id))
         return STATE_TASK_2FA_GMAIL_INPUT
 
     email = email.lower()
