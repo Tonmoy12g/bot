@@ -452,8 +452,8 @@ MESSAGES = {
         "task_off_gmail": "❌ জিমেইলের কাজ বর্তমানে বন্ধ রয়েছে।",
         "gmail_guidelines": "✨ <b>New Fresh Gmail Work</b>\n━━━━━━━━━━━━━━━━━━━━━━\n💵 <b>রেট (প্রতি জিমেইল):</b> ৳{price}\n🔑 <b>পাসওয়ার্ড (ট্যাপ করে কপি করুন):</b> <code>{fixed_pass}</code>\n━━━━━━━━━━━━━━━━━━━━━━\n<b>কাজের নিয়মাবলি:</b>\n১. উপরের পাসওয়ার্ড দিয়ে একটি নতুন Gmail তৈরি করুন।\n২. তৈরি করা Gmail অ্যাড্রেসটি নিচে লিখে পাঠান।\n৩. এরপর নিচের <b>Submit Gmail</b> বাটনে চাপ দিন।\n\n⚠️ <b>সতর্কতা:</b> বটে Gmail জমা দেওয়ার সাথে সাথেই আপনার ডিভাইস থেকে অ্যাকাউন্টটি <b>Logout</b> করে দেবেন, নাহলে কাজটি <b>Rejected</b> হবে!",
         "btn_done": "✅ Submit Gmail",
-        "file_received_msg": "📄 **ফাইল/ডেটা সফলভাবে গ্রহণ করা হয়েছে!**\n\nকাজটি রিভিউয়ের জন্য জমা দিতে নিচে **'✅ জমা দিন (Done)'** বাটনে চাপ দিন।",
-        "no_file_or_data_err": "⚠️ **কোনো ফাইল বা ডেটা পাওয়া যায়নি!**\n\nপ্রথমে এক্সেল ফাইল (.xlsx) বা টেক্সট পাঠান, তারপর **'✅ জমা দিন (Done)'** বাটনে চাপ দিন।",
+        "file_received_msg": "📄 **ফাইল/ডেটা সফলভাবে গ্রহণ করা হয়েছে!**\n\nকাজটি রিভিউয়ের জন্য জমা দিতে নিচে **'✅ Submit Gmail'** বাটনে চাপ দিন।",
+        "no_file_or_data_err": "⚠️ **কোনো ফাইল বা ডেটা পাওয়া যায়নি!**\n\nপ্রথমে এক্সেল ফাইল (.xlsx) বা টেক্সট পাঠান, তারপর **'✅ Submit Gmail'** বাটনে চাপ দিন।",
         "otp_prompt_secret": "🔑 **আপনার 2FA Secret Key-টি প্রদান করুন:**\n\nঅ্যাপ থেকে প্রাপ্ত সিক্রেট কোডটি নিচে মেসেজ করুন:",
         "otp_invalid_secret": "❌ **ভুল সিক্রেট কোড!**\n\nদয়া করে সঠিক ৩২ অক্ষরের বেস৩২ সিক্রেট কি পাঠান:",
         "otp_verified_msg": "✅ **ওটিপি সিক্রেট কি ভেরিফাই হয়েছে!**\n━━━━━━━━━━━━━━━━━━━━━━\n🔐 **সিক্রেট কি:** <code>{secret}</code>\n🔢 **লাইভ OTP:** <code>{otp}</code> (ট্যাপ করে কপি করুন)\n━━━━━━━━━━━━━━━━━━━━━━\nএই কোডটি দিয়ে অ্যাকাউন্ট ভেরিফিকেশন সম্পন্ন করুন।\nসম্পন্ন হলে **'✅ একাউন্ট খোলা শেষ'** বাটনে চাপ দিন।",
@@ -1600,7 +1600,7 @@ async def process_gmail_submission(update: Update, context: ContextTypes.DEFAULT
 
     await update.message.reply_text(
         f"✅ Gmail এড্রেস গ্রহণ করা হয়েছে: <code>{html.escape(normalized_gmail)}</code>\n\n"
-        "এখন কাজটি সাবমিট করতে নিচের 'জমা দিন' বাটনে চাপ দিন।",
+        "এখন কাজটি সাবমিট করতে নিচের <b>Submit Gmail</b> বাটনে চাপ দিন।",
         reply_markup=get_gmail_done_keyboard(user_id),
         parse_mode=ParseMode.HTML
     )
@@ -1903,7 +1903,7 @@ def get_used_gmail_done_keyboard(user_id: int = None, mode: str = "single", coun
         lbl = f"Submit All ({count})" if count > 0 else "Submit All"
         cb = "used_bulk_done"
     else:
-        lbl = "Submit Used Gmail"
+        lbl = "✅ Submit Gmail"
         cb = "used_single_done"
     return InlineKeyboardMarkup([[
         ikb_btn(lbl, style="success", callback_data=cb),
@@ -1954,7 +1954,7 @@ async def handle_used_single_menu(update: Update, context: ContextTypes.DEFAULT_
         f"<b>কাজের নিয়ম:</b>\n"
         f"১. আপনার ব্যবহৃত (Used) Gmail-এ উপরের পাসওয়ার্ড সেট করুন।\n"
         f"২. Gmail অ্যাড্রেসটি নিচে লিখে পাঠান।\n"
-        f"৩. এরপর <b>Submit Used Gmail</b> বাটনে চাপ দিন।\n\n"
+        f"৩. এরপর <b>Submit Gmail</b> বাটনে চাপ দিন।\n\n"
         f"⚠️ <b>সতর্কতা:</b> বটে Gmail জমা দেওয়ার সাথে সাথেই আপনার ডিভাইস থেকে অ্যাকাউন্টটি <b>Logout</b> করে দেবেন, নাহলে কাজটি <b>Rejected</b> হবে!"
     )
     sent_m = await update.message.reply_text(msg, parse_mode=ParseMode.HTML)
@@ -1974,7 +1974,7 @@ async def process_used_single_submission(update: Update, context: ContextTypes.D
     email = email.lower()
     context.user_data["used_gmail_single"] = email
     await update.message.reply_text(
-        f"✅ Used Gmail গ্রহণ করা হয়েছে: <code>{html.escape(email)}</code>\n\nজমা দিতে নিচের <b>Submit Used Gmail</b> বাটনে চাপ দিন।",
+        f"✅ Used Gmail গ্রহণ করা হয়েছে: <code>{html.escape(email)}</code>\n\nজমা দিতে নিচের <b>Submit Gmail</b> বাটনে চাপ দিন।",
         reply_markup=get_used_gmail_done_keyboard(user_id, "single"),
         parse_mode=ParseMode.HTML
     )
@@ -2227,7 +2227,7 @@ def _old_done_kb(user_id: int, mode: str, count: int = 0):
         lbl = f"Submit All ({count})" if count > 0 else "Submit All"
         done_cb = "old_bulk_done"
     else:
-        lbl = "Submit Old Gmail"
+        lbl = "✅ Submit Gmail"
         done_cb = "old_single_done"
     return InlineKeyboardMarkup([[
         ikb_btn(lbl, style="success", callback_data=done_cb),
@@ -2306,7 +2306,7 @@ async def process_old_single_submission(update: Update, context: ContextTypes.DE
     email = email.lower()
     context.user_data["old_gmail_single"] = email
     await update.message.reply_text(
-        f"✅ Old Gmail গ্রহণ করা হয়েছে: <code>{html.escape(email)}</code>\n\nজমা দিতে নিচের <b>Submit Old Gmail</b> বাটনে চাপ দিন।",
+        f"✅ Old Gmail গ্রহণ করা হয়েছে: <code>{html.escape(email)}</code>\n\nজমা দিতে নিচের <b>Submit Gmail</b> বাটনে চাপ দিন।",
         reply_markup=_old_done_kb(user_id, "single"),
         parse_mode=ParseMode.HTML
     )
@@ -2487,7 +2487,7 @@ async def old_gmail_cancel_callback(update: Update, context: ContextTypes.DEFAUL
 # --- 2FA GMAIL WORKFLOWS (NEW & OLD) ---
 def _twofa_done_kb(user_id: int):
     return InlineKeyboardMarkup([[
-        ikb_btn("Submit 2FA Gmail", style="success", callback_data="twofa_gmail_done"),
+        ikb_btn("✅ Submit Gmail", style="success", callback_data="twofa_gmail_done"),
         ikb_btn(tr(user_id, "btn_cancel"), style="danger", callback_data="twofa_gmail_cancel")
     ]])
 
@@ -2641,7 +2641,7 @@ async def process_2fa_secret_input(update: Update, context: ContextTypes.DEFAULT
         f"🔐 <b>Secret Key:</b> <code>{html.escape(secret)}</code>\n"
         f"🔢 <b>Live OTP:</b> <code>{otp}</code> (ট্যাপ করে কপি)\n"
         f"━━━━━━━━━━━━━━━━━━━━━━\n"
-        f"কাজটি জমা দিতে নিচের <b>Submit 2FA Gmail</b> বাটনে চাপ দিন।\n"
+        f"কাজটি জমা দিতে নিচের <b>Submit Gmail</b> বাটনে চাপ দিন।\n"
         f"⚠️ জমা দেওয়ার সাথে সাথেই ডিভাইস থেকে <b>Logout</b> করে দেবেন!",
         reply_markup=_twofa_done_kb(user_id),
         parse_mode=ParseMode.HTML
