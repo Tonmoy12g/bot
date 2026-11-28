@@ -2188,20 +2188,23 @@ async def handle_old_gmail_menu(update: Update, context: ContextTypes.DEFAULT_TY
         await start_command(update, context)
         return ConversationHandler.END
 
-    if get_setting_val("old_gmail_task_active", "ON") == "OFF":
+    old_on = get_setting_val("old_gmail_task_active", "ON") == "ON"
+    twofa_on = get_setting_val("old_gmail_2fa_active", "ON") == "ON"
+    if not old_on and not twofa_on:
         await update.message.reply_text("❌ Old Gmail Work বর্তমানে বন্ধ রয়েছে।", reply_markup=get_task_category_keyboard(user_id))
         return STATE_TASK_CATEGORY
 
     cats = get_old_categories()
-    if not cats and get_setting_val("old_gmail_2fa_active", "ON") == "OFF":
+    if old_on and not cats and not twofa_on:
         await update.message.reply_text(
             "⚠️ অ্যাডমিন এখনো কোনো Old Gmail ক্যাটাগরি যোগ করেননি।",
             reply_markup=get_task_category_keyboard(user_id)
         )
         return STATE_TASK_CATEGORY
 
+    menu_line = "Single অথবা Bulk Old Gmail বেছে নিন:" if old_on else "🔐 Old Gmail 2FA জমা দিতে নিচের বাটনে চাপ দিন:"
     await update.message.reply_text(
-        "♻️ <b>Old Gmail Work</b>\n━━━━━━━━━━━━━━━━━━━━━━\nSingle অথবা Bulk Old Gmail বেছে নিন:",
+        f"♻️ <b>Old Gmail Work</b>\n━━━━━━━━━━━━━━━━━━━━━━\n{menu_line}",
         reply_markup=get_old_gmail_menu_keyboard(user_id),
         parse_mode=ParseMode.HTML
     )
@@ -2210,6 +2213,9 @@ async def handle_old_gmail_menu(update: Update, context: ContextTypes.DEFAULT_TY
 
 async def handle_old_single_or_bulk_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
+    if get_setting_val("old_gmail_task_active", "ON") == "OFF":
+        await update.message.reply_text("❌ Old Gmail Work বর্তমানে বন্ধ রয়েছে।", reply_markup=get_old_gmail_menu_keyboard(user_id))
+        return STATE_TASK_OLD_MENU
     btn_text = (update.message.text or "").strip()
     mode = "bulk" if "Bulk" in btn_text else "single"
     context.user_data["old_mode"] = mode
