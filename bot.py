@@ -1163,13 +1163,14 @@ def get_main_keyboard(user_id: int = None, lang: str = None) -> ReplyKeyboardMar
         [kb_btn(tr(l, "btn_task"), style="success")],
         [kb_btn(tr(l, "btn_wallet"), style="primary"), kb_btn(tr(l, "btn_withdraw"), style="danger")],
         [kb_btn(tr(l, "btn_ref"), style="danger"), kb_btn(tr(l, "btn_support"), style="success")],
-        [kb_btn(tr(l, "btn_lang"), style="primary")],
     ]
+    lang_row = [kb_btn(tr(l, "btn_lang"), style="primary")]
+    if get_setting_val("work_rules_active", "ON") == "ON":
+        lang_row.append(kb_btn(tr(l, "btn_work_rules"), style="success"))
+    keyboard.append(lang_row)
     extra_row = []
     if get_setting_val("video_tutorial_active", "OFF") == "ON":
         extra_row.append(kb_btn(tr(l, "btn_video_tutorial"), style="primary"))
-    if get_setting_val("work_rules_active", "ON") == "ON":
-        extra_row.append(kb_btn(tr(l, "btn_work_rules"), style="success"))
     if extra_row:
         keyboard.append(extra_row)
     if user_id and is_admin(user_id):
