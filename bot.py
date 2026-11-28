@@ -391,7 +391,6 @@ MESSAGES = {
         "btn_task": "⚡ Gmail Work",
         "btn_wallet": "👛 Wallet",
         "btn_ref": "👥 My Referrals",
-        "btn_leaderboard": "🏆 Leaderboard",
         "btn_withdraw": "💸 Withdraw",
         "btn_support": "🎧 Support",
         "btn_lang": "🌐 Language",
@@ -489,8 +488,6 @@ MESSAGES = {
         "wd_success_msg": "🧾 **উইথড্র রিসিপ্ট #{wd_id}**\n━━━━━━━━━━━━━━━━━━━━━━\n💳 **মেথড:** {method}\n📞 **অ্যাকাউন্ট:** `{number}`\n💵 **পরিমাণ:** `৳{amount:.2f}`{fee_text}\n⏳ **স্ট্যাটাস:** পেন্ডিং রিভিউ *(১২–২৪ ঘণ্টা)*\n━━━━━━━━━━━━━━━━━━━━━━\n✅ পেমেন্ট সম্পন্ন হলেই আপনাকে নোটিফিকেশন দেওয়া হবে।",
 
         "ref_text": "👥 **আপনার ব্যক্তিগত রেফারেল প্রোগ্রাম** 💎\n━━━━━━━━━━━━━━━━━━━━━━\nআপনার রেফারেল লিঙ্ক ব্যবহার করে বন্ধুদের আমন্ত্রণ জানান। আপনার আমন্ত্রিত কর্মী যতগুলো কাজ সম্পন্ন ও এপ্রুভ করাবে, প্রতিটি কাজের ওপর আপনি পাবেন সরাসরি **{ref_percent}% কমিশন** আপনার ওয়ালেটে।\n\n🔗 **আপনার রেফারেল লিঙ্ক:**\n<code>{ref_link}</code>\n━━━━━━━━━━━━━━━━━━━━━━\n📊 **রেফারেল ট্র্যাকার:**\n• মোট আমন্ত্রিত কর্মী: <code>{ref_count}</code> জন\n• রেফারেল বোনাস থেকে আয়: <code>৳{ref_earnings:.2f}</code>",
-        "leaderboard_title": "🏆 **শীর্ষ ১০ উপার্জনকারী কর্মী (Leaderboard):** 👑\n━━━━━━━━━━━━━━━━━━━━━━\n",
-        "no_leaderboard_data": "কোনো ডেটা এখনো পাওয়া যায়নি।",
         "support_text": "🎧 **সাপোর্ট ও কমিউনিটি সেন্টার**\n━━━━━━━━━━━━━━━━━━━━━━\nযেকোনো সমস্যা, পেমেন্ট তথ্য বা সহায়তার জন্য সরাসরি অ্যাডমিনের সাথে যোগাযোগ করুন এবং অফিশিয়াল চ্যানেলে যুক্ত থাকুন।",
         "btn_admin_support": "Admin Support",
         "btn_official_channel": "Official Channel",
@@ -533,7 +530,6 @@ MESSAGES = {
         "btn_task": "⚡ Gmail Work",
         "btn_wallet": "👛 Wallet",
         "btn_ref": "👥 My Referrals",
-        "btn_leaderboard": "🏆 Leaderboard",
         "btn_withdraw": "💸 Withdraw",
         "btn_support": "🎧 Support",
         "btn_lang": "🌐 Language",
@@ -629,8 +625,6 @@ MESSAGES = {
         "wd_success_msg": "🧾 **Payout Receipt #{wd_id}**\n━━━━━━━━━━━━━━━━━━━━━━\n💳 **Method:** {method}\n📞 **Account:** `{number}`\n💵 **Amount:** `৳{amount:.2f}`{fee_text}\n⏳ **Status:** Pending Review *(12–24 hrs)*\n━━━━━━━━━━━━━━━━━━━━━━\n✅ You will be notified as soon as payment is sent.",
 
         "ref_text": "👥 **My Referral Program**\n\nInvite your friends using your referral link. You will earn a direct **{ref_percent}% commission** on EVERY task your referred worker completes and gets approved.\n\n🔗 **Your Personal Referral Link:**\n<code>{ref_link}</code>\n\n📊 **Your Referral Tracker:**\n• Total Invited Workers: <code>{ref_count}</code>\n• Total Referral Earnings: <code>৳{ref_earnings:.2f}</code>",
-        "leaderboard_title": "🏆 **Top 10 Earners:**\n\n",
-        "no_leaderboard_data": "No data available yet.",
         "support_text": "🎧 **Support & Community Center**\n━━━━━━━━━━━━━━━━━━━━━━\nContact our support team for any help or payout inquiry, and stay connected with our official channel.",
         "btn_admin_support": "Admin Support",
         "btn_official_channel": "Official Channel",
@@ -1099,7 +1093,7 @@ def get_gmail_done_keyboard(user_id: int = None):
 def is_menu_or_admin_button(text: str) -> bool:
     if not text:
         return False
-    known_buttons = ['↩️ Back to Gmail Work', '⏳ Held Tasks', '♻️ Old Gmail Categories', '♻️ Old Gmail Work', '♻️ Single Old Gmail', '⚙️ System Settings', '🎬 Video Tutorial', '📖 Work Rules', '⚡ Gmail Work', '✅ Approve All', '✅ Submit Gmail', '✖️ Cancel', '✖️ Reject All', '✦ New Gmail Work', '✦ Single New Gmail', '🌐 Language', '🎧 Support', '🏆 Leaderboard', '🏠 Main Menu', '🏷️ Price Manager', '👑 Admin Control', '👑 Admin Menu', '👑 Admin Panel', '👛 Wallet', '👥 My Referrals', '👥 User Management', '💎 USDT (BEP-20)', '💳 Bkash', '💳 Nagad', '💸 Withdraw', '💸 Withdraw Requests', '💾 Backup DB', '📂 User Export', '📈 Live Stats', '📊 Spreadsheet UI', '📢 Broadcast', '📦 Bulk Gmail Work', '📦 Bulk New Gmail', '📦 Bulk Old Gmail', '📩 Pending Tasks', '🔄 Restore DB', '🔍 Task Search', '🔐 New Gmail 2FA', '🔐 Old Gmail 2FA', '🔑 Password Manager', '🔶 Binance UID']
+    known_buttons = ['↩️ Back to Gmail Work', '⏳ Held Tasks', '♻️ Old Gmail Categories', '♻️ Old Gmail Work', '♻️ Single Old Gmail', '⚙️ System Settings', '🎬 Video Tutorial', '📖 Work Rules', '⚡ Gmail Work', '✅ Approve All', '✅ Submit Gmail', '✖️ Cancel', '✖️ Reject All', '✦ New Gmail Work', '✦ Single New Gmail', '🌐 Language', '🎧 Support', '🏠 Main Menu', '🏷️ Price Manager', '👑 Admin Control', '👑 Admin Menu', '👑 Admin Panel', '👛 Wallet', '👥 My Referrals', '👥 User Management', '💎 USDT (BEP-20)', '💳 Bkash', '💳 Nagad', '💸 Withdraw', '💸 Withdraw Requests', '💾 Backup DB', '📂 User Export', '📈 Live Stats', '📊 Spreadsheet UI', '📢 Broadcast', '📦 Bulk Gmail Work', '📦 Bulk New Gmail', '📦 Bulk Old Gmail', '📩 Pending Tasks', '🔄 Restore DB', '🔍 Task Search', '🔐 New Gmail 2FA', '🔐 Old Gmail 2FA', '🔑 Password Manager', '🔶 Binance UID']
     return text in known_buttons
 
 FIRST_NAMES = ["Sohan", "Kamal", "Robi", "Arif", "Nayan", "Sumon", "Rashed", "Alim", "Nusrat", "Riya", "Fariha", "Mim"]
@@ -1168,8 +1162,8 @@ def get_main_keyboard(user_id: int = None, lang: str = None) -> ReplyKeyboardMar
     keyboard = [
         [kb_btn(tr(l, "btn_task"), style="success")],
         [kb_btn(tr(l, "btn_wallet"), style="primary"), kb_btn(tr(l, "btn_withdraw"), style="danger")],
-        [kb_btn(tr(l, "btn_ref"), style="danger"), kb_btn(tr(l, "btn_leaderboard"), style="success")],
-        [kb_btn(tr(l, "btn_support"), style="success"), kb_btn(tr(l, "btn_lang"), style="primary")],
+        [kb_btn(tr(l, "btn_ref"), style="danger"), kb_btn(tr(l, "btn_support"), style="success")],
+        [kb_btn(tr(l, "btn_lang"), style="primary")],
     ]
     extra_row = []
     if get_setting_val("video_tutorial_active", "OFF") == "ON":
@@ -3289,7 +3283,7 @@ async def handle_withdraw_amount(update: Update, context: ContextTypes.DEFAULT_T
     return ConversationHandler.END
 
 # -----------------------------------------------------------------------------
-# REFERRAL, LEADERBOARD, SUPPORT, LANGUAGE
+# REFERRAL, SUPPORT, LANGUAGE
 # -----------------------------------------------------------------------------
 
 async def handle_referrals(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -3336,30 +3330,6 @@ async def handle_referrals(update: Update, context: ContextTypes.DEFAULT_TYPE):
         [ikb_btn("Share Referral Link", style="success", url=share_url)]
     ])
     await update.message.reply_text(ref_text, reply_markup=share_kb, parse_mode=ParseMode.HTML)
-
-async def handle_leaderboard(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    clear_user_state(context)
-    user_id = update.effective_user.id
-    is_joined, _ = await check_force_join(user_id, context)
-    if not is_joined:
-        await start_command(update, context)
-        return ConversationHandler.END
-
-    with get_db() as conn:
-        cursor = conn.cursor()
-        cursor.execute("SELECT full_name, balance FROM users WHERE is_banned = 0 ORDER BY balance DESC LIMIT 10")
-        top_earners = cursor.fetchall()
-
-    leaderboard = tr(user_id, "leaderboard_title")
-    if not top_earners:
-        leaderboard += tr(user_id, "no_leaderboard_data")
-    else:
-        for idx, row in enumerate(top_earners, 1):
-            name = html.escape(row["full_name"])
-            badge = "🥇" if idx == 1 else "🥈" if idx == 2 else "🥉" if idx == 3 else f"{idx}."
-            leaderboard += f"{badge} **{name}** — ৳{row['balance']:.2f}\n"
-
-    await update.message.reply_text(leaderboard, reply_markup=get_main_keyboard(user_id), parse_mode=ParseMode.MARKDOWN)
 
 
 async def handle_video_tutorial(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -6147,7 +6117,6 @@ def main():
     btn_wallet_re = r"^👛\ Wallet$"
     btn_withdraw_re = r"^💸\ Withdraw$"
     btn_ref_re = r"^👥\ My\ Referrals$"
-    btn_leaderboard_re = r"^🏆\ Leaderboard$"
     btn_support_re = r"^🎧\ Support$"
     btn_video_tut_re = r"^🎬\ Video\ Tutorial$"
     btn_work_rules_re = r"^📖\ Work\ Rules$"
@@ -6204,7 +6173,7 @@ def main():
     btn_adm_hub_used_re = r"^💠\ New\ Used\ Gmail\ \(Admin\)$"
     btn_adm_hub_old_re = r"^♻️\ Old\ Gmail\ \(Admin\)$"
 
-    all_menu_buttons_re = r"^(🎬\ Video\ Tutorial|📖\ Work\ Rules|⚡\ Gmail\ Work|👛\ Wallet|👥\ My\ Referrals|🏆\ Leaderboard|💸\ Withdraw|🎧\ Support|🌐\ Language|👑\ Admin\ Panel|🏠\ Main\ Menu|✖️\ Cancel|✦\ New\ Fresh\ Gmail|📦\ Bulk\ Gmail\ Work|♻️\ Old\ Gmail\ Work|✦\ Single\ Fresh\ Gmail|📦\ Bulk\ Fresh\ Gmail|🔐\ Fresh\ Gmail\ 2FA|♻️\ Single\ Old\ Gmail|📦\ Bulk\ Old\ Gmail|🔐\ Old\ Gmail\ 2FA|↩️\ Back\ to\ Gmail\ Work|✅\ Submit\ Gmail|💳\ Bkash|💳\ Nagad|💎\ USDT\ \(BEP\-20\)|🔶\ Binance\ UID|📩\ Pending\ Tasks|⏳\ Held\ Tasks|🔍\ Task\ Search|📂\ User\ Export|🔑\ Password\ Manager|🏷️\ Price\ Manager|💸\ Withdraw\ Requests|⚙️\ System\ Settings|📈\ Live\ Stats|📢\ Broadcast|💾\ Backup\ DB|🔄\ Restore\ DB|♻️\ Old\ Gmail\ Categories|✅\ Approve\ All|✖️\ Reject\ All|📊\ Spreadsheet\ UI|👥\ User\ Management|👑\ Admin\ Control|👑\ Admin\ Menu|💠\ New\ Used\ Gmail|💠\ Single\ Used\ Gmail|📦\ Bulk\ Used\ Gmail|📋\ Tasks\ &\ Payouts|🏷️\ Prices\ &\ Passwords|👥\ Users\ &\ Broadcast|⚙️\ Settings\ &\ Backup|↩️\ Back\ to\ Admin\ Panel|✦\ New\ Fresh\ Gmail\ \(Admin\)|💠\ New\ Used\ Gmail\ \(Admin\)|♻️\ Old\ Gmail\ \(Admin\))$"
+    all_menu_buttons_re = r"^(🎬\ Video\ Tutorial|📖\ Work\ Rules|⚡\ Gmail\ Work|👛\ Wallet|👥\ My\ Referrals|💸\ Withdraw|🎧\ Support|🌐\ Language|👑\ Admin\ Panel|🏠\ Main\ Menu|✖️\ Cancel|✦\ New\ Fresh\ Gmail|📦\ Bulk\ Gmail\ Work|♻️\ Old\ Gmail\ Work|✦\ Single\ Fresh\ Gmail|📦\ Bulk\ Fresh\ Gmail|🔐\ Fresh\ Gmail\ 2FA|♻️\ Single\ Old\ Gmail|📦\ Bulk\ Old\ Gmail|🔐\ Old\ Gmail\ 2FA|↩️\ Back\ to\ Gmail\ Work|✅\ Submit\ Gmail|💳\ Bkash|💳\ Nagad|💎\ USDT\ \(BEP\-20\)|🔶\ Binance\ UID|📩\ Pending\ Tasks|⏳\ Held\ Tasks|🔍\ Task\ Search|📂\ User\ Export|🔑\ Password\ Manager|🏷️\ Price\ Manager|💸\ Withdraw\ Requests|⚙️\ System\ Settings|📈\ Live\ Stats|📢\ Broadcast|💾\ Backup\ DB|🔄\ Restore\ DB|♻️\ Old\ Gmail\ Categories|✅\ Approve\ All|✖️\ Reject\ All|📊\ Spreadsheet\ UI|👥\ User\ Management|👑\ Admin\ Control|👑\ Admin\ Menu|💠\ New\ Used\ Gmail|💠\ Single\ Used\ Gmail|📦\ Bulk\ Used\ Gmail|📋\ Tasks\ &\ Payouts|🏷️\ Prices\ &\ Passwords|👥\ Users\ &\ Broadcast|⚙️\ Settings\ &\ Backup|↩️\ Back\ to\ Admin\ Panel|✦\ New\ Fresh\ Gmail\ \(Admin\)|💠\ New\ Used\ Gmail\ \(Admin\)|♻️\ Old\ Gmail\ \(Admin\))$"
     not_menu_text = filters.TEXT & ~filters.COMMAND & ~filters.Regex(all_menu_buttons_re)
 
     common_nav_fallbacks = [
@@ -6227,7 +6196,6 @@ def main():
         MessageHandler(filters.Regex(btn_back_gmail_work_re), handle_task_menu),
         MessageHandler(filters.Regex(btn_wallet_re), _auto_cancel_to(handle_wallet_menu)),
         MessageHandler(filters.Regex(btn_ref_re), _auto_cancel_to(handle_referrals)),
-        MessageHandler(filters.Regex(btn_leaderboard_re), _auto_cancel_to(handle_leaderboard)),
         MessageHandler(filters.Regex(btn_support_re), _auto_cancel_to(handle_support)),
         MessageHandler(filters.Regex(btn_video_tut_re), _auto_cancel_to(handle_video_tutorial)),
         MessageHandler(filters.Regex(btn_work_rules_re), _auto_cancel_to(handle_work_rules)),
@@ -6384,7 +6352,6 @@ def main():
     app.add_handler(CommandHandler("start", start_command), group=0)
     app.add_handler(MessageHandler(filters.Regex(btn_wallet_re), handle_wallet_menu), group=0)
     app.add_handler(MessageHandler(filters.Regex(btn_ref_re), handle_referrals), group=0)
-    app.add_handler(MessageHandler(filters.Regex(btn_leaderboard_re), handle_leaderboard), group=0)
     app.add_handler(MessageHandler(filters.Regex(btn_support_re), handle_support), group=0)
     app.add_handler(MessageHandler(filters.Regex(btn_video_tut_re), handle_video_tutorial), group=0)
     app.add_handler(MessageHandler(filters.Regex(btn_work_rules_re), handle_work_rules), group=0)
